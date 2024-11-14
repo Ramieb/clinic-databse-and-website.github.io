@@ -3,75 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Profile</title>
-    <link rel="stylesheet" href="../styles.css">
+    <title>Doctor Dashboard - Manage Doctors</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="js/doctorActions.js" defer></script> <!-- Separate JavaScript file for actions -->
 </head>
 <body>
-    <div class="dashboard">
-        <h1>Doctor Profile</h1>
-
-        <!-- Logout Button -->
-        <button id="logoutButton">Logout</button>
-
-        <!-- Doctor Information Section -->
-        <section id="doctor-info" class="section active">
-            <h2>Doctor Information</h2>
-            <p><strong>Name:</strong> <span id="doctor-name"></span></p>
-            <p><strong>Specialization:</strong> <span id="doctor-specialization"></span></p>
-            <p><strong>Contact:</strong> <span id="doctor-contact"></span></p>
-        </section>
-
-        <!-- Toggle buttons to expand/collapse other sections -->
-        <button class="toggle-button" data-section="patients-section">Patients</button>
-        <section id="patients-section" class="section">
-            <h2>Patients</h2>
-            <table id="patients-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Contact</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </section>
-
-        <button class="toggle-button" data-section="appointments-section">Appointments</button>
-        <section id="appointments-section" class="section">
-            <h2>Appointments</h2>
-            <table id="appointments-table">
-                <thead>
-                    <tr>
-                        <th>Patient ID</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Reason</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </section>
-
-        <button class="toggle-button" data-section="medical-records-section">Medical Records</button>
-        <section id="medical-records-section" class="section">
-            <h2>Medical Records</h2>
-            <input type="number" id="patient-id-input" placeholder="Enter Patient ID">
-            <button onclick="fetchMedicalRecords()">View Records</button>
-            <table id="medical-records-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Diagnosis</th>
-                        <th>Treatment</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </section>
+    <!-- Navbar -->
+    <div class="navbar">
+        <img src="logo.png" alt="Company Logo" class="logo">
+        <div class="navbar-right">
+            <i class="fas fa-bell notification-icon"></i>
+            <i class="fas fa-envelope message-icon"></i>
+            <img src="profile.jpg" alt="Profile Photo" class="profile-photo">
+            <span class="user-id">Admin123</span>
+        </div>
     </div>
+    
+    <!-- Container -->
+    <div class="container">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="admin.html">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="doctors.html">
+                        <i class="fas fa-user-md"></i> Doctors
+                    </a>
+                </li>
+                <li>
+                    <a href="doctorSchedule.html">
+                        <i class="fas fa-calendar"></i> Doctor Schedule
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_patients.html">
+                        <i class="fas fa-user"></i> Patients
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_appointments.html">
+                        <i class="fas fa-calendar-check"></i> Appointments
+                    </a>
+                </li>
+                <li>
+                    <a href="employees.html">
+                        <i class="fas fa-users"></i> Employees
+                    </a>    
+                </li>
+            </ul>
+        </div>
 
-    <script src="../frontend/doctor.js"></script>
+        <!-- Main Content for Doctors Management -->
+        <div class="main-content">
+            <h2>Manage Doctors</h2>
+            <div class="table-actions">
+                <button onclick="window.location.href='addDoctor.html'" class="add-doctor-btn">Add Doctor</button>
+            </div>
+            
+            <!-- Doctors Table -->
+            <table id="doctors-table">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Specialty</th>
+                        <th>Salary</th>
+                        <th>Office Id</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be dynamically populated with JavaScript -->
+                    <tr>
+                        <td>John</td>
+                        <td>Doe</td>
+                        <td>Cardiology</td>
+                        <td>$120,000</td>
+                        <td>1</td>
+                        <td>
+                            <button class="edit-btn">Edit</button>
+                            <button class="delete-btn">Delete</button>
+                        </td>
+                    </tr>
+                    <!-- Additional rows can be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 </html>
