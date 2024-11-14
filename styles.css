@@ -203,32 +203,11 @@ button:hover {
     margin: 10px 0;
     display: none; /* Initially hidden */
 }
+
 .section.active {
     display: block; /* Show when active */
 }
-.toggle-button {
-    cursor: pointer;
-    color: #007bff;
-    text-decoration: none;
-    background: none;
-    border: none;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    width: 100%;
-    text-align: left;
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    margin-top: 5px;
-}
-.toggle-button:focus {
-    outline: none;
-}
-.toggle-button span {
-    font-weight: bold;
-    margin-right: 8px;
-}
+
 .logout-button {
     position: absolute;
     top: 10px;

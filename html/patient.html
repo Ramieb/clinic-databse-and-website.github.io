@@ -7,8 +7,33 @@
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
-           <!-- Sections for each category under the appointments navbar -->
-           <section id="prescriptions" class="section">
+    <!-- Navbar with links for sections and logout -->
+    <header class="header">
+        <nav class="navbar">
+            <a href="#prescriptions" class="nav-link">Prescriptions</a>
+            <a href="#billing-info" class="nav-link">Billing Information</a>
+            <a href="#medications" class="nav-link">Medications</a>
+            <a href="#allergies" class="nav-link">Allergies</a>
+            <a href="#illnesses" class="nav-link">Illnesses</a>
+            <a href="#surgeries" class="nav-link">Surgeries</a>
+            <a href="#immunizations" class="nav-link">Immunizations</a>
+            <a href="#med-history" class="nav-link">Medical History</a>
+            <a href="#payment" class="nav-link">Payment</a>
+            <a href="#referrals" class="nav-link">Referrals</a>
+            <a href="#" id="logoutButton" class="nav-link logout-link">Logout</a>
+        </nav>
+    </header>
+
+    <div class="dashboard">
+        <h1>Patient Profile</h1>
+
+        <!-- Main Content Section -->
+        <section id="upcoming-appointments" class="section active">
+            <h2>Upcoming Appointments</h2>
+            <div id="appointmentContent">Loading upcoming appointments...</div>
+        </section>
+
+        <section id="prescriptions" class="section">
             <h2>Prescriptions</h2>
             <div id="prescriptionContent">No prescriptions found.</div>
         </section>
@@ -16,6 +41,16 @@
         <section id="billing-info" class="section">
             <h2>Billing Information</h2>
             <div id="billingContent">No billing information found.</div>
+        </section>
+
+        <section id="payment" class="section">
+            <h2>Payment</h2>
+            <div id="paymentContent">No payment records found.</div>
+        </section>
+
+        <section id="referrals" class="section">
+            <h2>Referrals</h2>
+            <div id="referralContent">No referrals found.</div>
         </section>
 
         <section id="medications" class="section">
@@ -46,41 +81,6 @@
         <section id="med-history" class="section">
             <h2>Medical History</h2>
             <div id="medHistoryContent">No medical history found.</div>
-        </section>
-    <button id="logoutButton" class="logout-button">Logout</button>
-    <div class="dashboard">
-        <h1>Patient Profile</h1>
-
-        <!-- Upcoming Appointments -->
-        <section id="upcoming-appointments" class="section active">
-            <h2>Upcoming Appointments</h2>
-            <div id="appointmentContent">Loading upcoming appointments...</div>
-        </section>
-
-        <!-- Navbar for other sections under appointments -->
-        <nav class="appointment-navbar">
-            <button class="nav-button" data-section="prescriptions">Prescriptions</button>
-            <button class="nav-button" data-section="billing-info">Billing Information</button>
-            <button class="nav-button" data-section="medications">Medications</button>
-            <button class="nav-button" data-section="allergies">Allergies</button>
-            <button class="nav-button" data-section="illnesses">Illnesses</button>
-            <button class="nav-button" data-section="surgeries">Surgeries</button>
-            <button class="nav-button" data-section="immunizations">Immunizations</button>
-            <button class="nav-button" data-section="med-history">Medical History</button>
-        </nav>
-
-        <!-- Payment and Referrals sections remain as separate buttons -->
-        <button class="toggle-button" data-section="payment">Payment</button>
-        <section id="payment" class="section">
-            <h2>Payment</h2>
-            <div id="paymentContent">No payment records found.</div>
-            <button id="payHereButton" class="pay-here-button">Pay Here</button>
-        </section>
-
-        <button class="toggle-button" data-section="referrals">Referrals</button>
-        <section id="referrals" class="section">
-            <h2>Referrals</h2>
-            <div id="referralContent">No referrals found.</div>
         </section>
     </div>
 

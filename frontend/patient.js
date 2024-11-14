@@ -136,8 +136,6 @@ function loadReferrals(username) {
         });
 }
 
-// Additional functions for each section, similar to the above
-
 // Function to load medications
 function loadMedications(username) {
     fetch(`/api/patient/medications/${username}`)
@@ -258,4 +256,3 @@ function loadMedicalHistory(username) {
             document.getElementById('medicalHistoryContent').innerHTML = 'Error loading medical history.';
         });
 }
-
