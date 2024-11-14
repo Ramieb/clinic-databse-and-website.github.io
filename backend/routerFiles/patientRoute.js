@@ -6,11 +6,14 @@ const db = require('../db');
 
 // Function to get payment data
 function getPaymentData(username) {
+    console.log('start of getPaymentData');
     return new Promise((resolve, reject) => {
         const query = `SELECT * FROM Payment WHERE username = ?`;
+        console.log('selected data from Payment table');
         db.query(query, [username], (error, results) => {
             if (error) reject(error);
             resolve(results);
+            console.log('results gotten');
         });
     });
 }

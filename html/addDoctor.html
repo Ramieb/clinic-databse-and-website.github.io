@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - Add Doctor</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="js/addDoctor.js" defer></script> <!-- Separate JavaScript file -->
+    <!-- <script type="text/javascript" src="https://form.jotform.com/jsform/243018434215044"></script> -->
+</head>
+<body>
+    <div class="navbar">
+        <img src="logo.png" alt="Company Logo" class="logo">
+        <div class="navbar-right">
+            <i class="fas fa-bell notification-icon"></i>
+            <i class="fas fa-envelope message-icon"></i>
+            <img src="profile.jpg" alt="Profile Photo" class="profile-photo">
+            <span class="user-id">Admin123</span>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="admin.html">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="doctors.html">
+                        <i class="fas fa-user-md"></i> Doctors
+                    </a>
+                </li>
+                <li>
+                    <a href="doctorSchedule.html">
+                        <i class="fas fa-calendar"></i> Doctor Schedule
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_patients.html">
+                        <i class="fas fa-user"></i> Patients
+                    </a>
+                </li>
+                <li>
+                    <a href="appointments.html">
+                        <i class="fas fa-calendar-check"></i> Appointments
+                    </a>
+                </li>
+                <li>
+                    <a href="employees.html">
+                        <i class="fas fa-users"></i> Employees
+                    </a>    
+                </li>
+            </ul>
+        </div>
+        <form>
+            <h2>Employee Information</h2>
+            <div class="form-group">
+                <label for="first-name">First Name:</label>
+                <input type="text" id="first-name" name="first_name" required>
+            </div>
+            <div class="form-group">
+                <label for="last-name">Last Name:</label>
+                <input type="text" id="last-name" name="last_name" required>
+            </div>
+            <div class="form-group">
+                <label   
+     for="phone-number">Phone Number:</label>
+                <input type="tel" id="phone-number" name="phone_number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
+            </div>   
+    
+            <div class="form-group">
+                <label for="ssn">SSN:</label>
+                <input type="text" id="ssn" name="ssn" pattern="[0-9]{3}-[0-9]{2}-[0-9]{4}" required>
+            </div>
+            <div class="form-group">
+                <label for="specialty">Specialty:</label>
+                <select id="specialty" name="specialty" required>
+                    <option   
+     value="">Please Select</option>
+                    <option value="Cardiologist">Cardiologist</option>
+                    <option value="Dermatologist">Dermatologist</option>
+                    <option value="Pediatrician">Pediatrician</option>   
+    
+                </select>   
+    
+            </div>
+            <div class="form-group">
+                <label for="office-id">Office ID:</label>
+                <input type="text" id="office-id" name="office_id" required>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <!--
+        <div class="main-content">
+            <h2>Add Doctor</h2>
+            <form id="addDoctorForm">
+                <label for="employee_ssn">Employee SSN:</label>
+                <input type="text" id="employee_ssn" name="employee_ssn" maxlength="9" required>
+
+                <label for="admin_ssn">Admin SSN:</label>
+                <input type="text" id="admin_ssn" name="admin_ssn" maxlength="11">
+
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" name="first_name" maxlength="50" required>
+
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" name="last_name" maxlength="50" required>
+
+                <label for="hire_date">Hire Date (YYYY-MM-DD):</label>
+                <input type="date" id="hire_date" name="hire_date" required>
+
+                <label for="salary">Salary:</label>
+                <input type="number" id="salary" name="salary" required>
+
+                <label for="office_id">Office ID:</label>
+                <input type="number" id="office_id" name="office_id">
+
+                <label for="specialty">Specialty:</label>
+                <input type="text" id="specialty" name="specialty" maxlength="25">
+
+                <label for="specialist">Specialist:</label>
+                <select id="specialist" name="specialist">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+
+                <label for="cost">Cost:</label>
+                <input type="number" id="cost" name="cost">
+
+                <button type="submit">Add Doctor</button>
+            </form>
+        </div>
+    -->
+    </div>
+</body>
+</html>

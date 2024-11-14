@@ -1,66 +1,68 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db'); // Adjust path if needed
+const db = require('../db');  // Database connection file
 
-// Route to get doctor details by ID
-router.get('/:doctorId', async (req, res) => {
-    const { doctorId } = req.params;
+// Route to get doctor information based on user ID
+router.get('/:id', async (req, res) => {
+    const doctorId = req.params.id;
+
     try {
-        const [doctor] = await db.query('SELECT * FROM Doctor WHERE doctor_id = ?', [doctorId]);
-        if (doctor) {
-            res.json({
-                name: `${doctor.first_name} ${doctor.last_name}`,
-                specialization: doctor.specialty,
-                contact: doctor.contact || 'Not provided'
-            });
+        const [doctorRows] = await db.query(
+            'SELECT * FROM Doctors WHERE id = ?',
+            [doctorId]
+        );
+
+        if (doctorRows.length > 0) {
+            res.json(doctorRows[0]);  // Send doctor info as JSON
         } else {
             res.status(404).json({ message: 'Doctor not found' });
         }
     } catch (error) {
-        console.error('Error fetching doctor data:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error("Error fetching doctor data:", error.message);
+        res.status(500).json({ message: 'Server error' });
     }
-});
+});  // <-- Closing parenthesis for the router.get('/:id') route
 
-// Route to get all patients under the doctor
-router.get('/doctorActions/patients', async (req, res) => {
+// Route to get all patients
+router.get('/patients', async (req, res) => {
     try {
-        const patients = await db.query('SELECT patient_id AS id, CONCAT(first_name, " ", last_name) AS name, phone_number AS contact FROM Patient');
+        const [patients] = await db.query('SELECT * FROM Patients');
         res.json(patients);
     } catch (error) {
-        console.error('Error fetching patients:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error("Error fetching patients:", error.message);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Route to get all appointments for the doctor
-router.get('/doctorActions/appointments/:doctorId', async (req, res) => {
-    const { doctorId } = req.params;
+// Route to get doctor’s appointments
+router.get('/appointments/:doctorId', async (req, res) => {
+    const doctorId = req.params.doctorId;
+
     try {
-        const appointments = await db.query(`
-            SELECT a.patient_id, a.date, a.time, a.reason 
-            FROM Appointment a 
-            JOIN Doctor d ON a.doctor_id = d.doctor_id
-            WHERE d.doctor_id = ?`, [doctorId]);
+        const [appointments] = await db.query(
+            'SELECT * FROM Appointments WHERE doctor_id = ?',
+            [doctorId]
+        );
         res.json(appointments);
     } catch (error) {
-        console.error('Error fetching appointments:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error("Error fetching appointments:", error.message);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Route to get medical records for a specific patient
-router.get('/doctorActions/medicalRecords/:patientId', async (req, res) => {
-    const { patientId } = req.params;
+// Route to get a patient's medical records
+router.get('/medicalRecords/:patientId', async (req, res) => {
+    const patientId = req.params.patientId;
+
     try {
-        const records = await db.query(`
-            SELECT date, diagnosis, treatment, notes 
-            FROM MedicalRecord 
-            WHERE patient_id = ?`, [patientId]);
-        res.json(records);
+        const [medicalRecords] = await db.query(
+            'SELECT * FROM MedicalRecords WHERE patient_id = ?',
+            [patientId]
+        );
+        res.json(medicalRecords);       
     } catch (error) {
-        console.error('Error fetching medical records:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error("Error fetching doctor data:", error.message);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
