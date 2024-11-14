@@ -16,17 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error("No username provided in URL");
         document.getElementById('appointmentContent').innerHTML = 'Username is missing from the URL.';
-        return; // Exit if no username
+        return;
     }
 
-    // Event listener for logout button
-    const logoutButton = document.getElementById('logoutButton');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            window.location.href = '../index.html'; // Redirects to the home or login page
-        });
-    }
+    // Event listener for logout link
+    document.querySelector('.logout-link').addEventListener('click', (event) => {
+        event.preventDefault(); // Prevent the default link behavior
+        window.location.href = '../index.html'; // Redirects to the home or login page
+    });
 });
 
 // Function to load upcoming appointments
