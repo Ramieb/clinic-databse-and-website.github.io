@@ -20,7 +20,7 @@
             <a href="#med-history" class="nav-link">Medical History</a>
             <a href="#payment" class="nav-link">Payment</a>
             <a href="#referrals" class="nav-link">Referrals</a>
-            <a href="#" id="logoutButton" class="nav-link logout-link">Logout</a>
+            <a href="#" id="logoutButton" class="nav-link logout-link" onclick="handleLogout()">Logout</a>
         </nav>
     </header>
 
@@ -85,5 +85,13 @@
     </div>
 
     <script src="../frontend/patient.js"></script>
+    <script>
+        function handleLogout() {
+            // Prevent default action for the logout link
+            event.preventDefault();
+            // Redirect or perform other logout actions
+            window.location.href = '../index.html';
+        }
+    </script>
 </body>
 </html>

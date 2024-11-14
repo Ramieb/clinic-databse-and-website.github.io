@@ -197,6 +197,7 @@ button:hover {
     color: #555;
 }
 
+/* Section display control */
 .section {
     border: 1px solid #ccc;
     padding: 10px;
@@ -208,6 +209,7 @@ button:hover {
     display: block; /* Show when active */
 }
 
+/* Logout Button */
 .logout-button {
     position: absolute;
     top: 10px;
@@ -220,6 +222,7 @@ button:hover {
     border-radius: 5px;
 }
 
+/* Payment Button */
 .pay-here-button {
     background-color: #ff0000;
     color: white;
