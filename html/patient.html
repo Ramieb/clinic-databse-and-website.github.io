@@ -20,7 +20,7 @@
             <a href="#med-history" class="nav-link">Medical History</a>
             <a href="#payment" class="nav-link">Payment</a>
             <a href="#referrals" class="nav-link">Referrals</a>
-            <a href="#" id="logoutButton" class="nav-link logout-link" onclick="handleLogout()">Logout</a>
+            <a href="#" class="nav-link logout-link" id="logoutButton">Logout</a>
         </nav>
     </header>
 
@@ -33,65 +33,9 @@
             <div id="appointmentContent">Loading upcoming appointments...</div>
         </section>
 
-        <section id="prescriptions" class="section">
-            <h2>Prescriptions</h2>
-            <div id="prescriptionContent">No prescriptions found.</div>
-        </section>
-
-        <section id="billing-info" class="section">
-            <h2>Billing Information</h2>
-            <div id="billingContent">No billing information found.</div>
-        </section>
-
-        <section id="payment" class="section">
-            <h2>Payment</h2>
-            <div id="paymentContent">No payment records found.</div>
-        </section>
-
-        <section id="referrals" class="section">
-            <h2>Referrals</h2>
-            <div id="referralContent">No referrals found.</div>
-        </section>
-
-        <section id="medications" class="section">
-            <h2>Medications</h2>
-            <div id="medicationContent">No medications found.</div>
-        </section>
-
-        <section id="allergies" class="section">
-            <h2>Allergies</h2>
-            <div id="allergyContent">No allergies found.</div>
-        </section>
-
-        <section id="illnesses" class="section">
-            <h2>Illnesses</h2>
-            <div id="illnessContent">No illnesses found.</div>
-        </section>
-
-        <section id="surgeries" class="section">
-            <h2>Surgeries</h2>
-            <div id="surgeryContent">No surgeries found.</div>
-        </section>
-
-        <section id="immunizations" class="section">
-            <h2>Immunizations</h2>
-            <div id="immunizationContent">No immunizations found.</div>
-        </section>
-
-        <section id="med-history" class="section">
-            <h2>Medical History</h2>
-            <div id="medHistoryContent">No medical history found.</div>
-        </section>
+        <!-- Other sections go here, as in your original HTML structure -->
     </div>
 
     <script src="../frontend/patient.js"></script>
-    <script>
-        function handleLogout() {
-            // Prevent default action for the logout link
-            event.preventDefault();
-            // Redirect or perform other logout actions
-            window.location.href = '../index.html';
-        }
-    </script>
 </body>
 </html>

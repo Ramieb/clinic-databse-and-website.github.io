@@ -19,33 +19,23 @@ document.addEventListener('DOMContentLoaded', () => {
         return; // Exit if no username
     }
 
-    // Attach event listeners for toggle buttons
-    document.querySelectorAll('.toggle-button').forEach(button => {
-        button.addEventListener('click', () => {
-            const section = button.getAttribute('data-section');
-            toggleSection(section);
-        });
-    });
-
     // Event listener for logout button
     const logoutButton = document.getElementById('logoutButton');
     if (logoutButton) {
-        logoutButton.addEventListener('click', () => {
+        logoutButton.addEventListener('click', (event) => {
+            event.preventDefault();
             window.location.href = '../index.html'; // Redirects to the home or login page
         });
     }
 });
 
-// Toggle the visibility of a section
-function toggleSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    section.classList.toggle('active');
-}
-
 // Function to load upcoming appointments
 function loadUpcomingAppointments(username) {
     fetch(`/api/patient/appointments/${username}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             let content = '';
             data.forEach(appointment => {
@@ -66,7 +56,10 @@ function loadUpcomingAppointments(username) {
 // Function to load billing information
 function loadBillingInfo(username) {
     fetch(`/api/patient/billing/${username}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             let content = '';
             data.forEach(bill => {
@@ -87,7 +80,10 @@ function loadBillingInfo(username) {
 // Function to load payment information and show "Pay Here" button if payment is due
 function loadPaymentInfo(username) {
     fetch(`/api/patient/payments/${username}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             let content = '';
             let paymentDue = false;
@@ -102,7 +98,7 @@ function loadPaymentInfo(username) {
             
             // Enable "Pay Here" button if payment is due
             const payHereButton = document.getElementById('payHereButton');
-            if (paymentDue) {
+            if (paymentDue && payHereButton) {
                 payHereButton.classList.add('active');
                 payHereButton.addEventListener('click', () => {
                     alert('Payment processing...');
@@ -118,14 +114,17 @@ function loadPaymentInfo(username) {
 // Function to load referrals
 function loadReferrals(username) {
     fetch(`/api/patient/referrals/${username}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             let content = '';
             data.forEach(referral => {
                 content += `<p>Primary Doctor: ${referral.primary_doc}</p>`;
                 content += `<p>Specialist: ${referral.specialist}</p>`;
                 content += `<p>Referral Date: ${referral.ref_date}</p>`;
-                content += `<p>Expiration: ${referral.experiation}</p>`;
+                content += `<p>Expiration: ${referral.expiration}</p>`;
                 content += `<hr>`;
             });
             document.getElementById('referralContent').innerHTML = content || 'No referrals found.';
@@ -139,7 +138,10 @@ function loadReferrals(username) {
 // Function to load medications
 function loadMedications(username) {
     fetch(`/api/patient/medications/${username}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             let content = '';
             data.forEach(med => {
@@ -160,7 +162,10 @@ function loadMedications(username) {
 // Function to load allergies
 function loadAllergies(username) {
     fetch(`/api/patient/allergies/${username}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             let content = '';
             data.forEach(allergy => {
@@ -179,7 +184,10 @@ function loadAllergies(username) {
 // Function to load illnesses
 function loadIllnesses(username) {
     fetch(`/api/patient/illnesses/${username}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             let content = '';
             data.forEach(illness => {
@@ -198,7 +206,10 @@ function loadIllnesses(username) {
 // Function to load surgeries
 function loadSurgeries(username) {
     fetch(`/api/patient/surgeries/${username}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             let content = '';
             data.forEach(surgery => {
@@ -219,7 +230,10 @@ function loadSurgeries(username) {
 // Function to load immunizations
 function loadImmunizations(username) {
     fetch(`/api/patient/immunizations/${username}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             let content = '';
             data.forEach(immunization => {
@@ -239,7 +253,10 @@ function loadImmunizations(username) {
 // Function to load medical history
 function loadMedicalHistory(username) {
     fetch(`/api/patient/medicalHistory/${username}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             let content = '';
             data.forEach(record => {
