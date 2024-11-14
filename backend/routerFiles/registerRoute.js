@@ -5,7 +5,7 @@ const router = express.Router();
 const db = require('../db');
 
 router.post('/', async (req, res) => {
-    const { username, password, role } = req.body;
+    const { username, password } = req.body; // Removed 'role' from the request body
     
     // Log the incoming registration attempt
     console.log("Registration attempt:", req.body);
@@ -19,7 +19,8 @@ router.post('/', async (req, res) => {
             return res.status(409).json({ message: 'Username already taken' });
         }
 
-        // Insert new user into Users table
+        // Insert new user into Users table with role set to 'patient'
+        const role = 'patient'; // Default role
         await db.query('INSERT INTO Users (username, password, role) VALUES (?, ?, ?)', [username, password, role]);
         console.log("Registration successful for:", username);
         res.status(201).json({ message: 'Registration successful' });
