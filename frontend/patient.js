@@ -20,61 +20,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Event listener for logout link
-    document.querySelector('.logout-link').addEventListener('click', (event) => {
-        event.preventDefault(); // Prevent the default link behavior
-        window.location.href = '../index.html'; // Redirects to the home or login page
-    });
+    const logoutLink = document.querySelector('.logout-link');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            window.location.href = '../index.html';
+        });
+    }
 });
 
-// Function to load upcoming appointments
+function handleFetchResponse(response, containerId, emptyMessage) {
+    if (!response.ok) throw new Error('Network response was not ok');
+    return response.json().then(data => {
+        let content = '';
+        data.forEach(item => {
+            for (const [key, value] of Object.entries(item)) {
+                content += `<p>${key.replace(/_/g, ' ')}: ${value}</p>`;
+            }
+            content += `<hr>`;
+        });
+        document.getElementById(containerId).innerHTML = content || emptyMessage;
+    }).catch(error => {
+        console.error(`Error loading ${containerId.replace('Content', '')}:`, error);
+        document.getElementById(containerId).innerHTML = `Error loading ${containerId.replace('Content', '').toLowerCase()}.`;
+    });
+}
+
+// Load upcoming appointments
 function loadUpcomingAppointments(username) {
     fetch(`/api/patient/appointments/${username}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            let content = '';
-            data.forEach(appointment => {
-                content += `<p>Date: ${appointment.date}</p>`;
-                content += `<p>Time: ${appointment.time}</p>`;
-                content += `<p>Doctor: ${appointment.doctor}</p>`;
-                content += `<p>Reason: ${appointment.reason}</p>`;
-                content += `<hr>`;
-            });
-            document.getElementById('appointmentContent').innerHTML = content || 'No upcoming appointments found.';
-        })
-        .catch(error => {
-            console.error('Error loading upcoming appointments:', error);
-            document.getElementById('appointmentContent').innerHTML = 'Error loading upcoming appointments.';
-        });
+        .then(response => handleFetchResponse(response, 'appointmentContent', 'No upcoming appointments found.'));
 }
 
-// Function to load billing information
+// Load billing information
 function loadBillingInfo(username) {
     fetch(`/api/patient/billing/${username}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            let content = '';
-            data.forEach(bill => {
-                content += `<p>Charge For: ${bill.chargeFor}</p>`;
-                content += `<p>Total Charge: $${bill.totalCharge}</p>`;
-                content += `<p>Charge Date: ${bill.chargeDate}</p>`;
-                content += `<p>Paid Off: ${bill.paidOff ? 'Yes' : 'No'}</p>`;
-                content += `<hr>`;
-            });
-            document.getElementById('billingContent').innerHTML = content || 'No billing information found.';
-        })
-        .catch(error => {
-            console.error('Error loading billing information:', error);
-            document.getElementById('billingContent').innerHTML = 'Error loading billing information.';
-        });
+        .then(response => handleFetchResponse(response, 'billingContent', 'No billing information found.'));
 }
 
-// Function to load payment information and show "Pay Here" button if payment is due
+// Load payment information and show "Pay Here" button if payment is due
 function loadPaymentInfo(username) {
     fetch(`/api/patient/payments/${username}`)
         .then(response => {
@@ -93,7 +77,6 @@ function loadPaymentInfo(username) {
             });
             document.getElementById('paymentContent').innerHTML = content || 'No payment records found.';
             
-            // Enable "Pay Here" button if payment is due
             const payHereButton = document.getElementById('payHereButton');
             if (paymentDue && payHereButton) {
                 payHereButton.classList.add('active');
@@ -108,165 +91,44 @@ function loadPaymentInfo(username) {
         });
 }
 
-// Function to load referrals
+// Load referrals
 function loadReferrals(username) {
     fetch(`/api/patient/referrals/${username}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            let content = '';
-            data.forEach(referral => {
-                content += `<p>Primary Doctor: ${referral.primary_doc}</p>`;
-                content += `<p>Specialist: ${referral.specialist}</p>`;
-                content += `<p>Referral Date: ${referral.ref_date}</p>`;
-                content += `<p>Expiration: ${referral.expiration}</p>`;
-                content += `<hr>`;
-            });
-            document.getElementById('referralContent').innerHTML = content || 'No referrals found.';
-        })
-        .catch(error => {
-            console.error('Error loading referrals:', error);
-            document.getElementById('referralContent').innerHTML = 'Error loading referrals.';
-        });
+        .then(response => handleFetchResponse(response, 'referralContent', 'No referrals found.'));
 }
 
-// Function to load medications
+// Load medications
 function loadMedications(username) {
     fetch(`/api/patient/medications/${username}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            let content = '';
-            data.forEach(med => {
-                content += `<p>Medicine: ${med.medicine}</p>`;
-                content += `<p>Dosage: ${med.dosage}</p>`;
-                content += `<p>Start Date: ${med.start_date}</p>`;
-                content += `<p>End Date: ${med.end_date}</p>`;
-                content += `<hr>`;
-            });
-            document.getElementById('medicationContent').innerHTML = content || 'No medications found.';
-        })
-        .catch(error => {
-            console.error('Error loading medications:', error);
-            document.getElementById('medicationContent').innerHTML = 'Error loading medications.';
-        });
+        .then(response => handleFetchResponse(response, 'medicationContent', 'No medications found.'));
 }
 
-// Function to load allergies
+// Load allergies
 function loadAllergies(username) {
     fetch(`/api/patient/allergies/${username}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            let content = '';
-            data.forEach(allergy => {
-                content += `<p>Allergy: ${allergy.allergy}</p>`;
-                content += `<p>Start Date: ${allergy.start_date}</p>`;
-                content += `<hr>`;
-            });
-            document.getElementById('allergyContent').innerHTML = content || 'No allergies found.';
-        })
-        .catch(error => {
-            console.error('Error loading allergies:', error);
-            document.getElementById('allergyContent').innerHTML = 'Error loading allergies.';
-        });
+        .then(response => handleFetchResponse(response, 'allergyContent', 'No allergies found.'));
 }
 
-// Function to load illnesses
+// Load illnesses
 function loadIllnesses(username) {
     fetch(`/api/patient/illnesses/${username}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            let content = '';
-            data.forEach(illness => {
-                content += `<p>Ailment: ${illness.ailment}</p>`;
-                content += `<p>Start Date: ${illness.start_date}</p>`;
-                content += `<hr>`;
-            });
-            document.getElementById('illnessContent').innerHTML = content || 'No illnesses found.';
-        })
-        .catch(error => {
-            console.error('Error loading illnesses:', error);
-            document.getElementById('illnessContent').innerHTML = 'Error loading illnesses.';
-        });
+        .then(response => handleFetchResponse(response, 'illnessContent', 'No illnesses found.'));
 }
 
-// Function to load surgeries
+// Load surgeries
 function loadSurgeries(username) {
     fetch(`/api/patient/surgeries/${username}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            let content = '';
-            data.forEach(surgery => {
-                content += `<p>Procedure Done: ${surgery.procedure_done}</p>`;
-                content += `<p>Body Part: ${surgery.body_part}</p>`;
-                content += `<p>Surgery Date: ${surgery.surgery_date}</p>`;
-                content += `<p>Cost: $${surgery.cost}</p>`;
-                content += `<hr>`;
-            });
-            document.getElementById('surgeryContent').innerHTML = content || 'No surgeries found.';
-        })
-        .catch(error => {
-            console.error('Error loading surgeries:', error);
-            document.getElementById('surgeryContent').innerHTML = 'Error loading surgeries.';
-        });
+        .then(response => handleFetchResponse(response, 'surgeryContent', 'No surgeries found.'));
 }
 
-// Function to load immunizations
+// Load immunizations
 function loadImmunizations(username) {
     fetch(`/api/patient/immunizations/${username}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            let content = '';
-            data.forEach(immunization => {
-                content += `<p>Vaccine: ${immunization.vaccine}</p>`;
-                content += `<p>Vaccine Date: ${immunization.vax_date}</p>`;
-                content += `<p>Cost: $${immunization.cost}</p>`;
-                content += `<hr>`;
-            });
-            document.getElementById('immunizationContent').innerHTML = content || 'No immunizations found.';
-        })
-        .catch(error => {
-            console.error('Error loading immunizations:', error);
-            document.getElementById('immunizationContent').innerHTML = 'Error loading immunizations.';
-        });
+        .then(response => handleFetchResponse(response, 'immunizationContent', 'No immunizations found.'));
 }
 
-// Function to load medical history
+// Load medical history
 function loadMedicalHistory(username) {
     fetch(`/api/patient/medicalHistory/${username}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            let content = '';
-            data.forEach(record => {
-                content += `<p>Last Visit: ${record.last_visit}</p>`;
-                content += `<p>Height: ${record.height} cm</p>`;
-                content += `<p>Weight: ${record.weight} kg</p>`;
-                content += `<p>Blood Pressure: ${record.blood_pressure}</p>`;
-                content += `<hr>`;
-            });
-            document.getElementById('medicalHistoryContent').innerHTML = content || 'No medical history found.';
-        })
-        .catch(error => {
-            console.error('Error loading medical history:', error);
-            document.getElementById('medicalHistoryContent').innerHTML = 'Error loading medical history.';
-        });
+        .then(response => handleFetchResponse(response, 'medicalHistoryContent', 'No medical history found.'));
 }

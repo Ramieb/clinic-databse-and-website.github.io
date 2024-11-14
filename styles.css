@@ -46,6 +46,17 @@ body {
     color: #2196f3;
 }
 
+/* Logout option styling (inside navbar) */
+.logout-link {
+    color: #d9534f; /* Slightly different color for logout */
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.logout-link:hover {
+    color: #c9302c;
+}
+
 /* Page header styling */
 .header {
     text-align: center;
@@ -144,19 +155,6 @@ form button:hover {
     transform: translateY(-2px);
 }
 
-/* Services and Contact Sections */
-.services ul {
-    list-style: none;
-    padding: 0;
-    color: #555;
-}
-
-.services li, .contact-info p, .reviews blockquote {
-    font-size: 18px;
-    line-height: 1.6;
-    text-align: center;
-}
-
 /* Button styling */
 button {
     padding: 12px 24px;
@@ -207,22 +205,6 @@ button:hover {
 
 .section.active {
     display: block; /* Show when active */
-}
-
-/* Logout Button (inside navbar) */
-.logout-link {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.logout-link:hover {
-    background-color: #0056b3;
 }
 
 /* Payment Button */
