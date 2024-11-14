@@ -66,4 +66,24 @@ router.get('/medicalRecords/:patientId', async (req, res) => {
     }
 });
 
+// Route to get doctor-patient history
+router.get('/doctor_patient_history', async (req, res) => {
+    try {
+        // Query the doctor_patient_history view
+        const [rows] = await db.query('SELECT * FROM doctor_patient_history');
+        
+        res.json({
+            success: true,
+            data: rows
+        });
+    } catch (error) {
+        console.error("Error fetching doctor-patient history:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching doctor-patient history"
+        });
+    }
+});
+
 module.exports = router;
+
