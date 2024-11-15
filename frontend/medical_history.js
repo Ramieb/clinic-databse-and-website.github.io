@@ -1,4 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Extract username from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get('username');
+
+    if (username) {
+        // Use the username for any necessary actions in the medical history page
+        console.log(`Username: ${username}`);
+    } else {
+        console.error("Username is missing from the URL.");
+    }
+
+    // Your existing collapsible and logout functionality
     const coll = document.querySelectorAll('.collapsible');
     coll.forEach(button => {
         button.addEventListener('click', function () {
