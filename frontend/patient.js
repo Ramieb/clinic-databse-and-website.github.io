@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (medicalHistoryLink) {
             medicalHistoryLink.addEventListener('click', (event) => {
                 event.preventDefault();
+                console.log(`Username is: ${username}`); // This should log the actual username
                 window.location.href = `medical_history.html?username=${username}`;
             });
         } else {
