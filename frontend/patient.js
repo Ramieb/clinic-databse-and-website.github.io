@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get('username');
+    console.log(`Username: ${username}`); // Should log the actual username
 
     if (username) {
         // Update Medical History link to include username in the URL

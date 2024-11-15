@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Extract username from the URL
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get('username');
+    console.log(`Extracted Username: ${username}`); // Log to see the actual value
 
     if (username) {
         console.log(`Username: ${username}`);
