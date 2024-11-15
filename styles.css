@@ -20,11 +20,11 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.3);
     position: fixed;
     top: 10px;
-    width: calc(100% - 40px);
-    max-width: 1200px;
+    width: 100%;
+    max-width: none;
     display: flex;
     justify-content: space-around;
-    padding: 12px 0;
+    padding: 8px 0;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     left: 50%;
