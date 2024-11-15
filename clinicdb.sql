@@ -341,8 +341,52 @@ BEGIN
 END //
 DELIMITER ;
 
-
 DELIMITER //
+
+CREATE TRIGGER No_Referral
+BEFORE INSERT ON Appointment
+FOR EACH ROW
+BEGIN
+    DECLARE referral_exists INT;
+
+    SELECT COUNT(*)
+    INTO referral_exists
+    FROM Referral AS R
+    WHERE R.P_ID = NEW.P_ID AND R.specialist = NEW.D_ID AND R.doc_appr = TRUE;
+
+    IF referral_exists = 0 THEN
+        IF EXISTS (
+            SELECT 1 
+            FROM Doctor 
+            WHERE employee_ssn = NEW.D_ID 
+              AND specialist = TRUE
+        ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot create appointment: No approved referral to specialist.';
+        END IF;
+    END IF;
+END //
+
+CREATE TRIGGER Appointment_Reminders
+AFTER INSERT ON Appointment
+FOR EACH ROW
+BEGIN
+    DECLARE reminder_date_1day DATETIME;
+    DECLARE reminder_date_2hour DATETIME;
+
+    SET reminder_date_1day = DATE_SUB(NEW.app_date, INTERVAL 1 DAY);
+    SET reminder_date_2hour = TIMESTAMPADD(HOUR, -2, CONCAT(NEW.app_date, ' ', NEW.app_start_time));
+
+    INSERT INTO Logs (log_message, log_time)
+    VALUES (CONCAT('Reminder set for 1 day before appointment on ', reminder_date_1day), NOW());
+
+    INSERT INTO Logs (log_message, log_time)
+    VALUES (CONCAT('Reminder set for 2 hours before appointment on ', reminder_date_2hour), NOW());
+END //
+
+DELIMITER ;
+
+/* DELIMITER //
 CREATE TRIGGER No_Referral
 BEFORE INSERT ON Appointment
 FOR EACH ROW
@@ -388,7 +432,7 @@ BEGIN
     INSERT INTO Logs (log_message, log_time)  -- Log for 2-hour reminder
     VALUES (CONCAT('Reminder set for 2 hours before appointment on ', reminder_date_2hour), NOW());
 END; //
-
+ */
 -- New User-Related Triggers for Default Data
 
 -- Trigger to insert default data into the Prescriptions table
@@ -471,7 +515,7 @@ BEGIN
     INSERT INTO Referral (username, referral_source, status, referred_date)
     VALUES (NEW.username, 'Default Source', 'Pending', CURDATE());
 END; // */
-DELIMITER ;
+--DELIMITER ;
 
 DELIMITER //
 CREATE EVENT Send_Reminders
