@@ -392,13 +392,13 @@ END; //
 -- New User-Related Triggers for Default Data
 
 -- Trigger to insert default data into the Prescriptions table
-CREATE TRIGGER after_user_insert_prescriptions
+/* CREATE TRIGGER after_user_insert_prescriptions
 AFTER INSERT ON Users
 FOR EACH ROW
 BEGIN
     INSERT INTO Prescriptions (username, prescription_name, dosage, frequency, prescribed_date)
     VALUES (NEW.username, 'Default Prescription', '5mg', 'Twice a day', CURDATE());
-END; //
+END; // */
 /* 
 -- Trigger to insert default data into the Billing Information table
 CREATE TRIGGER after_user_insert_billing
