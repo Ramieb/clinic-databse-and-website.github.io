@@ -221,3 +221,33 @@ button:hover {
 .pay-here-button.active {
     display: inline-block;
 }
+
+/* Style the collapsible button */
+.collapsible {
+    background-color: #2196f3;
+    color: white;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 18px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* Add a background color to the active collapsible button */
+.collapsible.active {
+    background-color: #42a5f5;
+}
+
+/* Style the collapsible content */
+.content {
+    padding: 0 18px;
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}

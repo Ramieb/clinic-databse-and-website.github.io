@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical History</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="header">
+        <nav class="navbar">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="#billing-info" class="nav-link">Billing Information</a>
+            <a href="#med-history" class="nav-link">Medical History</a>
+            <a href="#payment" class="nav-link">Payment</a>
+            <a href="#referrals" class="nav-link">Referrals</a>
+            <a href="index.html" class="nav-link" id="logoutLink">Logout</a>
+        </nav>
+    </header>
+
+    <!-- Medical History Content -->
+    <div class="dashboard">
+        <h1>Medical History</h1>
+        <p>Below are your medical details, including history, medications, and other related information.</p>
+
+        <!-- Collapsible Sections -->
+        <div class="collapsible-section">
+            <button class="collapsible">Medications</button>
+            <div class="content">
+                <p>No medications found.</p>
+            </div>
+        </div>
+
+        <div class="collapsible-section">
+            <button class="collapsible">Allergies</button>
+            <div class="content">
+                <p>No allergies found.</p>
+            </div>
+        </div>
+
+        <div class="collapsible-section">
+            <button class="collapsible">Illnesses</button>
+            <div class="content">
+                <p>No illnesses found.</p>
+            </div>
+        </div>
+
+        <div class="collapsible-section">
+            <button class="collapsible">Surgeries</button>
+            <div class="content">
+                <p>No surgeries found.</p>
+            </div>
+        </div>
+
+        <div class="collapsible-section">
+            <button class="collapsible">Immunizations</button>
+            <div class="content">
+                <p>No immunizations found.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../frontend/medical_history.js"></script>
+</body>
+</html>
