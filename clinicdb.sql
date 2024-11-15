@@ -399,7 +399,7 @@ BEGIN
     INSERT INTO Prescriptions (username, prescription_name, dosage, frequency, prescribed_date)
     VALUES (NEW.username, 'Default Prescription', '5mg', 'Twice a day', CURDATE());
 END; //
-
+/* 
 -- Trigger to insert default data into the Billing Information table
 CREATE TRIGGER after_user_insert_billing
 AFTER INSERT ON Users
@@ -470,7 +470,7 @@ FOR EACH ROW
 BEGIN
     INSERT INTO Referral (username, referral_source, status, referred_date)
     VALUES (NEW.username, 'Default Source', 'Pending', CURDATE());
-END; //
+END; // */
 DELIMITER ;
 
 DELIMITER //
