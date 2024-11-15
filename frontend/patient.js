@@ -20,12 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Event listener for logout link
-    const logoutLink = document.querySelector('.logout-link');
+    const logoutLink = document.querySelector('.nav-link[href="#logout"]');
     if (logoutLink) {
         logoutLink.addEventListener('click', (event) => {
             event.preventDefault();
             window.location.href = '../index.html';
         });
+    } else {
+        console.error("Logout link not found.");
     }
 });
 
