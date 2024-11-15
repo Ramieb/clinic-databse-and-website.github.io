@@ -3,6 +3,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const username = urlParams.get('username');
 
     if (username) {
+        // Update Medical History link to include username in the URL
+        const medicalHistoryLink = document.querySelector('.nav-link[href="#med-history"]');
+        if (medicalHistoryLink) {
+            medicalHistoryLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                window.location.href = `medical_history.html?username=${username}`;
+            });
+        } else {
+            console.error("Medical History link not found.");
+        }
+
+        // Load other patient data after setting up navigation
         loadUpcomingAppointments(username);
         loadBillingInfo(username);
         loadPaymentInfo(username);
@@ -19,15 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Update Medical History link to include username in the URL
-    const medicalHistoryLink = document.querySelector('.nav-link[href="#med-history"]');
-    if (medicalHistoryLink) {
-        medicalHistoryLink.href = `medical_history.html?username=${username}`;
-    } else {
-        console.error("Medical History link not found.");
-    }
-
-    // Event listener for logout link
+    // Logout functionality
     const logoutLink = document.querySelector('.nav-link[href="#logout"]');
     if (logoutLink) {
         logoutLink.addEventListener('click', (event) => {
