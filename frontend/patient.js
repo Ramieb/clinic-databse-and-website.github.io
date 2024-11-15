@@ -19,6 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Update Medical History link to include username in the URL
+    const medicalHistoryLink = document.querySelector('.nav-link[href="#med-history"]');
+    if (medicalHistoryLink) {
+        medicalHistoryLink.href = `medical_history.html?username=${username}`;
+    } else {
+        console.error("Medical History link not found.");
+    }
+
     // Event listener for logout link
     const logoutLink = document.querySelector('.nav-link[href="#logout"]');
     if (logoutLink) {
