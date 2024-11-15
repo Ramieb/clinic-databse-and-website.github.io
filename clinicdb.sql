@@ -289,20 +289,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- TRIGGERS
-DELIMITER //
-CREATE TRIGGER Populate_Default_Data
-AFTER INSERT ON Users
-FOR EACH ROW
-BEGIN
-    -- Insert default data for the new user in related tables
-    INSERT INTO Prescriptions (username, prescription_data) VALUES (NEW.username, 'default prescription');
-    INSERT INTO Billing (username, billing_data) VALUES (NEW.username, 'default billing');
-    INSERT INTO Medical_History (username, history_data) VALUES (NEW.username, 'default history');
-    -- Repeat for other tables if needed (e.g., Payment, Referrals)
-END; //
-DELIMITER ;
-
 /* DELIMITER //
 CREATE TRIGGER No_Referral
 BEFORE INSERT ON Appointment
@@ -518,3 +504,17 @@ VALUES
     (3, '2023-04-20', 160, 68, '125/82');
 
 COMMIT;
+
+-- TRIGGERS
+DELIMITER //
+CREATE TRIGGER Populate_Default_Data
+AFTER INSERT ON Users
+FOR EACH ROW
+BEGIN
+    -- Insert default data for the new user in related tables
+    INSERT INTO Prescriptions (username, prescription_data) VALUES (NEW.username, 'default prescription');
+    INSERT INTO Billing (username, billing_data) VALUES (NEW.username, 'default billing');
+    INSERT INTO Medical_History (username, history_data) VALUES (NEW.username, 'default history');
+    -- Repeat for other tables if needed (e.g., Payment, Referrals)
+END; //
+DELIMITER ;
