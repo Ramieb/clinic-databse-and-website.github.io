@@ -388,6 +388,89 @@ BEGIN
     INSERT INTO Logs (log_message, log_time)  -- Log for 2-hour reminder
     VALUES (CONCAT('Reminder set for 2 hours before appointment on ', reminder_date_2hour), NOW());
 END; //
+
+-- New User-Related Triggers for Default Data
+
+-- Trigger to insert default data into the Prescriptions table
+CREATE TRIGGER after_user_insert_prescriptions
+AFTER INSERT ON Users
+FOR EACH ROW
+BEGIN
+    INSERT INTO Prescriptions (username, prescription_name, dosage, frequency, prescribed_date)
+    VALUES (NEW.username, 'Default Prescription', '5mg', 'Twice a day', CURDATE());
+END; //
+
+-- Trigger to insert default data into the Billing Information table
+CREATE TRIGGER after_user_insert_billing
+AFTER INSERT ON Users
+FOR EACH ROW
+BEGIN
+    INSERT INTO Billing (username, billing_address, amount_due, due_date)
+    VALUES (NEW.username, 'Default Address', 100.00, CURDATE() + INTERVAL 30 DAY);
+END; //
+
+-- Trigger to insert default data into the Medical History - Medications table
+CREATE TRIGGER after_user_insert_med_history_medications
+AFTER INSERT ON Users
+FOR EACH ROW
+BEGIN
+    INSERT INTO Medication (username, medication_name, dosage, frequency, start_date)
+    VALUES (NEW.username, 'Default Medication', '10mg', 'Once a day', CURDATE());
+END; //
+
+-- Trigger to insert default data into the Medical History - Allergies table
+CREATE TRIGGER after_user_insert_med_history_allergies
+AFTER INSERT ON Users
+FOR EACH ROW
+BEGIN
+    INSERT INTO Allergies (username, allergy_name, severity, date_discovered)
+    VALUES (NEW.username, 'Default Allergy', 'Mild', CURDATE());
+END; //
+
+-- Trigger to insert default data into the Medical History - Illnesses table
+CREATE TRIGGER after_user_insert_med_history_illnesses
+AFTER INSERT ON Users
+FOR EACH ROW
+BEGIN
+    INSERT INTO Illness (username, illness_name, severity, date_diagnosed)
+    VALUES (NEW.username, 'Default Illness', 'Moderate', CURDATE());
+END; //
+
+-- Trigger to insert default data into the Medical History - Surgeries table
+CREATE TRIGGER after_user_insert_med_history_surgeries
+AFTER INSERT ON Users
+FOR EACH ROW
+BEGIN
+    INSERT INTO Surgery (username, surgery_name, surgery_date, outcome)
+    VALUES (NEW.username, 'Default Surgery', CURDATE() - INTERVAL 365 DAY, 'Successful');
+END; //
+
+-- Trigger to insert default data into the Medical History - Immunizations table
+CREATE TRIGGER after_user_insert_med_history_immunizations
+AFTER INSERT ON Users
+FOR EACH ROW
+BEGIN
+    INSERT INTO Immunization (username, immunization_name, date_administered)
+    VALUES (NEW.username, 'Default Immunization', CURDATE() - INTERVAL 180 DAY);
+END; //
+
+-- Trigger to insert default data into the Payment table
+CREATE TRIGGER after_user_insert_payment
+AFTER INSERT ON Users
+FOR EACH ROW
+BEGIN
+    INSERT INTO Payment (username, amount_due, status, due_date)
+    VALUES (NEW.username, 0.00, 'Not Due', CURDATE() + INTERVAL 30 DAY);
+END; //
+
+-- Trigger to insert default data into the Referrals table
+CREATE TRIGGER after_user_insert_referrals
+AFTER INSERT ON Users
+FOR EACH ROW
+BEGIN
+    INSERT INTO Referral (username, referral_source, status, referred_date)
+    VALUES (NEW.username, 'Default Source', 'Pending', CURDATE());
+END; //
 DELIMITER ;
 
 DELIMITER //
