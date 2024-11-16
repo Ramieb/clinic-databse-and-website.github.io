@@ -7,13 +7,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const username = new URLSearchParams(window.location.search).get('username');
 
     if (username) {
-        // Update navbar links with username
+        // Update navbar links with the username
         updateNavLinks(username);
 
         // Fetch upcoming appointments
         fetchAppointments(username);
     } else {
-        upcomingAppointmentsDiv.textContent = "Username is missing from the URL.";
+        // Redirect to login page if username is missing
+        alert('Username is missing from the URL. Redirecting to login page.');
+        window.location.href = '/index.html';
         return;
     }
 
@@ -21,16 +23,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateNavLinks(username) {
         const navLinks = document.querySelectorAll('nav a');
         navLinks.forEach(link => {
-            const url = new URL(link.href, window.location.origin);
-            url.searchParams.set('username', username); // Add or update the username query parameter
-            link.href = url.toString();
+            const url = new URL(link.href, window.location.origin); // Parse the link's href
+            url.searchParams.set('username', username); // Add or update the username parameter
+            link.href = url.toString(); // Update the link's href
         });
     }
 
     // Fetch upcoming appointments
     function fetchAppointments(username) {
         fetch(`/api/appointments/${username}`)
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then((data) => {
                 displayAppointments(data);
             })
