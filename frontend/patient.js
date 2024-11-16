@@ -15,18 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loadSurgeries(username);
         loadImmunizations(username);
         loadMedicalHistory(username);
-
-        // After loading patient data, update Medical History link to include username in the URL
-        const medicalHistoryLink = document.querySelector('.nav-link[href="#med-history"]');
-        if (medicalHistoryLink) {
-            medicalHistoryLink.addEventListener('click', (event) => {
-                event.preventDefault();
-                console.log(`Redirecting with Username: ${username}`); // Logs before redirection
-                window.location.href = `medical_history.html?username=${username}`;
-            });
-        } else {
-            console.error("Medical History link not found.");
-        }
     } else {
         console.error("No username provided in URL");
         document.getElementById('appointmentContent').innerHTML = 'Username is missing from the URL.';
