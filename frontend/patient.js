@@ -4,7 +4,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackDiv = document.getElementById('appointmentFeedback');
 
     // Extract username from the URL
-    const username = new URLSearchParams(window.location.search).get('username');
+    let username = new URLSearchParams(window.location.search).get('username');
+
+    if (username) {
+        // Save username in session storage for persistent access
+        sessionStorage.setItem('username', username);
+    } else {
+        // Retrieve username from session storage
+        username = sessionStorage.getItem('username');
+    }
 
     if (username) {
         // Update navbar links with the username
@@ -14,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchAppointments(username);
     } else {
         // Redirect to login page if username is missing
-        alert('Username is missing from the URL. Redirecting to login page.');
+        alert('Username is missing. Redirecting to login page.');
         window.location.href = '/index.html';
         return;
     }
