@@ -251,3 +251,17 @@ button:hover {
     border-radius: 5px;
     margin-bottom: 10px;
 }
+
+/* Jared's CSS */
+#appointments-section {
+    display: none;
+}
+/* Highlight editable fields */
+.editable input {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 5px;
+}
+.editing {
+    background-color: #f0f0f0;
+}
