@@ -1,32 +1,107 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const username = urlParams.get('username');
-    console.log(`Extracted Username: ${username}`); // Should log the actual username
+    const appointmentForm = document.getElementById('appointmentForm');
+    const upcomingAppointmentsDiv = document.getElementById('appointmentContent');
+    const feedbackDiv = document.getElementById('appointmentFeedback');
+
+    const username = new URLSearchParams(window.location.search).get('username');
 
     if (username) {
-        document.getElementById('appointmentContent').innerHTML = "Data will populate automatically via database triggers.";
-        document.getElementById('billingContent').innerHTML = "Data will populate automatically via database triggers.";
-        document.getElementById('paymentContent').innerHTML = "Data will populate automatically via database triggers.";
-        document.getElementById('referralContent').innerHTML = "Data will populate automatically via database triggers.";
-        document.getElementById('medicationContent').innerHTML = "Data will populate automatically via database triggers.";
-        document.getElementById('allergyContent').innerHTML = "Data will populate automatically via database triggers.";
-        document.getElementById('illnessContent').innerHTML = "Data will populate automatically via database triggers.";
-        document.getElementById('surgeryContent').innerHTML = "Data will populate automatically via database triggers.";
-        document.getElementById('immunizationContent').innerHTML = "Data will populate automatically via database triggers.";
-        document.getElementById('medicalHistoryContent').innerHTML = "Data will populate automatically via database triggers.";
+        fetchAppointments(username);
     } else {
-        console.error("No username provided in URL");
-        document.getElementById('appointmentContent').innerHTML = 'Username is missing from the URL.';
+        upcomingAppointmentsDiv.textContent = "Username is missing from the URL.";
     }
 
-    // Logout functionality
-    const logoutLink = document.querySelector('.nav-link[href="../index.html"]');
-    if (logoutLink) {
-        logoutLink.addEventListener('click', (event) => {
-            event.preventDefault();
-            window.location.href = '../index.html';
+    // Fetch upcoming appointments
+    function fetchAppointments(username) {
+        fetch(`/api/appointments/${username}`)
+            .then((response) => response.json())
+            .then((data) => {
+                displayAppointments(data);
+            })
+            .catch((error) => {
+                console.error('Error fetching appointments:', error);
+                upcomingAppointmentsDiv.textContent = 'Error loading appointments.';
+            });
+    }
+
+    // Display appointments dynamically
+    function displayAppointments(appointments) {
+        upcomingAppointmentsDiv.innerHTML = '';
+        if (appointments.length === 0) {
+            upcomingAppointmentsDiv.textContent = 'No upcoming appointments.';
+            return;
+        }
+        appointments.forEach((appointment) => {
+            const appointmentDiv = document.createElement('div');
+            appointmentDiv.className = 'appointment';
+            appointmentDiv.innerHTML = `
+                <p>Doctor: ${appointment.doctor}</p>
+                <p>Date: ${appointment.app_date}</p>
+                <p>Time: ${appointment.app_start_time}</p>
+                <p>Reason: ${appointment.reason_for_visit}</p>
+                <button class="delete-btn" data-id="${appointment.id}">Delete</button>
+            `;
+            upcomingAppointmentsDiv.appendChild(appointmentDiv);
         });
-    } else {
-        console.error("Logout link not found.");
+
+        // Add delete functionality
+        document.querySelectorAll('.delete-btn').forEach((button) => {
+            button.addEventListener('click', (event) => {
+                const appointmentId = event.target.getAttribute('data-id');
+                deleteAppointment(appointmentId);
+            });
+        });
+    }
+
+    // Add new appointment
+    appointmentForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(appointmentForm);
+        const appointmentData = Object.fromEntries(formData);
+        appointmentData.username = username; // Add username to the data
+
+        fetch('/api/appointments', {
+            method: 'POST',
+            body: JSON.stringify(appointmentData),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    feedbackDiv.textContent = "Appointment scheduled successfully!";
+                    feedbackDiv.style.color = "green";
+                    appointmentForm.reset();
+                    fetchAppointments(username); // Refresh the list
+                } else {
+                    feedbackDiv.textContent = `Error: ${data.message}`;
+                    feedbackDiv.style.color = "red";
+                }
+            })
+            .catch((error) => {
+                console.error('Error scheduling appointment:', error);
+                feedbackDiv.textContent = 'Error scheduling appointment.';
+                feedbackDiv.style.color = "red";
+            });
+    });
+
+    // Delete an appointment
+    function deleteAppointment(appointmentId) {
+        fetch(`/api/appointments/${appointmentId}`, {
+            method: 'DELETE',
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    fetchAppointments(username); // Refresh the list
+                } else {
+                    console.error('Error deleting appointment:', data.message);
+                }
+            })
+            .catch((error) => {
+                console.error('Error deleting appointment:', error);
+            });
     }
 });
