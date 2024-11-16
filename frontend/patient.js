@@ -21,11 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateNavLinks(username) {
         const navLinks = document.querySelectorAll('nav a');
         navLinks.forEach(link => {
-            const href = link.getAttribute('href');
-            if (href && !href.includes('username=')) {
-                const separator = href.includes('?') ? '&' : '?';
-                link.setAttribute('href', `${href}${separator}username=${username}`);
-            }
+            const url = new URL(link.href, window.location.origin);
+            url.searchParams.set('username', username); // Add or update the username query parameter
+            link.href = url.toString();
         });
     }
 
