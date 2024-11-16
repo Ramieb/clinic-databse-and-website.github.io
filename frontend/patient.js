@@ -6,9 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const username = new URLSearchParams(window.location.search).get('username');
 
     if (username) {
+        // Fetch upcoming appointments
         fetchAppointments(username);
     } else {
         upcomingAppointmentsDiv.textContent = "Username is missing from the URL.";
+        return;
     }
 
     // Fetch upcoming appointments
@@ -54,38 +56,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Add new appointment
-    appointmentForm.addEventListener('submit', (event) => {
-        event.preventDefault();
+    if (appointmentForm) {
+        appointmentForm.addEventListener('submit', (event) => {
+            event.preventDefault();
 
-        const formData = new FormData(appointmentForm);
-        const appointmentData = Object.fromEntries(formData);
-        appointmentData.username = username; // Add username to the data
+            const formData = new FormData(appointmentForm);
+            const appointmentData = Object.fromEntries(formData);
+            appointmentData.username = username; // Add username to the data
 
-        fetch('/api/appointments', {
-            method: 'POST',
-            body: JSON.stringify(appointmentData),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    feedbackDiv.textContent = "Appointment scheduled successfully!";
-                    feedbackDiv.style.color = "green";
-                    appointmentForm.reset();
-                    fetchAppointments(username); // Refresh the list
-                } else {
-                    feedbackDiv.textContent = `Error: ${data.message}`;
-                    feedbackDiv.style.color = "red";
-                }
+            fetch('/api/appointments', {
+                method: 'POST',
+                body: JSON.stringify(appointmentData),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             })
-            .catch((error) => {
-                console.error('Error scheduling appointment:', error);
-                feedbackDiv.textContent = 'Error scheduling appointment.';
-                feedbackDiv.style.color = "red";
-            });
-    });
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        feedbackDiv.textContent = "Appointment scheduled successfully!";
+                        feedbackDiv.style.color = "green";
+                        appointmentForm.reset();
+                        fetchAppointments(username); // Refresh the list
+                    } else {
+                        feedbackDiv.textContent = `Error: ${data.message}`;
+                        feedbackDiv.style.color = "red";
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error scheduling appointment:', error);
+                    feedbackDiv.textContent = 'Error scheduling appointment.';
+                    feedbackDiv.style.color = "red";
+                });
+        });
+    }
 
     // Delete an appointment
     function deleteAppointment(appointmentId) {
