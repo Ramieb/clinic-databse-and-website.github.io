@@ -3,14 +3,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const upcomingAppointmentsDiv = document.getElementById('appointmentContent');
     const feedbackDiv = document.getElementById('appointmentFeedback');
 
+    // Extract username from the URL
     const username = new URLSearchParams(window.location.search).get('username');
 
     if (username) {
+        // Update navbar links with username
+        updateNavLinks(username);
+
         // Fetch upcoming appointments
         fetchAppointments(username);
     } else {
         upcomingAppointmentsDiv.textContent = "Username is missing from the URL.";
         return;
+    }
+
+    // Function to update navigation links with the username
+    function updateNavLinks(username) {
+        const navLinks = document.querySelectorAll('nav a');
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && !href.includes('username=')) {
+                const separator = href.includes('?') ? '&' : '?';
+                link.setAttribute('href', `${href}${separator}username=${username}`);
+            }
+        });
     }
 
     // Fetch upcoming appointments
