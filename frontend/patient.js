@@ -3,15 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const upcomingAppointmentsDiv = document.getElementById('appointmentContent');
     const feedbackDiv = document.getElementById('appointmentFeedback');
 
-    // Extract username from the URL
+    // Extract username from the URL or session storage
     let username = new URLSearchParams(window.location.search).get('username');
-
     if (username) {
-        // Save username in session storage for persistent access
-        sessionStorage.setItem('username', username);
+        sessionStorage.setItem('username', username); // Save username in session storage
     } else {
-        // Retrieve username from session storage
-        username = sessionStorage.getItem('username');
+        username = sessionStorage.getItem('username'); // Retrieve username from session storage
     }
 
     if (username) {
