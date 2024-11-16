@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Dashboard - Manage Patients</title>
     <link rel="stylesheet" href="../styles.css">
-    <script src="js/patientActions.js" defer></script> <!-- Separate JavaScript file for actions -->
+    <script src="../html/frontend/addPatient.js" defer></script> <!-- Separate JavaScript file for actions -->
 </head>
 <body>
     <!-- Navbar -->
@@ -23,6 +23,11 @@
         <!-- Title -->
         <h2>Manage Patients</h2>
         <!-- Patients Table -->
+
+        
+<div class="add-doctor-btn">
+            <button onclick="window.location.href = 'addPatient.html';">Add Patient</button>
+        </div>
         <table id="doctors-table">
             <thead>
                 <tr>

@@ -20,11 +20,11 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.3);
     position: fixed;
     top: 10px;
-    width: 100%;
-    max-width: none;
+    width: 90%;
+    max-width: 1200px;
     display: flex;
     justify-content: space-around;
-    padding: 8px 0;
+    padding: 12px 0;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     left: 50%;
@@ -44,17 +44,6 @@ body {
 .navbar a:hover {
     background-color: rgba(33, 150, 243, 0.1);
     color: #2196f3;
-}
-
-/* Logout option styling (inside navbar) */
-.logout-link {
-    color: #d9534f; /* Slightly different color for logout */
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.logout-link:hover {
-    color: #c9302c;
 }
 
 /* Page header styling */
@@ -120,7 +109,7 @@ form {
     flex-direction: column;
     gap: 10px;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 30px;
 }
 
 form label {
@@ -153,6 +142,19 @@ form button {
 form button:hover {
     background: linear-gradient(45deg, #42a5f5, #7e57c2);
     transform: translateY(-2px);
+}
+
+/* Services and Contact Sections */
+.services ul {
+    list-style: none;
+    padding: 0;
+    color: #555;
+}
+
+.services li, .contact-info p, .reviews blockquote {
+    font-size: 18px;
+    line-height: 1.6;
+    text-align: center;
 }
 
 /* Button styling */
@@ -195,19 +197,50 @@ button:hover {
     color: #555;
 }
 
-/* Section display control */
 .section {
     border: 1px solid #ccc;
     padding: 10px;
     margin: 10px 0;
     display: none; /* Initially hidden */
 }
-
 .section.active {
     display: block; /* Show when active */
 }
+.toggle-button {
+    cursor: pointer;
+    color: #007bff;
+    text-decoration: none;
+    background: none;
+    border: none;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    width: 100%;
+    text-align: left;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+.toggle-button:focus {
+    outline: none;
+}
+.toggle-button span {
+    font-weight: bold;
+    margin-right: 8px;
+}
+.logout-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
 
-/* Payment Button */
 .pay-here-button {
     background-color: #ff0000;
     color: white;
@@ -222,40 +255,158 @@ button:hover {
     display: inline-block;
 }
 
-/* Style the collapsible button */
-.collapsible {
+
+/* Table Styling */
+#doctors-table {
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+h2 {
+    margin-top: 50px;  /* Adjust this value as needed */
+}
+
+#doctors-table th, #doctors-table td {
+    padding: 12px 15px;
+    text-align: left;
+    color: #333;
+    font-size: 16px;
+    border-bottom: 1px solid #ddd;
+}
+
+#doctors-table th {
+    background-color: #e3f2fd;
+    color: #2196f3;
+    font-weight: 600;
+}
+
+#doctors-table tr:hover {
+    background-color: rgba(33, 150, 243, 0.05);
+}
+
+#doctors-table td button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+}
+
+#doctors-table .edit-btn {
+    background-color: #4caf50;
+    margin-right: 5px;
+    transition: background 0.3s;
+}
+
+#doctors-table .edit-btn:hover {
+    background-color: #45a049;
+}
+
+#doctors-table .delete-btn {
+    background-color: #f44336;
+    transition: background 0.3s;
+}
+
+#doctors-table .delete-btn:hover {
+    background-color: #e53935;
+}
+
+/* Button group for horizontal layout */
+.button-group {
+    display: flex;
+    gap: 10px; /* Adds space between the buttons */
+    justify-content: flex-start; /* Ensures buttons are aligned to the left */
+}
+
+.edit-btn, .delete-btn {
+    padding: 10px 20px;
+    background: linear-gradient(45deg, #2196f3, #673ab7);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.edit-btn:hover, .delete-btn:hover {
+    background: linear-gradient(45deg, #42a5f5, #7e57c2);
+    transform: translateY(-2px);
+}
+
+/* Container for the doctor schedule */
+.schedule-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-top: 20px;
+    padding: 20px;
+}
+
+/* Header inside the schedule container */
+.schedule-container .header {
+    margin-bottom: 20px;
+}
+
+/* Controls for selecting doctor and date */
+.schedule-container .controls {
+    width: 100%; /* Ensures controls take up the full width available */
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between; /* Space out the elements */
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.schedule-container .controls select,
+.schedule-container .controls input,
+.schedule-container .controls button {
+    width: 32%; /* Each element takes up 1/3 of the available space */
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.schedule-container .controls button {
     background-color: #2196f3;
     color: white;
     cursor: pointer;
-    padding: 18px;
-    width: 100%;
-    border: none;
-    text-align: left;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.schedule-container .controls button:hover {
+    background-color: #1976d2;
+}
+
+.schedule-container .controls select,
+.schedule-container .controls input {
+    background-color: #fff;
+    border: 1px solid #bbb;
+}
+
+.schedule-container .controls select:focus,
+.schedule-container .controls input:focus {
+    border-color: #2196f3;
     outline: none;
-    font-size: 18px;
-    border-radius: 5px;
-    margin-top: 10px;
 }
 
-/* Add a background color to the active collapsible button */
-.collapsible.active {
-    background-color: #42a5f5;
-}
-
-/* Style the collapsible content */
-.content {
-    padding: 0 18px;
-    display: none;
-    overflow: hidden;
-    background-color: #f1f1f1;
-    border-radius: 5px;
-    margin-bottom: 10px;
-}
-
-/* Jared's CSS */
 #appointments-section {
     display: none;
 }
+
 /* Highlight editable fields */
 .editable input {
     background-color: #f9f9f9;

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Dashboard - Add Appointment</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="frontend/addAppointment.js" defer></script> <!-- Correct path to JavaScript -->
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="admin.html">Admin Dashboard</a>
+        <a href="admin_Doctors.html">Doctors</a>
+        <a href="doctorSchedule.html">Doctor Schedule</a>
+        <a href="admin_patients.html">Patients</a>
+        <a href="admin_appointments.html">Appointments</a>
+        <a href="employees.html">Employees</a>
+        <a href="../index.html">Logout</a>
+    </div>
+
+    <!-- Main Content for Add Appointment Form -->
+    <div class="main-content">
+    <form id="addAppointmentForm">
+        <h2>Appointment Information</h2>
+
+        <!-- Appointment Date -->
+        <div class="form">
+            <label for="appointment-date">Appointment Date:</label>
+            <input type="date" id="appointment-date" name="appointment_date" required>
+        </div>
+
+        <!-- Appointment Start Time -->
+        <div class="form">
+            <label for="app-start-time">Start Time:</label>
+            <input type="time" id="app-start-time" name="app_start_time" required>
+        </div>
+
+        <!-- Doctor Selection -->
+        <div class="form">
+            <label for="doctor">Doctor:</label>
+            <select id="doctor" name="doctor_id" required>
+                <option value="" disabled selected>Select a Doctor</option>
+                <!-- Doctors will be populated here dynamically -->
+                <option value="1">Dr. John Doe</option>
+                <option value="2">Dr. Jane Smith</option>
+                <option value="3">Dr. Emily Johnson</option>
+                <!-- Add more doctors as needed -->
+            </select>
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+    </div>
+</body>
+</html>

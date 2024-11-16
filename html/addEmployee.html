@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard - Add Employee</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="frontend/addEmployee.js" defer></script> <!-- Correct path to JavaScript -->
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="admin.html">Admin Dashboard</a>
+        <a href="admin_Doctors.html">Doctors</a>
+        <a href="doctorSchedule.html">Doctor Schedule</a>
+        <a href="admin_patients.html">Patients</a>
+        <a href="admin_appointments.html">Appointments</a>
+        <a href="employees.html">Employees</a>
+        <a href="../index.html">Logout</a>
+    </div>
+
+    <!-- Main Content for Add Employee Form -->
+    <div class="main-content">
+    <form id="addEmployeeForm">
+        <h2>Employee Information</h2>
+
+        <!-- First Name -->
+        <div class="form">
+            <label for="employee-first-name">First Name:</label>
+            <input type="text" id="employee-first-name" name="first_name" required>
+        </div>
+
+        <!-- Last Name -->
+        <div class="form">
+            <label for="employee-last-name">Last Name:</label>
+            <input type="text" id="employee-last-name" name="last_name" required>
+        </div>
+
+        <!-- Hire Date -->
+        <div class="form">
+            <label for="employee-hire-date">Hire Date:</label>
+            <input type="date" id="employee-hire-date" name="hire_date" required>
+        </div>
+
+        <!-- Office ID -->
+        <div class="form">
+            <label for="office-id">Office ID:</label>
+            <input type="text" id="office-id" name="office_id" required>
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+    </div>
+</body>
+</html>
