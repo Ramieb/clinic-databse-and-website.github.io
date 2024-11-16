@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - Add Doctor</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="frontend/addDoctor.js" defer></script> <!-- Correct path to JavaScript -->
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="admin.html">Admin Dashboard</a>
+        <a href="admin_Doctors.html">Doctors</a>
+        <a href="doctorSchedule.html">Doctor Schedule</a>
+        <a href="admin_patients.html">Patients</a>
+        <a href="admin_appointments.html">Appointments</a>
+        <a href="employees.html">Employees</a>
+        <a href="../index.html">Logout</a>
+    </div>
+
+    <!-- Main Content for Add Doctor Form -->
+    <div class="main-content">
+    <form id="addPatientForm">
+        <h2>Patient Information</h2>
+
+        <!-- First Name -->
+        <div class="form">
+            <label for="patient-first-name">First Name:</label>
+            <input type="text" id="patient-first-name" name="first_name" required>
+        </div>
+
+        <!-- Last Name -->
+        <div class="form">
+            <label for="patient-last-name">Last Name:</label>
+            <input type="text" id="patient-last-name" name="last_name" required>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="form">
+            <label for="patient-phone-number">Phone Number:</label>
+            <input type="tel" id="patient-phone-number" name="phone_number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
+        </div>
+
+        <!-- Address -->
+        <div class="form">
+            <label for="patient-address">Address:</label>
+            <input type="text" id="patient-address" name="address" required>
+        </div>
+
+        <!-- Date of Birth -->
+        <div class="form">
+            <label for="patient-dob">Date of Birth:</label>
+            <input type="date" id="patient-dob" name="dob" required>
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+    </div>
+</body>
+</html> 
