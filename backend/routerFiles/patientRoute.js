@@ -22,16 +22,34 @@ router.get('/appointments/:username', (req, res) => {
 
 // Add a new appointment
 router.post('/appointments', (req, res) => {
-    const { username, doctor_id, appointmentDate, appointmentTime, reason } = req.body;
-    const query = `
-        INSERT INTO Appointment (username, doctor_id, app_date, app_start_time, reason_for_visit) 
-        VALUES (?, ?, ?, ?, ?);
+    const { username, doctor, appointmentDate, appointmentTime, reason } = req.body;
+
+    // Query to resolve P_ID (patient_id) based on username
+    const resolvePatientIdQuery = `SELECT patient_id FROM Patient WHERE username = ?`;
+
+    // Insert query for appointments
+    const insertAppointmentQuery = `
+        INSERT INTO Appointment (app_date, P_ID, app_start_time, app_end_time, D_ID, reason_for_visit, referral, need_referral)
+        VALUES (?, ?, ?, ADDTIME(?, '01:00:00'), ?, ?, NULL, FALSE);
     `;
-    db.query(query, [username, doctor_id, appointmentDate, appointmentTime, reason], (error) => {
-        if (error) {
-            res.status(500).json({ error: 'Error creating appointment' });
+
+    db.query(resolvePatientIdQuery, [username], (error, results) => {
+        if (error || results.length === 0) {
+            res.status(500).json({ error: 'Error resolving patient ID' });
         } else {
-            res.json({ success: true });
+            const patientId = results[0].patient_id;
+
+            db.query(
+                insertAppointmentQuery,
+                [appointmentDate, patientId, appointmentTime, appointmentTime, doctor, reason],
+                (error) => {
+                    if (error) {
+                        res.status(500).json({ error: 'Error creating appointment' });
+                    } else {
+                        res.json({ success: true });
+                    }
+                }
+            );
         }
     });
 });

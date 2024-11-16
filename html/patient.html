@@ -28,21 +28,25 @@
             <h2>Schedule an Appointment</h2>
             <form id="appointmentForm">
                 <label for="doctor">Choose a Doctor:</label>
-                <select name="doctor" id="doctor">
+                <select name="doctor" id="doctor" required>
                     <option value="123456789">John Doe (Cardiology)</option>
                     <option value="234567890">Alice Smith (Pediatrics)</option>
                     <option value="345678901">Bob Johnson (Family Medicine)</option>
                     <option value="456789012">Charlie White (Internal Medicine)</option>
                     <option value="567890123">Diana Lee (Neurology)</option>
                 </select>
+            
                 <label for="appointmentDate">Choose a Date:</label>
                 <input type="date" name="appointmentDate" id="appointmentDate" required>
+            
                 <label for="appointmentTime">Choose a Time:</label>
                 <input type="time" name="appointmentTime" id="appointmentTime" required>
+            
                 <label for="reason">Reason for Visit:</label>
                 <textarea name="reason" id="reason" placeholder="Brief reason for visit..." required></textarea>
+            
                 <button type="submit">Submit</button>
-            </form>
+            </form>           
             <div id="appointmentFeedback"></div>
         </section>        
     </div>

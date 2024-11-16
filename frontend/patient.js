@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const appointmentForm = document.getElementById('appointmentForm');
     const upcomingAppointmentsDiv = document.getElementById('appointmentContent');
     const feedbackDiv = document.getElementById('appointmentFeedback');
+    const scheduleAppointmentSection = document.getElementById('schedule-appointment');
 
     // Extract username from the URL or session storage
     let username = new URLSearchParams(window.location.search).get('username');
@@ -32,6 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
             url.searchParams.set('username', username); // Add or update the username parameter
             link.href = url.toString(); // Update the link's href
         });
+    }
+
+    if (scheduleAppointmentSection) {
+        scheduleAppointmentSection.style.display = 'block';
     }
 
     // Fetch upcoming appointments
