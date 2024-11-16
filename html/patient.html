@@ -19,14 +19,36 @@
 
     <div class="dashboard">
         <h1>Patient Profile</h1>
-
-        <!-- Main Content Section -->
         <section id="upcoming-appointments" class="section active">
             <h2>Upcoming Appointments</h2>
             <div id="appointmentContent">Loading upcoming appointments...</div>
         </section>
 
-        <!-- Other sections go here, as in your original HTML structure -->
+        <section id="schedule-appointment" class="section active">
+            <h2>Schedule an Appointment</h2>
+            <form id="appointmentForm">
+                <label for="doctorSelect">Choose a Doctor:</label>
+                <select id="doctorSelect" name="doctor" required>
+                    <option value="123456789">John Doe (Cardiology)</option>
+                    <option value="234567890">Alice Smith (Pediatrics)</option>
+                    <option value="345678901">Bob Johnson (Family Medicine)</option>
+                    <option value="456789012">Charlie White (Internal Medicine)</option>
+                    <option value="567890123">Diana Lee (Neurology)</option>
+                </select>
+        
+                <label for="appointmentDate">Choose a Date:</label>
+                <input type="date" id="appointmentDate" name="appointmentDate" required>
+        
+                <label for="appointmentTime">Choose a Time:</label>
+                <input type="time" id="appointmentTime" name="appointmentTime" required>
+        
+                <label for="reason">Reason for Visit:</label>
+                <textarea id="reason" name="reason" placeholder="Brief reason for visit..." required></textarea>
+        
+                <button type="submit">Submit</button>
+            </form>
+            <div id="appointmentFeedback"></div>
+        </section>        
     </div>
 
     <script src="../frontend/patient.js"></script>

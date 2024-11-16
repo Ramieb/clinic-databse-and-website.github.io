@@ -383,6 +383,42 @@ CREATE TABLE Logs (
 
 -- TRIGGERS
 DELIMITER //
+CREATE TRIGGER Calculate_End_Time
+BEFORE INSERT ON Appointment
+FOR EACH ROW
+BEGIN
+    -- Add 1 hour to the start time for the default appointment duration
+    SET NEW.app_end_time = ADDTIME(NEW.app_start_time, '01:00:00');
+END; //
+DELIMITER ;
+
+-- Ensure that no two appointments overlap for the same doctor
+DELIMITER //
+CREATE TRIGGER Prevent_Double_Booking
+BEFORE INSERT ON Appointment
+FOR EACH ROW
+BEGIN
+    DECLARE overlap_count INT;
+
+    SELECT COUNT(*)
+    INTO overlap_count
+    FROM Appointment
+    WHERE D_ID = NEW.D_ID
+      AND app_date = NEW.app_date
+      AND (
+        (NEW.app_start_time BETWEEN app_start_time AND app_end_time)
+        OR (NEW.app_end_time BETWEEN app_start_time AND app_end_time)
+        OR (app_start_time BETWEEN NEW.app_start_time AND NEW.app_end_time)
+      );
+
+    IF overlap_count > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Double-booking is not allowed for this doctor.';
+    END IF;
+END; //
+DELIMITER ;
+
+DELIMITER //
 CREATE TRIGGER Populate_Default_Data
 AFTER INSERT ON Users
 FOR EACH ROW
