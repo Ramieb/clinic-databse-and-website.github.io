@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="../html/css/recept.css"> <!-- Updated path to styles.css -->
+</head>
+<body>
+    <div class="navbar">
+        <a href="recep_register.html">Register</a>
+        <a href="rec_appt.html">Appointments</a>
+        <a href="billing.html">Billing</a>
+    </div>
+    <div class="sidebar">
+        <img src="" alt="Profile picture">
+        <a href="/">My Account</a>
+        <a href="/html/receptionist.html">Dashboard</a>
+    </div>
+    <main class="main-content"></main>
+        <header class="header"> 
+            <h1>Register at Our Clinic</h1>
+            <p>Create an account to access our clinic services.</p>
+        </header>
+
+    
+        <section class="register-container">
+            <h2>Register</h2>
+            <form id="registerForm">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <label for="role">Role:</label>
+                <select id="role" name="role" required>
+                    <option value="patient">Patient</option>
+                </select>
+
+                <button type="submit">Register</button>
+            </form>
+        </section>
+    </main>
+
+    <script src="../frontend/register.js"></script> <!-- Updated path to register.js -->
+</body>
+</html>
