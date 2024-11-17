@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add timeout functionality to fetch
     async function fetchWithTimeout(resource, options = {}) {
-        const { timeout = 5000 } = options; // 5-second timeout (can adjust as needed)
+        const { timeout = 7000 } = options; // 7-second timeout
         const controller = new AbortController();
         const id = setTimeout(() => controller.abort(), timeout);
         const response = await fetch(resource, {
@@ -54,10 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch upcoming appointments
     function fetchAppointments(username) {
-        const appointmentContentDiv = document.getElementById('appointmentContent'); // Match your HTML
-        appointmentContentDiv.textContent = 'Loading upcoming appointments...';
+        const fetchUrl = `${window.location.origin}/api/appointments/${username}`; // Dynamically determine the API URL
+        upcomingAppointmentsDiv.textContent = 'Loading upcoming appointments...';
 
-        fetchWithTimeout(`https://clinic-website.azurewebsites.net/api/appointments/${username}`, { timeout: 7000 }) // 7-second timeout
+        fetchWithTimeout(fetchUrl, { timeout: 7000 })
             .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -69,17 +69,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 displayAppointments(data);
             })
             .catch((error) => {
-                console.error('Error fetching appointments:', error);
-                appointmentContentDiv.textContent = 'Failed to load upcoming appointments.';
+                if (error.name === 'AbortError') {
+                    console.error('Request was aborted: Timeout reached');
+                    upcomingAppointmentsDiv.textContent = 'Request timed out. Please try again later.';
+                } else {
+                    console.error('Error fetching appointments:', error);
+                    upcomingAppointmentsDiv.textContent = 'Failed to load upcoming appointments.';
+                }
             });
     }
 
     function displayAppointments(appointments) {
-        const appointmentContentDiv = document.getElementById('appointmentContent'); // Match your HTML
-        appointmentContentDiv.innerHTML = ''; // Clear any existing content
+        upcomingAppointmentsDiv.innerHTML = ''; // Clear any existing content
 
         if (appointments.length === 0) {
-            appointmentContentDiv.textContent = 'No upcoming appointments.';
+            upcomingAppointmentsDiv.textContent = 'No upcoming appointments.';
             return;
         }
 
@@ -93,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Time: ${appointment.app_start_time}</p>
                 <p>Reason: ${appointment.reason_for_visit}</p>
             `;
-            appointmentContentDiv.appendChild(appointmentCard);
+            upcomingAppointmentsDiv.appendChild(appointmentCard);
         });
     }
 
@@ -108,12 +112,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log('Submitting appointment data:', appointmentData); // Debug log
 
-            fetch('https://clinic-website.azurewebsites.net/api/appointments', {
+            const postUrl = `${window.location.origin}/api/appointments`; // Dynamically determine the API URL
+
+            fetchWithTimeout(postUrl, {
                 method: 'POST',
                 body: JSON.stringify(appointmentData),
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                timeout: 7000, // 7-second timeout
             })
                 .then((response) => {
                     if (!response.ok) {
@@ -133,9 +140,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 })
                 .catch((error) => {
-                    console.error('Error scheduling appointment:', error);
-                    feedbackDiv.textContent = 'Error scheduling appointment.';
-                    feedbackDiv.style.color = 'red';
+                    if (error.name === 'AbortError') {
+                        console.error('Request was aborted: Timeout reached');
+                        feedbackDiv.textContent = 'Request timed out. Please try again.';
+                        feedbackDiv.style.color = 'red';
+                    } else {
+                        console.error('Error scheduling appointment:', error);
+                        feedbackDiv.textContent = 'Error scheduling appointment.';
+                        feedbackDiv.style.color = 'red';
+                    }
                 });
         });
     }
