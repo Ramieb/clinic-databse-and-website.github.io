@@ -239,7 +239,7 @@ CREATE TABLE Med_History (
         ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE VIEW Doctor_Patient_History_View
+/* CREATE VIEW Doctor_Patient_History_View
 AS SELECT	P.patient_id, P.first_name, P.last_name,
 			H.height, HIST.weight, H.blood_pressure,
             MED.medicine, MED.start_date, MED.end_date, MED.dosage,
@@ -269,7 +269,7 @@ AS SELECT	P.patient_id, P.first_name, P.last_name,
 FROM Patient AS P
 LEFT OUTER JOIN Payment AS PAY ON P.patient_id = PAY.P_ID
 LEFT OUTER JOIN Billing AS B ON P.patient_id = B.P_ID
-WHERE B.paid_off = TRUE;
+WHERE B.paid_off = TRUE; */
 
 -- Find the login info in users table, then if found use the username to query the specific role to find the correct user
 DELIMITER //
