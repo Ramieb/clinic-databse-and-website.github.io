@@ -6,13 +6,12 @@ const db = require('../db');
 router.get('/appointments/:username', (req, res) => {
     const username = req.params.username;
 
-    // Query to fetch upcoming appointments
     const query = `
         SELECT 
-            app_date, 
-            app_start_time, 
-            app_end_time, 
-            reason_for_visit, 
+            Appointment.app_date, 
+            Appointment.app_start_time, 
+            Appointment.app_end_time, 
+            Appointment.reason_for_visit, 
             D.first_name AS doctor_first_name, 
             D.last_name AS doctor_last_name, 
             D.specialty AS doctor_specialty
@@ -28,7 +27,6 @@ router.get('/appointments/:username', (req, res) => {
         ORDER BY Appointment.app_date, Appointment.app_start_time;
     `;
 
-    // Execute the query
     db.query(query, [username], (error, results) => {
         if (error) {
             console.error('Error fetching appointments:', error);
@@ -47,14 +45,12 @@ router.post('/appointments', (req, res) => {
         return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // Query to resolve P_ID (patient_id) based on username
     const resolvePatientIdQuery = `
         SELECT patient_id 
         FROM Patient 
         WHERE username = ?
     `;
 
-    // Insert query for appointments
     const insertAppointmentQuery = `
         INSERT INTO Appointment (
             app_date, 
@@ -92,7 +88,7 @@ router.post('/appointments', (req, res) => {
     });
 });
 
-// Delete an appointment (Soft Delete)
+// Delete an appointment
 router.delete('/appointments/:id', (req, res) => {
     const appointmentId = req.params.id;
 
@@ -103,7 +99,7 @@ router.delete('/appointments/:id', (req, res) => {
     const query = `
         UPDATE Appointment 
         SET deleted = TRUE 
-        WHERE P_ID = ?;
+        WHERE id = ?;
     `;
 
     db.query(query, [appointmentId], (error) => {
@@ -112,26 +108,6 @@ router.delete('/appointments/:id', (req, res) => {
             res.status(500).json({ error: 'Error deleting appointment' });
         } else {
             res.json({ success: true, message: 'Appointment deleted successfully' });
-        }
-    });
-});
-
-// Fetch all patients
-router.get('/patients', (req, res) => {
-    const query = `
-        SELECT patient_id AS id, 
-               first_name AS firstName, 
-               last_name AS lastName, 
-               account_creation_date AS accountCreationDate
-        FROM Patient;
-    `;
-
-    db.query(query, (error, results) => {
-        if (error) {
-            console.error('Error fetching patients:', error);
-            res.status(500).json({ error: 'Error fetching patients' });
-        } else {
-            res.json(results);
         }
     });
 });

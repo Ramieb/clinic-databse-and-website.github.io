@@ -49,7 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then((data) => {
-                displayAppointments(data);
+                if (data.length === 0) {
+                    upcomingAppointmentsDiv.textContent = 'No upcoming appointments.';
+                } else {
+                    displayAppointments(data);
+                }
             })
             .catch((error) => {
                 console.error('Error fetching appointments:', error);
@@ -60,15 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Display appointments dynamically
     function displayAppointments(appointments) {
         upcomingAppointmentsDiv.innerHTML = '';
-        if (appointments.length === 0) {
-            upcomingAppointmentsDiv.textContent = 'No upcoming appointments.';
-            return;
-        }
         appointments.forEach((appointment) => {
             const appointmentDiv = document.createElement('div');
             appointmentDiv.className = 'appointment';
             appointmentDiv.innerHTML = `
-                <p>Doctor: ${appointment.doctor}</p>
+                <p>Doctor: ${appointment.doctor_first_name} ${appointment.doctor_last_name} (${appointment.doctor_specialty})</p>
                 <p>Date: ${appointment.app_date}</p>
                 <p>Time: ${appointment.app_start_time}</p>
                 <p>Reason: ${appointment.reason_for_visit}</p>
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         appointmentForm.reset();
                         fetchAppointments(username); // Refresh the list
                     } else {
-                        feedbackDiv.textContent = `Error: ${data.message}`;
+                        feedbackDiv.textContent = `Error: ${data.error || 'Unknown error'}`;
                         feedbackDiv.style.color = "red";
                     }
                 })
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.success) {
                     fetchAppointments(username); // Refresh the list
                 } else {
-                    console.error('Error deleting appointment:', data.message);
+                    console.error('Error deleting appointment:', data.error);
                 }
             })
             .catch((error) => {
