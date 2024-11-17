@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receptionist Dashboard</title>
+    <link rel="stylesheet" href="../html/css/recept.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="recep_register.html">Register</a>
+        <a href="rec_appt.html">Appointments</a>
+        <a href="billing_recept.html">Billing</a>
+    </div>
+    <div class="sidebar">
+        <img src="/html/pictures/receptionist2_clear.png" alt="Profile picture">
+        <a href="/">My Account</a>
+        <a href="/html/receptionist.html">Dashboard</a>
+    </div>
+    <main class="main-content">
+        <div class="patient_search_bar"></div>
+            <form id="find_patient" action="../frontend/recep_front.js" method="GET">
+                <input id="lookup_info" type="text" placeholder="Enter Patient ID:">
+                <button id="submitPatientID"onclick="lookForPatient()">Search</button>
+            </form>
+        </div>
+    </main>
+    <script src="../frontend/recep_front.js"></script>
+</body>
+</html>
