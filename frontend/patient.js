@@ -101,55 +101,66 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Add new appointment
-    if (appointmentForm) {
-        appointmentForm.addEventListener('submit', (event) => {
-            event.preventDefault();
+    // Add new appointment using the async function
+    async function addAppointment(appointmentData) {
+        const postUrl = `https://clinic-website.azurewebsites.net/api/appointments`; // Updated to full URL
 
-            const formData = new FormData(appointmentForm);
-            const appointmentData = Object.fromEntries(formData);
-            appointmentData.username = username; // Add username to the data
-
-            console.log('Submitting appointment data:', appointmentData); // Debug log
-
-            const postUrl = `https://clinic-website.azurewebsites.net/api/appointments`; // Updated to full URL
-
-            fetchWithTimeout(postUrl, {
+        try {
+            const response = await fetchWithTimeout(postUrl, {
                 method: 'POST',
                 body: JSON.stringify(appointmentData),
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 timeout: 7000, // 7-second timeout
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    if (data.success) {
-                        feedbackDiv.textContent = 'Appointment scheduled successfully!';
-                        feedbackDiv.style.color = 'green';
-                        appointmentForm.reset();
-                        fetchAppointments(username); // Refresh the list
-                    } else {
-                        feedbackDiv.textContent = `Error: ${data.error || 'Unknown error'}`;
-                        feedbackDiv.style.color = 'red';
-                    }
-                })
-                .catch((error) => {
-                    if (error.name === 'AbortError') {
-                        console.error('Request was aborted: Timeout reached');
-                        feedbackDiv.textContent = 'Request timed out. Please try again.';
-                        feedbackDiv.style.color = 'red';
-                    } else {
-                        console.error('Error scheduling appointment:', error);
-                        feedbackDiv.textContent = 'Error scheduling appointment.';
-                        feedbackDiv.style.color = 'red';
-                    }
-                });
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                console.error('Request was aborted: Timeout reached');
+                throw new Error('Request timed out. Please try again.');
+            } else {
+                console.error('Error adding appointment:', error);
+                throw error;
+            }
+        }
+    }
+
+    // Add new appointment form submission handler
+    if (appointmentForm) {
+        appointmentForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(appointmentForm);
+            const appointmentData = Object.fromEntries(formData);
+
+            // Add username to the appointment data
+            appointmentData.username = username;
+
+            console.log('Submitting appointment data:', appointmentData); // Debug log
+
+            try {
+                const result = await addAppointment(appointmentData);
+
+                if (result.success) {
+                    feedbackDiv.textContent = 'Appointment scheduled successfully!';
+                    feedbackDiv.style.color = 'green';
+                    appointmentForm.reset();
+                    fetchAppointments(username); // Refresh the list
+                } else {
+                    feedbackDiv.textContent = `Error: ${result.error || 'Unknown error'}`;
+                    feedbackDiv.style.color = 'red';
+                }
+            } catch (error) {
+                feedbackDiv.textContent = error.message || 'Error scheduling appointment.';
+                feedbackDiv.style.color = 'red';
+            }
         });
     }
 });
