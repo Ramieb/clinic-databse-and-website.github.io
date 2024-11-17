@@ -6,9 +6,11 @@ const helmet = require('helmet');
 const express = require('express');
 const path = require('path');
 const app = express();
-const fs = require('fs');
 
-app.use(helmet()); // Adds security headers
+// Apply security headers
+app.use(helmet());
+
+// Parse incoming JSON requests
 app.use(bodyParser.json());
 
 // Define CORS options
@@ -51,7 +53,7 @@ app.use('/api', patientRoute); // Prefix routes with /api
 const doctorRoute = require('./backend/routerFiles/doctorRoute');
 app.use('/api/doctor', doctorRoute); // Prefix doctor routes with /api/doctor
 
-// Serve other static assets from root if needed (like root-level CSS or JS)
+// Serve other static assets from the root directory if needed
 app.use(express.static(path.join(__dirname)));
 
 // Set the port for Azure or default to 8080
@@ -59,5 +61,3 @@ const port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
-
-

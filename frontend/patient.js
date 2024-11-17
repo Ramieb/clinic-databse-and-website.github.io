@@ -41,9 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch upcoming appointments
     function fetchAppointments(username) {
-        const appointmentContentDiv = document.getElementById('appointmentContent'); // Updated to match your HTML
-        appointmentContentDiv.textContent = 'Loading upcoming appointments...';
-    
+        upcomingAppointmentsDiv.textContent = 'Loading upcoming appointments...';
+
         fetch(`https://clinic-website.azurewebsites.net/api/appointments/${username}`)
             .then((response) => {
                 if (!response.ok) {
@@ -57,32 +56,32 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch((error) => {
                 console.error('Error fetching appointments:', error);
-                appointmentContentDiv.textContent = 'Failed to load upcoming appointments.';
+                upcomingAppointmentsDiv.textContent = 'Failed to load upcoming appointments.';
             });
     }
-    
+
+    // Display upcoming appointments
     function displayAppointments(appointments) {
-        const appointmentContentDiv = document.getElementById('appointmentContent'); // Updated to match your HTML
-        appointmentContentDiv.innerHTML = ''; // Clear any existing content
-    
+        upcomingAppointmentsDiv.innerHTML = ''; // Clear any existing content
+
         if (appointments.length === 0) {
-            appointmentContentDiv.textContent = 'No upcoming appointments.';
+            upcomingAppointmentsDiv.textContent = 'No upcoming appointments.';
             return;
         }
-    
+
         appointments.forEach((appointment) => {
             const appointmentCard = document.createElement('div');
             appointmentCard.className = 'appointment-card';
             appointmentCard.innerHTML = `
-                <p>Doctor: ${appointment.doctor_first_name} ${appointment.doctor_last_name}</p>
-                <p>Specialty: ${appointment.doctor_specialty}</p>
-                <p>Date: ${appointment.app_date}</p>
-                <p>Time: ${appointment.app_start_time}</p>
-                <p>Reason: ${appointment.reason_for_visit}</p>
+                <p><strong>Doctor:</strong> ${appointment.doctor_first_name} ${appointment.doctor_last_name}</p>
+                <p><strong>Specialty:</strong> ${appointment.doctor_specialty}</p>
+                <p><strong>Date:</strong> ${appointment.app_date}</p>
+                <p><strong>Time:</strong> ${appointment.app_start_time} - ${appointment.app_end_time}</p>
+                <p><strong>Reason:</strong> ${appointment.reason_for_visit}</p>
             `;
-            appointmentContentDiv.appendChild(appointmentCard);
+            upcomingAppointmentsDiv.appendChild(appointmentCard);
         });
-    }    
+    }
 
     // Add new appointment
     if (appointmentForm) {
@@ -110,19 +109,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
                 .then((data) => {
                     if (data.success) {
-                        feedbackDiv.textContent = "Appointment scheduled successfully!";
-                        feedbackDiv.style.color = "green";
+                        feedbackDiv.textContent = 'Appointment scheduled successfully!';
+                        feedbackDiv.style.color = 'green';
                         appointmentForm.reset();
                         fetchAppointments(username); // Refresh the list
                     } else {
                         feedbackDiv.textContent = `Error: ${data.error || 'Unknown error'}`;
-                        feedbackDiv.style.color = "red";
+                        feedbackDiv.style.color = 'red';
                     }
                 })
                 .catch((error) => {
                     console.error('Error scheduling appointment:', error);
                     feedbackDiv.textContent = 'Error scheduling appointment.';
-                    feedbackDiv.style.color = "red";
+                    feedbackDiv.style.color = 'red';
                 });
         });
     }

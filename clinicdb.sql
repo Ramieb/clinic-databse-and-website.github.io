@@ -113,7 +113,6 @@ CREATE TABLE Appointment (
     reason_for_visit VARCHAR(50),
     referral VARCHAR(9),
     need_referral BOOL,
-    deleted BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (P_ID, app_date, app_start_time),
     FOREIGN KEY (D_ID) REFERENCES Doctor(employee_ssn)
         ON DELETE RESTRICT ON UPDATE CASCADE,

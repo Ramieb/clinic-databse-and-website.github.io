@@ -18,5 +18,8 @@
   "engines": {
     "node": "20.x"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^9.15.0"
+  }
 }
