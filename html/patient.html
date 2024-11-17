@@ -38,33 +38,24 @@
             <form id="appointmentForm">
                 <label for="app_date">Appointment Date:</label>
                 <input name="app_date" type="date" required />
-
+            
                 <label for="app_start_time">Start Time:</label>
                 <input name="app_start_time" type="time" required />
-
-                <label for="app_end_time">End Time:</label>
-                <input name="app_end_time" type="time" required />
-
-                <label for="D_ID">Choose a Doctor:</label>
-                <select name="D_ID" id="D_ID" required>
+            
+                <label for="D_ID">Doctor ID:</label>
+                <select name="D_ID" required>
                     <option value="123456789">John Doe (Cardiology)</option>
                     <option value="234567890">Alice Smith (Pediatrics)</option>
                     <option value="345678901">Bob Johnson (Family Medicine)</option>
                     <option value="456789012">Charlie White (Internal Medicine)</option>
                     <option value="567890123">Diana Lee (Neurology)</option>
                 </select>
-
+            
                 <label for="reason_for_visit">Reason for Visit:</label>
                 <input name="reason_for_visit" type="text" required />
-
-                <label for="referral">Referral:</label>
-                <input name="referral" type="text" />
-
-                <label for="need_referral">Need Referral:</label>
-                <input name="need_referral" type="checkbox" />
-
-                <button type="submit">Add Appointment</button>
-            </form>
+            
+                <button type="submit">Submit</button>
+            </form>            
         </section>
     </div>
 

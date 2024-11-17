@@ -37,6 +37,18 @@
                     </tr>
                 </tbody>
             </table>
+            <form id="referralRequestForm">
+                <label for="D_ID">Choose Doctor for Referral:</label>
+                <select name="D_ID" required>
+                    <option value="123456789">John Doe (Cardiology)</option>
+                    <option value="234567890">Alice Smith (Pediatrics)</option>
+                    <option value="345678901">Bob Johnson (Family Medicine)</option>
+                    <option value="456789012">Charlie White (Internal Medicine)</option>
+                    <option value="567890123">Diana Lee (Neurology)</option>
+                </select>
+                <button type="submit">Request Referral</button>
+            </form>
+            <div id="referralFeedback"></div>            
         </div>
     </main>
 </body>
