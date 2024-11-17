@@ -2,25 +2,21 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// Fetch appointments for a user
+// Fetch upcoming appointments for a user
 router.get('/appointments/:username', (req, res) => {
     const username = req.params.username;
 
-    if (!username) {
-        return res.status(400).json({ error: 'Username is required' });
-    }
-
     const query = `
         SELECT 
-            app_date, 
-            app_start_time, 
-            app_end_time, 
-            reason_for_visit, 
-            D.first_name AS doctor_first_name, 
-            D.last_name AS doctor_last_name, 
-            D.specialty AS doctor_specialty
+            Appointment.app_date, 
+            Appointment.app_start_time, 
+            Appointment.app_end_time, 
+            Appointment.reason_for_visit, 
+            Doctor.first_name AS doctor_first_name, 
+            Doctor.last_name AS doctor_last_name, 
+            Doctor.specialty AS doctor_specialty
         FROM Appointment
-        JOIN Doctor D ON Appointment.D_ID = D.employee_ssn
+        JOIN Doctor ON Appointment.D_ID = Doctor.employee_ssn
         WHERE Appointment.P_ID = (
             SELECT patient_id 
             FROM Patient 
@@ -31,13 +27,16 @@ router.get('/appointments/:username', (req, res) => {
         ORDER BY Appointment.app_date, Appointment.app_start_time;
     `;
 
+    console.log('Fetching appointments for username:', username); // Debug log
+
     db.query(query, [username], (error, results) => {
         if (error) {
             console.error('Error fetching appointments:', error);
-            return res.status(500).json({ error: 'Internal server error' });
+            res.status(500).json({ error: 'Error fetching appointments' });
+        } else {
+            console.log('Fetched appointments:', results); // Debug log
+            res.status(200).json(results);
         }
-
-        res.json(results);
     });
 });
 
@@ -83,37 +82,32 @@ router.post('/appointments', (req, res) => {
             (error) => {
                 if (error) {
                     console.error('Error creating appointment:', error);
-                    return res.status(500).json({ error: 'Error creating appointment' });
+                    res.status(500).json({ error: 'Error creating appointment' });
+                } else {
+                    res.status(201).json({ success: true, message: 'Appointment created successfully' });
                 }
-
-                // Always return valid JSON
-                res.status(201).json({ success: true, message: 'Appointment created successfully' });
             }
         );
     });
 });
 
-// Delete an appointment (Soft Delete)
-router.delete('/appointments/:id', (req, res) => {
-    const appointmentId = req.params.id;
-
-    if (!appointmentId) {
-        return res.status(400).json({ error: 'Appointment ID is required' });
-    }
-
+// Fetch all patients
+router.get('/patients', (req, res) => {
     const query = `
-        UPDATE Appointment 
-        SET deleted = TRUE 
-        WHERE P_ID = ?;
+        SELECT patient_id AS id, 
+               first_name AS firstName, 
+               last_name AS lastName, 
+               account_creation_date AS accountCreationDate
+        FROM Patient;
     `;
 
-    db.query(query, [appointmentId], (error) => {
+    db.query(query, (error, results) => {
         if (error) {
-            console.error('Error deleting appointment:', error);
-            return res.status(500).json({ error: 'Error deleting appointment' });
+            console.error('Error fetching patients:', error);
+            res.status(500).json({ error: 'Error fetching patients' });
+        } else {
+            res.json(results);
         }
-
-        res.json({ success: true, message: 'Appointment deleted successfully' });
     });
 });
 
