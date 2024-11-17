@@ -31,14 +31,15 @@ app.use(cors(corsOptions));
 // Handle preflight requests for all routes with OPTIONS method
 app.options('*', cors(corsOptions));
 
-// Serve the main index.html file
+// Serve the main index.html file from the root directory
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'html', 'index.html')); // Adjust path if needed
+    res.sendFile(path.join(__dirname, 'index.html')); // Ensure index.html is in the root directory
 });
 
 // Serve static files
-app.use('/html', express.static(path.join(__dirname, 'html')));
-app.use('/frontend', express.static(path.join(__dirname, 'frontend')));
+app.use('/html', express.static(path.join(__dirname, 'html'))); // Serve additional HTML files
+app.use('/frontend', express.static(path.join(__dirname, 'frontend'))); // Serve frontend assets
+app.use(express.static(path.join(__dirname))); // Serve static files from the root directory
 
 // Import and use backend routes
 const loginRoute = require('./backend/routerFiles/loginRoute');
@@ -52,9 +53,6 @@ app.use('/api', patientRoute);
 
 const doctorRoute = require('./backend/routerFiles/doctorRoute');
 app.use('/api/doctor', doctorRoute);
-
-// Serve other static assets from the root directory if needed
-app.use(express.static(path.join(__dirname)));
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
