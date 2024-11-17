@@ -45,7 +45,7 @@ app.use('/register', registerRoute);
 
 // Import and use the patientRoute
 const patientRoute = require('./backend/routerFiles/patientRoute');
-app.use('/api/patient', patientRoute); // Prefix patient routes with /api/patient
+app.use('/api', patientRoute); // Prefix routes with /api
 
 // Explicitly add the doctor route
 const doctorRoute = require('./backend/routerFiles/doctorRoute');

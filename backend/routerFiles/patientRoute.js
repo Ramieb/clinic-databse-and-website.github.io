@@ -2,184 +2,113 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// Database Retrieval Functions
+// Fetch upcoming appointments for a user
+router.get('/appointments/:username', (req, res) => {
+    const username = req.params.username;
 
-// Function to get payment data
-function getPaymentData(username) {
-    console.log('start of getPaymentData');
-    return new Promise((resolve, reject) => {
-        const query = `SELECT * FROM Payment WHERE username = ?`;
-        console.log('selected data from Payment table');
-        db.query(query, [username], (error, results) => {
-            if (error) reject(error);
-            resolve(results);
-            console.log('results gotten');
-        });
+    const query = `
+        SELECT 
+            Appointment.app_date, 
+            Appointment.app_start_time, 
+            Appointment.app_end_time, 
+            Appointment.reason_for_visit, 
+            Doctor.first_name AS doctor_first_name, 
+            Doctor.last_name AS doctor_last_name, 
+            Doctor.specialty AS doctor_specialty
+        FROM Appointment
+        JOIN Doctor ON Appointment.D_ID = Doctor.employee_ssn
+        WHERE Appointment.P_ID = (
+            SELECT patient_id 
+            FROM Patient 
+            WHERE username = ?
+        )
+          AND Appointment.deleted = FALSE
+          AND Appointment.app_date >= CURDATE()
+        ORDER BY Appointment.app_date, Appointment.app_start_time;
+    `;
+
+    console.log('Fetching appointments for username:', username); // Debug log
+
+    db.query(query, [username], (error, results) => {
+        if (error) {
+            console.error('Error fetching appointments:', error);
+            res.status(500).json({ error: 'Error fetching appointments' });
+        } else {
+            console.log('Fetched appointments:', results); // Debug log
+            res.status(200).json(results);
+        }
     });
-}
-
-// Function to get referral data
-function getReferralData(username) {
-    return new Promise((resolve, reject) => {
-        const query = `SELECT * FROM Referral WHERE username = ?`;
-        db.query(query, [username], (error, results) => {
-            if (error) reject(error);
-            resolve(results);
-        });
-    });
-}
-
-// Function to get medication data
-function getMedicationData(username) {
-    return new Promise((resolve, reject) => {
-        const query = `SELECT * FROM Medication WHERE username = ?`;
-        db.query(query, [username], (error, results) => {
-            if (error) reject(error);
-            resolve(results);
-        });
-    });
-}
-
-// Function to get allergy data
-function getAllergyData(username) {
-    return new Promise((resolve, reject) => {
-        const query = `SELECT * FROM Allergies WHERE username = ?`;
-        db.query(query, [username], (error, results) => {
-            if (error) reject(error);
-            resolve(results);
-        });
-    });
-}
-
-// Function to get illness data
-function getIllnessData(username) {
-    return new Promise((resolve, reject) => {
-        const query = `SELECT * FROM Illness WHERE username = ?`;
-        db.query(query, [username], (error, results) => {
-            if (error) reject(error);
-            resolve(results);
-        });
-    });
-}
-
-// Function to get surgery data
-function getSurgeryData(username) {
-    return new Promise((resolve, reject) => {
-        const query = `SELECT * FROM Surgery WHERE username = ?`;
-        db.query(query, [username], (error, results) => {
-            if (error) reject(error);
-            resolve(results);
-        });
-    });
-}
-
-// Function to get immunization data
-function getImmunizationData(username) {
-    return new Promise((resolve, reject) => {
-        const query = `SELECT * FROM Immunization WHERE username = ?`;
-        db.query(query, [username], (error, results) => {
-            if (error) reject(error);
-            resolve(results);
-        });
-    });
-}
-
-// Function to get medical history data
-function getMedHistoryData(username) {
-    return new Promise((resolve, reject) => {
-        const query = `SELECT * FROM Med_History WHERE username = ?`;
-        db.query(query, [username], (error, results) => {
-            if (error) reject(error);
-            resolve(results);
-        });
-    });
-}
-
-// Routes for each section
-router.get('/appointments/:username', (req, res) => { /* Existing route */ });
-router.get('/prescriptions/:username', (req, res) => { /* Existing route */ });
-router.get('/billing/:username', (req, res) => { /* Existing route */ });
-
-// New routes for additional sections
-
-router.get('/payment/:username', async (req, res) => {
-    try {
-        const data = await getPaymentData(req.params.username);
-        res.json(data);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error retrieving payment data' });
-    }
 });
 
-router.get('/referrals/:username', async (req, res) => {
-    try {
-        const data = await getReferralData(req.params.username);
-        res.json(data);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error retrieving referral data' });
+// Add a new appointment
+router.post('/appointments', (req, res) => {
+    const { username, doctor, appointmentDate, appointmentTime, reason } = req.body;
+
+    if (!username || !doctor || !appointmentDate || !appointmentTime || !reason) {
+        return res.status(400).json({ error: 'All fields are required' });
     }
+
+    const resolvePatientIdQuery = `
+        SELECT patient_id 
+        FROM Patient 
+        WHERE username = ?
+    `;
+
+    const insertAppointmentQuery = `
+        INSERT INTO Appointment (
+            app_date, 
+            P_ID, 
+            app_start_time, 
+            app_end_time, 
+            D_ID, 
+            reason_for_visit, 
+            referral, 
+            need_referral
+        )
+        VALUES (?, ?, ?, ADDTIME(?, '01:00:00'), ?, ?, NULL, FALSE);
+    `;
+
+    db.query(resolvePatientIdQuery, [username], (error, results) => {
+        if (error || results.length === 0) {
+            console.error('Error resolving patient ID:', error);
+            return res.status(500).json({ error: 'Could not resolve patient ID' });
+        }
+
+        const patientId = results[0].patient_id;
+
+        db.query(
+            insertAppointmentQuery,
+            [appointmentDate, patientId, appointmentTime, appointmentTime, doctor, reason],
+            (error) => {
+                if (error) {
+                    console.error('Error creating appointment:', error);
+                    res.status(500).json({ error: 'Error creating appointment' });
+                } else {
+                    res.status(201).json({ success: true, message: 'Appointment created successfully' });
+                }
+            }
+        );
+    });
 });
 
-router.get('/medications/:username', async (req, res) => {
-    try {
-        const data = await getMedicationData(req.params.username);
-        res.json(data);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error retrieving medication data' });
-    }
-});
+// Fetch all patients
+router.get('/patients', (req, res) => {
+    const query = `
+        SELECT patient_id AS id, 
+               first_name AS firstName, 
+               last_name AS lastName, 
+               account_creation_date AS accountCreationDate
+        FROM Patient;
+    `;
 
-router.get('/allergies/:username', async (req, res) => {
-    try {
-        const data = await getAllergyData(req.params.username);
-        res.json(data);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error retrieving allergy data' });
-    }
-});
-
-router.get('/illnesses/:username', async (req, res) => {
-    try {
-        const data = await getIllnessData(req.params.username);
-        res.json(data);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error retrieving illness data' });
-    }
-});
-
-router.get('/surgeries/:username', async (req, res) => {
-    try {
-        const data = await getSurgeryData(req.params.username);
-        res.json(data);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error retrieving surgery data' });
-    }
-});
-
-router.get('/immunizations/:username', async (req, res) => {
-    try {
-        const data = await getImmunizationData(req.params.username);
-        res.json(data);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error retrieving immunization data' });
-    }
-});
-
-router.get('/med-history/:username', async (req, res) => {
-    try {
-        const data = await getMedHistoryData(req.params.username);
-        res.json(data);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error retrieving medical history data' });
-    }
+    db.query(query, (error, results) => {
+        if (error) {
+            console.error('Error fetching patients:', error);
+            res.status(500).json({ error: 'Error fetching patients' });
+        } else {
+            res.json(results);
+        }
+    });
 });
 
 module.exports = router;

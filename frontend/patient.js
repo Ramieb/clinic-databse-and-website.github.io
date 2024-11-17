@@ -1,150 +1,125 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const username = urlParams.get('username');
-    console.log(`Extracted Username: ${username}`); // Should log the actual username
+    const appointmentForm = document.getElementById('appointmentForm');
+    const upcomingAppointmentsDiv = document.getElementById('appointmentContent');
+    const feedbackDiv = document.getElementById('appointmentFeedback');
+    const scheduleAppointmentSection = document.getElementById('schedule-appointment');
+
+    // Extract username from the URL or session storage
+    let username = new URLSearchParams(window.location.search).get('username');
+    if (username) {
+        sessionStorage.setItem('username', username); // Save username in session storage
+    } else {
+        username = sessionStorage.getItem('username'); // Retrieve username from session storage
+    }
 
     if (username) {
-        // Load patient data
-        loadUpcomingAppointments(username);
-        loadBillingInfo(username);
-        loadPaymentInfo(username);
-        loadReferrals(username);
-        loadMedications(username);
-        loadAllergies(username);
-        loadIllnesses(username);
-        loadSurgeries(username);
-        loadImmunizations(username);
-        loadMedicalHistory(username);
+        // Update navbar links with the username
+        updateNavLinks(username);
 
-        // After loading patient data, update Medical History link to include username in the URL
-        const medicalHistoryLink = document.querySelector('.nav-link[href="#med-history"]');
-        if (medicalHistoryLink) {
-            medicalHistoryLink.addEventListener('click', (event) => {
-                event.preventDefault();
-                console.log(`Redirecting with Username: ${username}`); // Logs before redirection
-                window.location.href = `medical_history.html?username=${username}`;
-            });
-        } else {
-            console.error("Medical History link not found.");
-        }
+        // Fetch upcoming appointments
+        fetchAppointments(username);
     } else {
-        console.error("No username provided in URL");
-        document.getElementById('appointmentContent').innerHTML = 'Username is missing from the URL.';
+        // Redirect to login page if username is missing
+        alert('Username is missing. Redirecting to login page.');
+        window.location.href = '/index.html';
         return;
     }
 
-    // Logout functionality
-    const logoutLink = document.querySelector('.nav-link[href="#logout"]');
-    if (logoutLink) {
-        logoutLink.addEventListener('click', (event) => {
-            event.preventDefault();
-            window.location.href = '../index.html';
+    // Function to update navigation links with the username
+    function updateNavLinks(username) {
+        const navLinks = document.querySelectorAll('nav a');
+        navLinks.forEach(link => {
+            const url = new URL(link.href, window.location.origin); // Parse the link's href
+            url.searchParams.set('username', username); // Add or update the username parameter
+            link.href = url.toString(); // Update the link's href
         });
-    } else {
-        console.error("Logout link not found.");
+    }
+
+    if (scheduleAppointmentSection) {
+        scheduleAppointmentSection.style.display = 'block';
+    }
+
+    // Fetch upcoming appointments
+    function fetchAppointments(username) {
+        fetch(`https://clinic-website.azurewebsites.net/api/appointments/${username}`)
+            .then((response) => {
+                if (!response.ok) {
+                    console.error('Error in response:', response);
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json(); // Parse the JSON response
+            })
+            .then((appointments) => {
+                displayAppointments(appointments); // Send the fetched data to the display function
+            })
+            .catch((error) => {
+                console.error('Error fetching appointments:', error);
+                upcomingAppointmentsDiv.textContent = 'Error loading appointments.';
+            });
+    }
+
+    // Display upcoming appointments
+    function displayAppointments(appointments) {
+        upcomingAppointmentsDiv.innerHTML = ''; // Clear previous content
+
+        if (appointments.length === 0) {
+            upcomingAppointmentsDiv.textContent = 'No upcoming appointments.';
+            return;
+        }
+
+        appointments.forEach((appointment) => {
+            const appointmentDiv = document.createElement('div');
+            appointmentDiv.className = 'appointment';
+            appointmentDiv.innerHTML = `
+                <p>Doctor: ${appointment.doctor_first_name} ${appointment.doctor_last_name} (${appointment.doctor_specialty})</p>
+                <p>Date: ${appointment.app_date}</p>
+                <p>Time: ${appointment.app_start_time}</p>
+                <p>Reason: ${appointment.reason_for_visit}</p>
+            `;
+            upcomingAppointmentsDiv.appendChild(appointmentDiv);
+        });
+    }
+
+    // Add new appointment
+    if (appointmentForm) {
+        appointmentForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(appointmentForm);
+            const appointmentData = Object.fromEntries(formData);
+            appointmentData.username = username; // Add username to the data
+
+            console.log('Submitting appointment data:', appointmentData); // Debug log
+
+            fetch('https://clinic-website.azurewebsites.net/api/appointments', {
+                method: 'POST',
+                body: JSON.stringify(appointmentData),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    if (data.success) {
+                        feedbackDiv.textContent = "Appointment scheduled successfully!";
+                        feedbackDiv.style.color = "green";
+                        appointmentForm.reset();
+                        fetchAppointments(username); // Refresh the list
+                    } else {
+                        feedbackDiv.textContent = `Error: ${data.error || 'Unknown error'}`;
+                        feedbackDiv.style.color = "red";
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error scheduling appointment:', error);
+                    feedbackDiv.textContent = 'Error scheduling appointment.';
+                    feedbackDiv.style.color = "red";
+                });
+        });
     }
 });
-
-function handleFetchResponse(response, containerId, emptyMessage) {
-    if (!response.ok) throw new Error('Network response was not ok');
-    return response.json().then(data => {
-        let content = '';
-        data.forEach(item => {
-            for (const [key, value] of Object.entries(item)) {
-                content += `<p>${key.replace(/_/g, ' ')}: ${value}</p>`;
-            }
-            content += `<hr>`;
-        });
-        document.getElementById(containerId).innerHTML = content || emptyMessage;
-    }).catch(error => {
-        console.error(`Error loading ${containerId.replace('Content', '')}:`, error);
-        document.getElementById(containerId).innerHTML = `Error loading ${containerId.replace('Content', '').toLowerCase()}.`;
-    });
-}
-
-// Load upcoming appointments
-function loadUpcomingAppointments(username) {
-    fetch(`/api/patient/appointments/${username}`)
-        .then(response => handleFetchResponse(response, 'appointmentContent', 'No upcoming appointments found.'));
-}
-
-// Load billing information
-function loadBillingInfo(username) {
-    fetch(`/api/patient/billing/${username}`)
-        .then(response => handleFetchResponse(response, 'billingContent', 'No billing information found.'));
-}
-
-// Load payment information and show "Pay Here" button if payment is due
-function loadPaymentInfo(username) {
-    fetch(`/api/patient/payments/${username}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            let content = '';
-            let paymentDue = false;
-            data.forEach(payment => {
-                content += `<p>Total Paid: $${payment.total_paid}</p>`;
-                content += `<p>Pay Date: ${payment.pay_date}</p>`;
-                content += `<p>Pay Towards: ${payment.pay_towards}</p>`;
-                content += `<hr>`;
-                if (!payment.paid) paymentDue = true;
-            });
-            document.getElementById('paymentContent').innerHTML = content || 'No payment records found.';
-            
-            const payHereButton = document.getElementById('payHereButton');
-            if (paymentDue && payHereButton) {
-                payHereButton.classList.add('active');
-                payHereButton.addEventListener('click', () => {
-                    alert('Payment processing...');
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error loading payment information:', error);
-            document.getElementById('paymentContent').innerHTML = 'Error loading payment information.';
-        });
-}
-
-// Load referrals
-function loadReferrals(username) {
-    fetch(`/api/patient/referrals/${username}`)
-        .then(response => handleFetchResponse(response, 'referralContent', 'No referrals found.'));
-}
-
-// Load medications
-function loadMedications(username) {
-    fetch(`/api/patient/medications/${username}`)
-        .then(response => handleFetchResponse(response, 'medicationContent', 'No medications found.'));
-}
-
-// Load allergies
-function loadAllergies(username) {
-    fetch(`/api/patient/allergies/${username}`)
-        .then(response => handleFetchResponse(response, 'allergyContent', 'No allergies found.'));
-}
-
-// Load illnesses
-function loadIllnesses(username) {
-    fetch(`/api/patient/illnesses/${username}`)
-        .then(response => handleFetchResponse(response, 'illnessContent', 'No illnesses found.'));
-}
-
-// Load surgeries
-function loadSurgeries(username) {
-    fetch(`/api/patient/surgeries/${username}`)
-        .then(response => handleFetchResponse(response, 'surgeryContent', 'No surgeries found.'));
-}
-
-// Load immunizations
-function loadImmunizations(username) {
-    fetch(`/api/patient/immunizations/${username}`)
-        .then(response => handleFetchResponse(response, 'immunizationContent', 'No immunizations found.'));
-}
-
-// Load medical history
-function loadMedicalHistory(username) {
-    fetch(`/api/patient/medicalHistory/${username}`)
-        .then(response => handleFetchResponse(response, 'medicalHistoryContent', 'No medical history found.'));
-}

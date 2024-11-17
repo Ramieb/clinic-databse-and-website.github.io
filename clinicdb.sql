@@ -113,6 +113,7 @@ CREATE TABLE Appointment (
     reason_for_visit VARCHAR(50),
     referral VARCHAR(9),
     need_referral BOOL,
+    deleted BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (P_ID, app_date, app_start_time),
     FOREIGN KEY (D_ID) REFERENCES Doctor(employee_ssn)
         ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -156,7 +157,7 @@ CREATE TABLE Referral (
     primary_doc VARCHAR(9) NOT NULL,
     P_ID INT NOT NULL,
     ref_date DATETIME NOT NULL,
-    experiation DATE NOT NULL,
+    expiriation DATE NOT NULL,
     specialist VARCHAR(9) NOT NULL,
     doc_appr BOOL,
     used BOOL,
@@ -238,7 +239,7 @@ CREATE TABLE Med_History (
         ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE VIEW Doctor_Patient_History_View
+/* CREATE VIEW Doctor_Patient_History_View
 AS SELECT	P.patient_id, P.first_name, P.last_name,
 			H.height, HIST.weight, H.blood_pressure,
             MED.medicine, MED.start_date, MED.end_date, MED.dosage,
@@ -268,7 +269,7 @@ AS SELECT	P.patient_id, P.first_name, P.last_name,
 FROM Patient AS P
 LEFT OUTER JOIN Payment AS PAY ON P.patient_id = PAY.P_ID
 LEFT OUTER JOIN Billing AS B ON P.patient_id = B.P_ID
-WHERE B.paid_off = TRUE;
+WHERE B.paid_off = TRUE; */
 
 -- Find the login info in users table, then if found use the username to query the specific role to find the correct user
 DELIMITER //
@@ -292,7 +293,7 @@ BEGIN
 END //
 DELIMITER ;
 
-/* DELIMITER //
+DELIMITER //
 CREATE TRIGGER No_Referral
 BEFORE INSERT ON Appointment
 FOR EACH ROW
@@ -338,7 +339,7 @@ BEGIN
     INSERT INTO Logs (log_message, log_time)  -- Log for 2-hour reminder
     VALUES (CONCAT('Reminder set for 2 hours before appointment on ', reminder_date_2hour), NOW());
 END; //
-DELIMITER ; */
+DELIMITER ;
 
 DELIMITER //
 CREATE EVENT Send_Reminders
@@ -382,6 +383,42 @@ CREATE TABLE Logs (
 -- need to add login info (username, password, security lvl/role)
 
 -- TRIGGERS
+DELIMITER //
+CREATE TRIGGER Calculate_End_Time
+BEFORE INSERT ON Appointment
+FOR EACH ROW
+BEGIN
+    -- Add 1 hour to the start time for the default appointment duration
+    SET NEW.app_end_time = ADDTIME(NEW.app_start_time, '01:00:00');
+END; //
+DELIMITER ;
+
+-- Ensure that no two appointments overlap for the same doctor
+DELIMITER //
+CREATE TRIGGER Prevent_Double_Booking
+BEFORE INSERT ON Appointment
+FOR EACH ROW
+BEGIN
+    DECLARE overlap_count INT;
+
+    SELECT COUNT(*)
+    INTO overlap_count
+    FROM Appointment
+    WHERE D_ID = NEW.D_ID
+      AND app_date = NEW.app_date
+      AND (
+        (NEW.app_start_time BETWEEN app_start_time AND app_end_time)
+        OR (NEW.app_end_time BETWEEN app_start_time AND app_end_time)
+        OR (app_start_time BETWEEN NEW.app_start_time AND NEW.app_end_time)
+      );
+
+    IF overlap_count > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Double-booking is not allowed for this doctor.';
+    END IF;
+END; //
+DELIMITER ;
+
 DELIMITER //
 CREATE TRIGGER Populate_Default_Data
 AFTER INSERT ON Users
@@ -471,7 +508,7 @@ VALUES
     (3, 50, '2023-06-25', '2023-06-20');
 
 -- REFERRALS DUMMY INFO
-INSERT INTO Referral (primary_doc, P_ID, ref_date, experiation, specialist, doc_appr, used)
+INSERT INTO Referral (primary_doc, P_ID, ref_date, expiriation, specialist, doc_appr, used)
 VALUES 
     ('123456789', 1, '2023-04-01', '2023-06-01', '345678901', TRUE, FALSE),
     ('234567890', 2, '2023-05-01', '2023-07-01', '456789012', FALSE, TRUE),
