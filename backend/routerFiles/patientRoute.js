@@ -22,6 +22,7 @@ router.get('/appointments/:username', (req, res) => {
 
 // Add a new appointment
 router.post('/appointments', (req, res) => {
+    console.log('POST /appointments called with body:', req.body);
     const { username, doctor, appointmentDate, appointmentTime, reason } = req.body;
 
     // Query to resolve P_ID (patient_id) based on username
