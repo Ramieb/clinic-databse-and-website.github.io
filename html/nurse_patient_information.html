@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Information - Nurse Dashboard</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="nursePatientInfo.js"></script>
+</head>
+<body>
+    <div class="navbar">
+        <a href="nurse.html">Nurse Dashboard</a>
+        <a href="nurse_patient_information.html" class="active">Patient Information</a>
+        <a href="nurse_patient_appointments.html">Patient Appointments</a>
+        <a href="../index.html">Logout</a>
+    </div>
+    <div class="dashboard">
+        <h1>Patient Information</h1>
+
+        <!-- Patient Information Form -->
+        <section class="patient-form">
+            <h2>Patient Details</h2>
+            <label for="patient-id">Enter Patient ID:</label>
+            <input type="text" id="patient-id" placeholder="e.g., 12345">
+            <button onclick="loadPatientInfo()">Load Patient Info</button>
+
+            <div id="patient-details" style="display: none;">
+                <h3>Patient Medical Information</h3>
+
+                <div class="patient-form">
+                    <div class="patient-info-row">
+                        <label for="edit-first-name">First Name:</label>
+                        <input type="text" id="edit-first-name" placeholder="Enter First Name" readonly>
+                    </div>
+
+                    <div class="patient-info-row">
+                        <label for="edit-last-name">Last Name:</label>
+                        <input type="text" id="edit-last-name" placeholder="Enter Last Name" readonly>
+                    </div>
+
+                    <div class="patient-info-row">
+                        <label for="edit-dob">Date of Birth:</label>
+                        <input type="date" id="edit-dob" placeholder="Enter Date of Birth" readonly>
+                    </div>
+
+                    <div class="patient-info-row">
+                        <label for="edit-age">Age:</label>
+                        <input type="number" id="edit-age" placeholder="Enter Age" readonly>
+                    </div>
+
+                    <div class="patient-info-row">
+                        <label for="edit-gender">Gender:</label>
+                        <input type="text" id="edit-gender" placeholder="Enter Gender" readonly>
+                    </div>
+
+                    <div class="patient-info-row">
+                        <label for="edit-current-illnesses">Current Illnesses:</label>
+                        <textarea id="edit-current-illnesses" placeholder="Enter current illnesses"></textarea>
+                    </div>
+
+                    <div class="patient-info-row">
+                        <label for="edit-surgical-history">Surgical History:</label>
+                        <textarea id="edit-surgical-history" placeholder="Enter surgical history details"></textarea>
+                    </div>
+
+                    <div class="patient-info-row">
+                        <label for="edit-immunizations">Immunizations:</label>
+                        <input type="text" id="edit-immunizations" placeholder="Enter immunization details">
+                    </div>
+
+                    <div class="patient-info-row">
+                        <label for="edit-medications">Medications:</label>
+                        <input type="text" id="edit-medications" placeholder="Enter medications">
+                    </div>
+
+                    <div class="patient-info-row">
+                        <label for="edit-allergies">Allergies:</label>
+                        <input type="text" id="edit-allergies" placeholder="Enter allergies">
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="button-container">
+                        <button onclick="savePatientInfo()">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

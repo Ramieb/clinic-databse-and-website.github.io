@@ -94,6 +94,7 @@ CREATE TABLE Patient (
     username VARCHAR(50) UNIQUE NOT NULL,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
+    gender VARCHAR(6),
     date_of_birth DATE,
     address VARCHAR(128),
     phone_number VARCHAR(10),
@@ -111,6 +112,7 @@ CREATE TABLE Appointment (
     app_end_time TIME NOT NULL,
     D_ID VARCHAR(9) NOT NULL,
     reason_for_visit VARCHAR(50),
+    nurse_notes VARCHAR(100),
     referral VARCHAR(9),
     need_referral BOOL,
     deleted BOOLEAN DEFAULT FALSE,
@@ -234,6 +236,7 @@ CREATE TABLE Med_History (
     height SMALLINT,
     weight SMALLINT,
     blood_pressure VARCHAR(10),
+    temperature SMALLINT,
     PRIMARY KEY (P_ID, last_visit),
     FOREIGN KEY (P_ID) REFERENCES Patient(patient_id)
         ON DELETE CASCADE ON UPDATE CASCADE
