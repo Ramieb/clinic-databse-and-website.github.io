@@ -41,44 +41,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch upcoming appointments
     function fetchAppointments(username) {
+        const appointmentContentDiv = document.getElementById('appointmentContent'); // Updated to match your HTML
+        appointmentContentDiv.textContent = 'Loading upcoming appointments...';
+    
         fetch(`https://clinic-website.azurewebsites.net/api/appointments/${username}`)
             .then((response) => {
                 if (!response.ok) {
-                    console.error('Error in response:', response);
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                return response.json(); // Parse the JSON response
+                return response.json();
             })
-            .then((appointments) => {
-                displayAppointments(appointments); // Send the fetched data to the display function
+            .then((data) => {
+                console.log('Fetched appointments:', data);
+                displayAppointments(data);
             })
             .catch((error) => {
                 console.error('Error fetching appointments:', error);
-                upcomingAppointmentsDiv.textContent = 'Error loading appointments.';
+                appointmentContentDiv.textContent = 'Failed to load upcoming appointments.';
             });
     }
-
-    // Display upcoming appointments
+    
     function displayAppointments(appointments) {
-        upcomingAppointmentsDiv.innerHTML = ''; // Clear previous content
-
+        const appointmentContentDiv = document.getElementById('appointmentContent'); // Updated to match your HTML
+        appointmentContentDiv.innerHTML = ''; // Clear any existing content
+    
         if (appointments.length === 0) {
-            upcomingAppointmentsDiv.textContent = 'No upcoming appointments.';
+            appointmentContentDiv.textContent = 'No upcoming appointments.';
             return;
         }
-
+    
         appointments.forEach((appointment) => {
-            const appointmentDiv = document.createElement('div');
-            appointmentDiv.className = 'appointment';
-            appointmentDiv.innerHTML = `
-                <p>Doctor: ${appointment.doctor_first_name} ${appointment.doctor_last_name} (${appointment.doctor_specialty})</p>
+            const appointmentCard = document.createElement('div');
+            appointmentCard.className = 'appointment-card';
+            appointmentCard.innerHTML = `
+                <p>Doctor: ${appointment.doctor_first_name} ${appointment.doctor_last_name}</p>
+                <p>Specialty: ${appointment.doctor_specialty}</p>
                 <p>Date: ${appointment.app_date}</p>
                 <p>Time: ${appointment.app_start_time}</p>
                 <p>Reason: ${appointment.reason_for_visit}</p>
             `;
-            upcomingAppointmentsDiv.appendChild(appointmentDiv);
+            appointmentContentDiv.appendChild(appointmentCard);
         });
-    }
+    }    
 
     // Add new appointment
     if (appointmentForm) {

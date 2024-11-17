@@ -48,12 +48,23 @@ router.post('/appointments', (req, res) => {
         return res.status(400).json({ error: 'All fields are required' });
     }
 
-    const resolvePatientIdQuery = `
-        SELECT patient_id 
-        FROM Patient 
-        WHERE username = ?
+    // Query to resolve P_ID (patient_id) based on username
+    const resolvePatientIdQuery = `SELECT patient_id FROM Patient WHERE username = ?`;
+
+    // Query to check for overlapping appointments for the same doctor
+    const checkOverlapQuery = `
+        SELECT COUNT(*) AS count
+        FROM Appointment
+        WHERE D_ID = ?
+          AND app_date = ?
+          AND (
+              (app_start_time <= ? AND app_end_time > ?) OR
+              (app_start_time < ADDTIME(?, '01:00:00') AND app_end_time >= ADDTIME(?, '01:00:00'))
+          )
+          AND deleted = FALSE;
     `;
 
+    // Insert query for appointments
     const insertAppointmentQuery = `
         INSERT INTO Appointment (
             app_date, 
@@ -76,18 +87,31 @@ router.post('/appointments', (req, res) => {
 
         const patientId = results[0].patient_id;
 
-        db.query(
-            insertAppointmentQuery,
-            [appointmentDate, patientId, appointmentTime, appointmentTime, doctor, reason],
-            (error) => {
-                if (error) {
-                    console.error('Error creating appointment:', error);
-                    res.status(500).json({ error: 'Error creating appointment' });
-                } else {
-                    res.status(201).json({ success: true, message: 'Appointment created successfully' });
-                }
+        // Check for overlapping appointments
+        db.query(checkOverlapQuery, [doctor, appointmentDate, appointmentTime, appointmentTime, appointmentTime, appointmentTime], (overlapError, overlapResults) => {
+            if (overlapError) {
+                console.error('Error checking for overlapping appointments:', overlapError);
+                return res.status(500).json({ error: 'Error checking for overlapping appointments' });
             }
-        );
+
+            if (overlapResults[0].count > 0) {
+                return res.status(400).json({ error: 'This time slot is already booked for the selected doctor.' });
+            }
+
+            // Insert the appointment if no overlap
+            db.query(
+                insertAppointmentQuery,
+                [appointmentDate, patientId, appointmentTime, appointmentTime, doctor, reason],
+                (insertError) => {
+                    if (insertError) {
+                        console.error('Error creating appointment:', insertError);
+                        res.status(500).json({ error: 'Error creating appointment' });
+                    } else {
+                        res.status(201).json({ success: true, message: 'Appointment created successfully' });
+                    }
+                }
+            );
+        });
     });
 });
 
