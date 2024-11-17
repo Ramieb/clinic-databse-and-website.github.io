@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Doctors</title>
     <link rel="stylesheet" href="../styles.css">
-    <script src="../frontend/doctor.js" defer></script> <!-- Separate JavaScript file for actions -->
+    <script src="../frontend/admin_doctor.js" defer></script> <!-- Separate JavaScript file for actions -->
 </head>
 <body>
     <!-- Navbar -->
@@ -44,23 +44,6 @@
             </tbody>
         </table>
 
-        <!-- Appointments Section (will be shown on button click) -->
-        <section id="appointments-section" class="table-section" display="none">
-            <h3>Past Appointments</h3>
-            <table id="appointments-table">
-                <thead>
-                    <tr>
-                        <th>Patient ID</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Reason</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Appointments will be dynamically inserted here -->
-                </tbody>
-            </table>
-        </section>
     </div>
 </body>
 </html>
