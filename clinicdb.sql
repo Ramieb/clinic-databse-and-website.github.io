@@ -145,6 +145,7 @@ CREATE TABLE Payment (
     total_paid INT,
     pay_date DATETIME NOT NULL,
     pay_towards DATETIME,
+    payment_type VARCHAR(25);
     PRIMARY KEY (P_ID, pay_date),
     FOREIGN KEY (P_ID) REFERENCES Patient(patient_id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -493,16 +494,19 @@ VALUES
 -- BILLING DUMMY INFO
 INSERT INTO Billing (P_ID, D_ID, charge_for, total_charge, charge_date, paid_off, paid_total)
 VALUES 
-    (1, '123456789', 'Consultation', 150, '2023-04-10', FALSE, 0),
-    (2, '234567890', 'Lab Test', 200, '2023-05-15', TRUE, 200),
-    (3, '345678901', 'Follow-up', 100, '2023-06-20', FALSE, 50);
+    (1, '123456789', 'Consultation', 150, '2023-04-10 00:00:00', FALSE, 0),
+    (2, '234567890', 'Lab Test', 200, '2023-05-15 00:00:00', TRUE, 200),   
+    (3, '345678901', 'Follow-up', 100, '2023-06-20 00:00:00', FALSE, 50);      
+
 
 -- PAYMENT DUMMY INFO
-INSERT INTO Payment (P_ID, total_paid, pay_date, pay_towards)
+
+INSERT INTO Payment (P_ID, total_paid, pay_date, pay_towards, payment_type)
 VALUES 
-    (1, 75, '2023-04-15', '2023-04-10'),
-    (2, 200, '2023-05-18', '2023-05-15'),
-    (3, 50, '2023-06-25', '2023-06-20');
+    (1, 75, '2023-04-15 10:00:00', '2023-04-10 00:00:00', 'Credit'),
+    (2, 200, '2023-05-18 14:30:00', '2023-05-15 00:00:00', 'Debit'),
+    (3, 50, '2023-06-25 09:00:00', '2023-06-20 00:00:00', 'Cash');  
+
 
 -- REFERRALS DUMMY INFO
 INSERT INTO Referral (primary_doc, P_ID, ref_date, expiriation, specialist, doc_appr, used)
