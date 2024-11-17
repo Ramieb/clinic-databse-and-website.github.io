@@ -293,7 +293,7 @@ BEGIN
 END //
 DELIMITER ;
 
-/* DELIMITER //
+DELIMITER //
 CREATE TRIGGER No_Referral
 BEFORE INSERT ON Appointment
 FOR EACH ROW
@@ -339,7 +339,7 @@ BEGIN
     INSERT INTO Logs (log_message, log_time)  -- Log for 2-hour reminder
     VALUES (CONCAT('Reminder set for 2 hours before appointment on ', reminder_date_2hour), NOW());
 END; //
-DELIMITER ; */
+DELIMITER ;
 
 DELIMITER //
 CREATE EVENT Send_Reminders
