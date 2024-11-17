@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update navbar links with the username
         updateNavLinks(username);
 
-        // Fetch upcoming appointments with timeout
+        // Fetch upcoming appointments
         fetchAppointments(username);
     } else {
         // Redirect to login page if username is missing
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch upcoming appointments
     function fetchAppointments(username) {
-        const fetchUrl = `${window.location.origin}/api/appointments/${username}`; // Dynamically determine the API URL
+        const fetchUrl = `/api/appointments/${username}`; // Simplified URL to use relative path
         upcomingAppointmentsDiv.textContent = 'Loading upcoming appointments...';
 
         fetchWithTimeout(fetchUrl, { timeout: 7000 })
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log('Submitting appointment data:', appointmentData); // Debug log
 
-            const postUrl = `${window.location.origin}/api/appointments`; // Dynamically determine the API URL
+            const postUrl = `/api/appointments`; // Simplified URL to use relative path
 
             fetchWithTimeout(postUrl, {
                 method: 'POST',

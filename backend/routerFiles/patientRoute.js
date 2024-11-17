@@ -6,7 +6,7 @@ const db = require('../db');
 router.get('/appointments/:username', (req, res) => {
     const username = req.params.username;
 
-        const query = `
+    const query = `
         SELECT 
             Appointment.app_date, 
             Appointment.app_start_time, 
@@ -22,7 +22,6 @@ router.get('/appointments/:username', (req, res) => {
         AND Appointment.app_date >= CURDATE()
         ORDER BY Appointment.app_date, Appointment.app_start_time;
     `;
-
 
     console.log('Fetching appointments for username:', username);
 
@@ -45,10 +44,8 @@ router.post('/appointments', (req, res) => {
         return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // Query to resolve P_ID (patient_id) based on username
     const resolvePatientIdQuery = `SELECT patient_id FROM Patient WHERE username = ?`;
 
-    // Insert query for appointments
     const insertAppointmentQuery = `
         INSERT INTO Appointment (
             app_date, 
@@ -71,7 +68,6 @@ router.post('/appointments', (req, res) => {
 
         const patientId = results[0].patient_id;
 
-        // Insert the appointment directly
         db.query(
             insertAppointmentQuery,
             [appointmentDate, patientId, appointmentTime, appointmentTime, doctor, reason],
@@ -84,27 +80,6 @@ router.post('/appointments', (req, res) => {
                 }
             }
         );
-    });
-});
-
-// Fetch all patients
-router.get('/patients', (_, res) => {
-    const query = `
-        SELECT 
-            patient_id AS id, 
-            first_name AS firstName, 
-            last_name AS lastName, 
-            account_creation_date AS accountCreationDate
-        FROM Patient;
-    `;
-
-    db.query(query, (error, results) => {
-        if (error) {
-            console.error('Error fetching patients:', error);
-            res.status(500).json({ error: 'Error fetching patients' });
-        } else {
-            res.status(200).json(results);
-        }
     });
 });
 
