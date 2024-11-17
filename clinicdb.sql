@@ -392,7 +392,7 @@ END; //
 DELIMITER ;
 
 -- Ensure that no two appointments overlap for the same doctor
-DELIMITER //
+/* DELIMITER //
 CREATE TRIGGER Prevent_Double_Booking
 BEFORE INSERT ON Appointment
 FOR EACH ROW
@@ -415,7 +415,7 @@ BEGIN
         SET MESSAGE_TEXT = 'Double-booking is not allowed for this doctor.';
     END IF;
 END; //
-DELIMITER ;
+DELIMITER ; */
 
 DELIMITER //
 CREATE TRIGGER Populate_Default_Data
