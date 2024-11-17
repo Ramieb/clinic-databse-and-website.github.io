@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch upcoming appointments
     function fetchAppointments(username) {
-        const fetchUrl = `/api/appointments/${username}`; // Simplified URL to use relative path
+        const fetchUrl = `https://clinic-website.azurewebsites.net/api/appointments/${username}`; // Updated to full URL
         upcomingAppointmentsDiv.textContent = 'Loading upcoming appointments...';
 
         fetchWithTimeout(fetchUrl, { timeout: 7000 })
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log('Submitting appointment data:', appointmentData); // Debug log
 
-            const postUrl = `/api/appointments`; // Simplified URL to use relative path
+            const postUrl = `https://clinic-website.azurewebsites.net/api/appointments`; // Updated to full URL
 
             fetchWithTimeout(postUrl, {
                 method: 'POST',
