@@ -367,8 +367,6 @@ BEGIN
 END; //
 DELIMITER ;
 
-;
-
 -- Testing the appointment_Reminder by storing the reminders in a log table. This table is not required, only using for debugging.
 CREATE TABLE Logs (
     log_id INT AUTO_INCREMENT PRIMARY KEY,
