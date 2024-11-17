@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Appointments</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="nursePatientApp.js" defer></script>
+</head>
+<body>
+    <div class="navbar">
+        <a href="nurse.html">Nurse Dashboard</a>
+        <a href="nurse_patient_information.html">Patient Information</a>
+        <a href="nurse_patient_appointments.html">Patient Appointments</a>
+        <a href="../index.html">Logout</a>
+    </div>
+    <div class="dashboard">
+        <h1>Patient Appointments</h1>
+        <p>Search for patient appointments and update necessary information.</p>
+
+        <!-- Search Form -->
+        <div class="form-container">
+            <h2>Search Appointments</h2>
+            <form id="search-form">
+                <!-- New Patient ID filter -->
+                <label for="patient-id">Patient ID:</label>
+                <input type="text" id="patient-id" name="patient-id" placeholder="Enter Patient ID">
+
+                <!-- Split Patient Name into First and Last Name -->
+                <label for="first-name">First Name:</label>
+                <input type="text" id="first-name" name="first-name" placeholder="Enter Patient First Name">
+
+                <label for="last-name">Last Name:</label>
+                <input type="text" id="last-name" name="last-name" placeholder="Enter Patient Last Name">
+
+                <!-- Date Filters -->
+                <label for="start-date">Start Date:</label>
+                <input type="date" id="start-date" name="start-date">
+
+                <label for="end-date">End Date:</label>
+                <input type="date" id="end-date" name="end-date">
+
+                <button type="submit">Search Appointments</button>
+            </form>
+        </div>
+
+        <!-- Appointment List -->
+        <div class="appointment-list">
+            <h2>Appointments</h2>
+            <table class="appointment-table">
+                <thead>
+                    <tr>
+                        <th>Patient Name</th>
+                        <th>Appointment Date</th>
+                        <th>Doctor</th>
+                        <th>View Details</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        <!-- Appointment Details Form -->
+        <div id="appointment-details" class="appointment-details" style="display:none;">
+            <h2>Appointment Details</h2>
+            <form id="update-appointment-form">
+                <input type="hidden" id="appointment-id" name="appointment-id">
+
+                <label for="weight">Weight:</label>
+                <input type="text" id="weight" name="weight" placeholder="Enter weight (lb)">
+
+                <label for="height">Height:</label>
+                <input type="text" id="height" name="height" placeholder="Enter height (ft / in)">
+
+                <label for="blood-pressure">Blood Pressure:</label>
+                <input type="text" id="blood-pressure" name="blood-pressure" placeholder="Enter blood pressure">
+
+                <label for="temperature">Temperature:</label>
+                <input type="text" id="temperature" name="temperature" placeholder="Enter temperature (°F)">
+
+                <label for="doctor-notes">Notes for Doctor:</label>
+                <textarea id="doctor-notes" name="doctor-notes" rows="4" placeholder="Enter notes for the doctor"></textarea>
+
+                <button type="submit">Update Appointment</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
