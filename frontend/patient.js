@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch upcoming appointments
     function fetchAppointments(username) {
-        fetch(`/api/appointments/${username}`)
+        fetch(`https://clinic-website.azurewebsites.net/api/appointments/${username}`)
             .then((response) => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const appointmentData = Object.fromEntries(formData);
             appointmentData.username = username; // Add username to the data
 
-            fetch('/api/appointments', {
+            fetch('https://clinic-website.azurewebsites.net/api/appointments', {
                 method: 'POST',
                 body: JSON.stringify(appointmentData),
                 headers: {
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Delete an appointment
     function deleteAppointment(appointmentId) {
-        fetch(`/api/appointments/${appointmentId}`, {
+        fetch(`https://clinic-website.azurewebsites.net/api/appointments/${appointmentId}`, {
             method: 'DELETE',
         })
             .then((response) => response.json())
