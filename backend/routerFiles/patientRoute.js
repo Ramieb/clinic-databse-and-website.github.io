@@ -52,7 +52,7 @@ router.post('/appointments', (req, res) => {
     const resolvePatientIdQuery = `SELECT patient_id FROM Patient WHERE username = ?`;
 
     // Query to check for overlapping appointments for the same doctor
-    const checkOverlapQuery = `
+    /* const checkOverlapQuery = `
         SELECT COUNT(*) AS count
         FROM Appointment
         WHERE D_ID = ?
@@ -62,7 +62,7 @@ router.post('/appointments', (req, res) => {
               (app_start_time < ADDTIME(?, '01:00:00') AND app_end_time >= ADDTIME(?, '01:00:00'))
           )
           AND deleted = FALSE;
-    `;
+    `; */
 
     // Insert query for appointments
     const insertAppointmentQuery = `
@@ -98,7 +98,6 @@ router.post('/appointments', (req, res) => {
                 return res.status(400).json({ error: 'This time slot is already booked for the selected doctor.' });
             }
 
-            // Insert the appointment if no overlap
             db.query(
                 insertAppointmentQuery,
                 [appointmentDate, patientId, appointmentTime, appointmentTime, doctor, reason],
