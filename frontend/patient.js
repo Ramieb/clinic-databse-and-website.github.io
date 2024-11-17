@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update navbar links with the username
         updateNavLinks(username);
 
-        // Fetch upcoming appointments
+        // Fetch upcoming appointments with timeout
         fetchAppointments(username);
     } else {
         // Redirect to login page if username is missing
@@ -39,11 +39,25 @@ document.addEventListener('DOMContentLoaded', () => {
         scheduleAppointmentSection.style.display = 'block';
     }
 
+    // Add timeout functionality to fetch
+    async function fetchWithTimeout(resource, options = {}) {
+        const { timeout = 5000 } = options; // 5-second timeout (can adjust as needed)
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        const response = await fetch(resource, {
+            ...options,
+            signal: controller.signal,
+        });
+        clearTimeout(id);
+        return response;
+    }
+
     // Fetch upcoming appointments
     function fetchAppointments(username) {
-        upcomingAppointmentsDiv.textContent = 'Loading upcoming appointments...';
+        const appointmentContentDiv = document.getElementById('appointmentContent'); // Match your HTML
+        appointmentContentDiv.textContent = 'Loading upcoming appointments...';
 
-        fetch(`https://clinic-website.azurewebsites.net/api/appointments/${username}`)
+        fetchWithTimeout(`https://clinic-website.azurewebsites.net/api/appointments/${username}`, { timeout: 7000 }) // 7-second timeout
             .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -56,16 +70,16 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch((error) => {
                 console.error('Error fetching appointments:', error);
-                upcomingAppointmentsDiv.textContent = 'Failed to load upcoming appointments.';
+                appointmentContentDiv.textContent = 'Failed to load upcoming appointments.';
             });
     }
 
-    // Display upcoming appointments
     function displayAppointments(appointments) {
-        upcomingAppointmentsDiv.innerHTML = ''; // Clear any existing content
+        const appointmentContentDiv = document.getElementById('appointmentContent'); // Match your HTML
+        appointmentContentDiv.innerHTML = ''; // Clear any existing content
 
         if (appointments.length === 0) {
-            upcomingAppointmentsDiv.textContent = 'No upcoming appointments.';
+            appointmentContentDiv.textContent = 'No upcoming appointments.';
             return;
         }
 
@@ -73,13 +87,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const appointmentCard = document.createElement('div');
             appointmentCard.className = 'appointment-card';
             appointmentCard.innerHTML = `
-                <p><strong>Doctor:</strong> ${appointment.doctor_first_name} ${appointment.doctor_last_name}</p>
-                <p><strong>Specialty:</strong> ${appointment.doctor_specialty}</p>
-                <p><strong>Date:</strong> ${appointment.app_date}</p>
-                <p><strong>Time:</strong> ${appointment.app_start_time} - ${appointment.app_end_time}</p>
-                <p><strong>Reason:</strong> ${appointment.reason_for_visit}</p>
+                <p>Doctor: ${appointment.doctor_first_name} ${appointment.doctor_last_name}</p>
+                <p>Specialty: ${appointment.doctor_specialty}</p>
+                <p>Date: ${appointment.app_date}</p>
+                <p>Time: ${appointment.app_start_time}</p>
+                <p>Reason: ${appointment.reason_for_visit}</p>
             `;
-            upcomingAppointmentsDiv.appendChild(appointmentCard);
+            appointmentContentDiv.appendChild(appointmentCard);
         });
     }
 

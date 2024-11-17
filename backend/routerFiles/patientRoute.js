@@ -6,7 +6,7 @@ const db = require('../db');
 router.get('/appointments/:username', (req, res) => {
     const username = req.params.username;
 
-    const query = `
+        const query = `
         SELECT 
             Appointment.app_date, 
             Appointment.app_start_time, 
@@ -17,14 +17,12 @@ router.get('/appointments/:username', (req, res) => {
             Doctor.specialty AS doctor_specialty
         FROM Appointment
         JOIN Doctor ON Appointment.D_ID = Doctor.employee_ssn
-        WHERE Appointment.P_ID = (
-            SELECT patient_id 
-            FROM Patient 
-            WHERE username = ?
-        )
+        JOIN Patient ON Appointment.P_ID = Patient.patient_id
+        WHERE Patient.username = ?
         AND Appointment.app_date >= CURDATE()
         ORDER BY Appointment.app_date, Appointment.app_start_time;
     `;
+
 
     console.log('Fetching appointments for username:', username);
 
