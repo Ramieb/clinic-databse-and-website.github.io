@@ -5,17 +5,31 @@ const db = require('../db');
 // Fetch appointments for a user
 router.get('/appointments/:username', (req, res) => {
     const username = req.params.username;
+
+    // Query to fetch upcoming appointments
     const query = `
-        SELECT A.id, A.app_date, A.app_start_time, A.reason_for_visit, D.first_name AS doctor_first_name, D.last_name AS doctor_last_name, D.specialty AS doctor_specialty
-        FROM Appointment A
-        JOIN Doctor D ON A.D_ID = D.employee_ssn
-        WHERE A.P_ID = (SELECT patient_id FROM Patient WHERE username = ?) AND A.deleted = FALSE;
+        SELECT app_date, 
+               app_start_time, 
+               app_end_time, 
+               reason_for_visit, 
+               D.first_name AS doctor_first_name, 
+               D.last_name AS doctor_last_name, 
+               D.specialty AS doctor_specialty
+        FROM Appointment
+        JOIN Doctor D ON D_ID = D.employee_ssn
+        WHERE P_ID = (SELECT patient_id FROM Patient WHERE username = ?)
+          AND deleted = FALSE
+          AND app_date >= CURDATE() -- Only include upcoming appointments
+        ORDER BY app_date, app_start_time; -- Sort by date and time
     `;
+
+    // Execute the query
     db.query(query, [username], (error, results) => {
         if (error) {
+            console.error('Error fetching appointments:', error);
             res.status(500).json({ error: 'Error fetching appointments' });
         } else {
-            res.json(results);
+            res.json(results); // Send the results back to the frontend
         }
     });
 });

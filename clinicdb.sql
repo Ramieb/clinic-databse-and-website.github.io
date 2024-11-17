@@ -157,7 +157,7 @@ CREATE TABLE Referral (
     primary_doc VARCHAR(9) NOT NULL,
     P_ID INT NOT NULL,
     ref_date DATETIME NOT NULL,
-    experiation DATE NOT NULL,
+    expiriation DATE NOT NULL,
     specialist VARCHAR(9) NOT NULL,
     doc_appr BOOL,
     used BOOL,
@@ -508,7 +508,7 @@ VALUES
     (3, 50, '2023-06-25', '2023-06-20');
 
 -- REFERRALS DUMMY INFO
-INSERT INTO Referral (primary_doc, P_ID, ref_date, experiation, specialist, doc_appr, used)
+INSERT INTO Referral (primary_doc, P_ID, ref_date, expiriation, specialist, doc_appr, used)
 VALUES 
     ('123456789', 1, '2023-04-01', '2023-06-01', '345678901', TRUE, FALSE),
     ('234567890', 2, '2023-05-01', '2023-07-01', '456789012', FALSE, TRUE),
