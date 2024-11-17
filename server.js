@@ -38,12 +38,10 @@ app.use('/frontend', express.static(path.join(__dirname, 'frontend')));
 
 // Import and use backend routes from the 'routerFiles' folder
 const loginRoute = require('./backend/routerFiles/loginRoute');
-app.use('/api/login', loginRoute);
-//app.use('/login', loginRoute);
+app.use('/login', loginRoute);
 
 const registerRoute = require('./backend/routerFiles/registerRoute');
-app.use('/api/register', registerRoute);
-//app.use('/register', registerRoute);
+app.use('/register', registerRoute);
 
 // Import and use the patientRoute
 const patientRoute = require('./backend/routerFiles/patientRoute');
