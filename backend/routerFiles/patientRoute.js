@@ -86,6 +86,7 @@ router.post('/appointments', (req, res) => {
                     return res.status(500).json({ error: 'Error creating appointment' });
                 }
 
+                // Always return valid JSON
                 res.status(201).json({ success: true, message: 'Appointment created successfully' });
             }
         );
