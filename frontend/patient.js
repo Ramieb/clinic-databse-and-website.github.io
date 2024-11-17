@@ -87,40 +87,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Add new appointment
-    if (appointmentForm) {
-        appointmentForm.addEventListener('submit', (event) => {
-            event.preventDefault();
+if (appointmentForm) {
+    appointmentForm.addEventListener('submit', (event) => {
+        event.preventDefault();
 
-            const formData = new FormData(appointmentForm);
-            const appointmentData = Object.fromEntries(formData);
-            appointmentData.username = username; // Add username to the data
+        const formData = new FormData(appointmentForm);
+        const appointmentData = Object.fromEntries(formData);
+        appointmentData.username = username; // Add username to the data
 
-            fetch('https://clinic-website.azurewebsites.net/api/appointments', {
-                method: 'POST',
-                body: JSON.stringify(appointmentData),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+        // Log data for debugging
+        console.log('Submitting appointment data:', appointmentData);
+
+        // Fetch request to schedule appointment
+        fetch('https://clinic-website.azurewebsites.net/api/appointments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(appointmentData),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    // Handle non-2xx status codes
+                    return response.json().then((data) => {
+                        throw new Error(data.error || 'Unknown server error');
+                    });
+                }
+                return response.json(); // Parse JSON if successful
             })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        feedbackDiv.textContent = "Appointment scheduled successfully!";
-                        feedbackDiv.style.color = "green";
-                        appointmentForm.reset();
-                        fetchAppointments(username); // Refresh the list
-                    } else {
-                        feedbackDiv.textContent = `Error: ${data.error || 'Unknown error'}`;
-                        feedbackDiv.style.color = "red";
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error scheduling appointment:', error);
-                    feedbackDiv.textContent = 'Error scheduling appointment.';
-                    feedbackDiv.style.color = "red";
-                });
-        });
-    }
+            .then((data) => {
+                console.log('Server response:', data); // Log server response for debugging
+                if (data.success) {
+                    feedbackDiv.textContent = 'Appointment scheduled successfully!';
+                    feedbackDiv.style.color = 'green';
+                    appointmentForm.reset();
+                    fetchAppointments(username); // Refresh the list of appointments
+                } else {
+                    feedbackDiv.textContent = `Error: ${data.error || 'Unknown error'}`;
+                    feedbackDiv.style.color = 'red';
+                }
+            })
+            .catch((error) => {
+                console.error('Error scheduling appointment:', error);
+                feedbackDiv.textContent = `Error scheduling appointment: ${error.message}`;
+                feedbackDiv.style.color = 'red';
+            });
+    });
+}
 
     // Delete an appointment
     function deleteAppointment(appointmentId) {

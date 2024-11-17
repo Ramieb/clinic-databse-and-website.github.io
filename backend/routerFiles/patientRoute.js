@@ -2,16 +2,20 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// Fetch upcoming appointments for a user
+// Fetch appointments for a user
 router.get('/appointments/:username', (req, res) => {
     const username = req.params.username;
 
+    if (!username) {
+        return res.status(400).json({ error: 'Username is required' });
+    }
+
     const query = `
         SELECT 
-            Appointment.app_date, 
-            Appointment.app_start_time, 
-            Appointment.app_end_time, 
-            Appointment.reason_for_visit, 
+            app_date, 
+            app_start_time, 
+            app_end_time, 
+            reason_for_visit, 
             D.first_name AS doctor_first_name, 
             D.last_name AS doctor_last_name, 
             D.specialty AS doctor_specialty
@@ -30,10 +34,10 @@ router.get('/appointments/:username', (req, res) => {
     db.query(query, [username], (error, results) => {
         if (error) {
             console.error('Error fetching appointments:', error);
-            res.status(500).json({ error: 'Error fetching appointments' });
-        } else {
-            res.json(results);
+            return res.status(500).json({ error: 'Internal server error' });
         }
+
+        res.json(results);
     });
 });
 
@@ -79,16 +83,16 @@ router.post('/appointments', (req, res) => {
             (error) => {
                 if (error) {
                     console.error('Error creating appointment:', error);
-                    res.status(500).json({ error: 'Error creating appointment' });
-                } else {
-                    res.status(201).json({ success: true, message: 'Appointment created successfully' });
+                    return res.status(500).json({ error: 'Error creating appointment' });
                 }
+
+                res.status(201).json({ success: true, message: 'Appointment created successfully' });
             }
         );
     });
 });
 
-// Delete an appointment
+// Delete an appointment (Soft Delete)
 router.delete('/appointments/:id', (req, res) => {
     const appointmentId = req.params.id;
 
@@ -99,16 +103,16 @@ router.delete('/appointments/:id', (req, res) => {
     const query = `
         UPDATE Appointment 
         SET deleted = TRUE 
-        WHERE id = ?;
+        WHERE P_ID = ?;
     `;
 
     db.query(query, [appointmentId], (error) => {
         if (error) {
             console.error('Error deleting appointment:', error);
-            res.status(500).json({ error: 'Error deleting appointment' });
-        } else {
-            res.json({ success: true, message: 'Appointment deleted successfully' });
+            return res.status(500).json({ error: 'Error deleting appointment' });
         }
+
+        res.json({ success: true, message: 'Appointment deleted successfully' });
     });
 });
 
