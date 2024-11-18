@@ -48,5 +48,24 @@
             </table>
         </div>
     </div>
+    <div class="referral-section">
+    <h3>Create Referral</h3>
+    <form id="referralForm">
+        <label for="specialist">Select Specialist:</label>
+        <select id="specialist" name="specialist" required>
+            <!-- Options will be dynamically populated -->
+        </select>
+
+        <label for="patientId">Patient ID:</label>
+        <input type="text" id="patientId" name="patientId" placeholder="Enter Patient ID" required>
+
+        <label for="referralReason">Reason for Referral:</label>
+        <textarea id="referralReason" name="referralReason" placeholder="Enter reason" required></textarea>
+
+        <button type="submit">Create Referral</button>
+    </form>
+    <div id="referralMessage"></div>
+</div>
+
 </body>
 </html>
