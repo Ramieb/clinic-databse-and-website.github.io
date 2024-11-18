@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const appointmentForm = document.getElementById('appointmentForm');
-    const referralRequestForm = document.getElementById('referralRequestForm');
     const upcomingAppointmentsDiv = document.getElementById('appointmentContent');
     const feedbackDiv = document.getElementById('appointmentFeedback');
-    const referralFeedbackDiv = document.getElementById('referralFeedback');
     const scheduleAppointmentSection = document.getElementById('schedule-appointment');
 
     // Extract username from the URL or session storage
@@ -103,125 +101,55 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Add new appointment using the async function
-    async function addAppointment(appointmentData) {
-        const postUrl = `https://clinic-website.azurewebsites.net/api/appointments`; // Updated to full URL
+    // Add new appointment
+    if (appointmentForm) {
+        appointmentForm.addEventListener('submit', (event) => {
+            event.preventDefault();
 
-        try {
-            const response = await fetchWithTimeout(postUrl, {
+            const formData = new FormData(appointmentForm);
+            const appointmentData = Object.fromEntries(formData);
+            appointmentData.username = username; // Add username to the data
+
+            console.log('Submitting appointment data:', appointmentData); // Debug log
+
+            const postUrl = `https://clinic-website.azurewebsites.net/api/appointments`; // Updated to full URL
+
+            fetchWithTimeout(postUrl, {
                 method: 'POST',
                 body: JSON.stringify(appointmentData),
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 timeout: 7000, // 7-second timeout
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            if (error.name === 'AbortError') {
-                console.error('Request was aborted: Timeout reached');
-                throw new Error('Request timed out. Please try again.');
-            } else {
-                console.error('Error adding appointment:', error);
-                throw error;
-            }
-        }
-    }
-
-    // Add referral request using the async function
-    async function requestReferral(referralData) {
-        const postUrl = `https://clinic-website.azurewebsites.net/api/referrals`;
-
-        try {
-            const response = await fetchWithTimeout(postUrl, {
-                method: 'POST',
-                body: JSON.stringify(referralData),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                timeout: 7000, // 7-second timeout
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            if (error.name === 'AbortError') {
-                console.error('Request was aborted: Timeout reached');
-                throw new Error('Request timed out. Please try again.');
-            } else {
-                console.error('Error requesting referral:', error);
-                throw error;
-            }
-        }
-    }
-
-    // Add new appointment form submission handler
-    if (appointmentForm) {
-        appointmentForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            const formData = new FormData(appointmentForm);
-            const appointmentData = Object.fromEntries(formData);
-
-            // Add username to the appointment data
-            appointmentData.username = username;
-
-            console.log('Submitting appointment data:', appointmentData); // Debug log
-
-            try {
-                const result = await addAppointment(appointmentData);
-
-                if (result.success) {
-                    feedbackDiv.textContent = 'Appointment scheduled successfully!';
-                    feedbackDiv.style.color = 'green';
-                    appointmentForm.reset();
-                    fetchAppointments(username); // Refresh the list
-                } else {
-                    feedbackDiv.textContent = `Error: ${result.error || 'Unknown error'}`;
-                    feedbackDiv.style.color = 'red';
-                }
-            } catch (error) {
-                feedbackDiv.textContent = error.message || 'Error scheduling appointment.';
-                feedbackDiv.style.color = 'red';
-            }
-        });
-    }
-
-    // Referral request form submission handler
-    if (referralRequestForm) {
-        referralRequestForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            const formData = new FormData(referralRequestForm);
-            const referralData = Object.fromEntries(formData);
-
-            console.log('Submitting referral request data:', referralData); // Debug log
-
-            try {
-                const result = await requestReferral(referralData);
-
-                if (result.success) {
-                    referralFeedbackDiv.textContent = 'Referral request sent successfully!';
-                    referralFeedbackDiv.style.color = 'green';
-                    referralRequestForm.reset();
-                } else {
-                    referralFeedbackDiv.textContent = `Error: ${result.error || 'Unknown error'}`;
-                    referralFeedbackDiv.style.color = 'red';
-                }
-            } catch (error) {
-                referralFeedbackDiv.textContent = error.message || 'Error sending referral request.';
-                referralFeedbackDiv.style.color = 'red';
-            }
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    if (data.success) {
+                        feedbackDiv.textContent = 'Appointment scheduled successfully!';
+                        feedbackDiv.style.color = 'green';
+                        appointmentForm.reset();
+                        fetchAppointments(username); // Refresh the list
+                    } else {
+                        feedbackDiv.textContent = `Error: ${data.error || 'Unknown error'}`;
+                        feedbackDiv.style.color = 'red';
+                    }
+                })
+                .catch((error) => {
+                    if (error.name === 'AbortError') {
+                        console.error('Request was aborted: Timeout reached');
+                        feedbackDiv.textContent = 'Request timed out. Please try again.';
+                        feedbackDiv.style.color = 'red';
+                    } else {
+                        console.error('Error scheduling appointment:', error);
+                        feedbackDiv.textContent = 'Error scheduling appointment.';
+                        feedbackDiv.style.color = 'red';
+                    }
+                });
         });
     }
 });
