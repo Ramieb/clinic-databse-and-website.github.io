@@ -348,9 +348,11 @@ CREATE TRIGGER after_update_referral
 AFTER UPDATE ON Referral
 FOR EACH ROW
 BEGIN
+    -- Check if the status is updated to 'Approved'
     IF NEW.doc_appr = TRUE THEN
+        -- Log that the referral has been approved (or take necessary actions)
         INSERT INTO ReferralLogs (referral_id, doctor_id, patient_id, status, timestamp)
-        VALUES (NEW.referral_id, NEW.specialist, NEW.P_ID, 'Approved', NOW()); -- Ensure referral_id exists
+        VALUES (NEW.ref_date, NEW.specialist, NEW.P_ID, 'Approved', NOW());
     END IF;
 END;
 //
@@ -358,21 +360,17 @@ END;
 DELIMITER ;
 
 DELIMITER //
-
 CREATE TRIGGER No_Referral
 BEFORE INSERT ON Appointment
 FOR EACH ROW
 BEGIN
-    DECLARE referral_exists INT;
-
+	DECLARE referral_exists INT;
+    
     SELECT COUNT(*)
     INTO referral_exists
-    FROM Referral AS R
-    WHERE R.P_ID = NEW.P_ID 
-      AND R.specialist = NEW.D_ID 
-      AND R.doc_appr = TRUE
-      AND R.expiriation >= CURDATE(); -- Ensure referral is not expired
-
+	FROM Referral AS R
+    WHERE R.P_ID = NEW.P_ID AND R.specialist = NEW.D_ID AND R.doc_appr = TRUE; -- new refers to the new row trying to be inserted and specialist is the doctor id of the specialist that is being referred to
+    
     IF referral_exists = 0 THEN
         IF EXISTS (
             SELECT 1 
@@ -380,12 +378,11 @@ BEGIN
             WHERE employee_ssn = NEW.D_ID 
               AND specialist = TRUE
         ) THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Cannot create appointment: No approved referral to specialist.';
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot create appointment: No approved referral to specialist.';
         END IF;
     END IF;
-END;
-//
+END; //
 
 -- THIS MIGHT NOT WORK SAYS ERRORS ON MY WORKBENCH
 DELIMITER //
@@ -626,19 +623,5 @@ VALUES
     (1, '2023-05-01', 170, 70, '120/80'),
     (2, '2023-05-10', 165, 75, '130/85'),
     (3, '2023-04-20', 160, 68, '125/82');
---Appointment dummy info
-INSERT INTO Appointment (app_date, P_ID, app_start_time, app_end_time, D_ID, reason_for_visit)
-SELECT CURDATE(), patient_id, '10:00:00', '11:00:00', '123456789', 'General Checkup'
-FROM Patient
-WHERE patient_id NOT IN (SELECT DISTINCT P_ID FROM Appointment);
-
--- Add admin id
-UPDATE Office
-SET admin_id = '111111111'
-WHERE admin_id IS NULL;
---Add doctor ID for corresponding patient
-UPDATE Patient
-SET primary_id = '123456789' -- Replace with an actual doctor ID
-WHERE primary_id IS NULL;
 
 COMMIT;
