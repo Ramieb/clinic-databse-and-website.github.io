@@ -2,6 +2,31 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
+router.use(bodyParser.json());
+
+// Route to handle adding a doctor
+router.post('/addDoctor', async (req, res) => {
+    const { first_name, last_name, phone_number, ssn, specialty, salary, office_id } = req.body;
+
+    if (!first_name || !last_name || !phone_number || !ssn || !specialty || !salary || !office_id) {
+        return res.status(400).json({ message: 'Please provide all required fields.' });
+    }
+
+    try {
+        // Logic to add the doctor to the database
+        const query = 'INSERT INTO doctors (first_name, last_name, phone_number, ssn, specialty, salary, office_id) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        const values = [first_name, last_name, phone_number, ssn, specialty, salary, office_id];
+
+        // Assuming you have a database connection (e.g., MySQL)
+        await db.query(query, values);
+
+        res.status(200).json({ message: 'Doctor added successfully.' });
+    } catch (error) {
+        console.error('Error adding doctor:', error);
+        res.status(500).json({ message: 'Failed to add doctor.' });
+    }
+});
+
 // Endpoint to fetch referral count by doctor for a given time range
 router.get('/referral-report-by-doctor', async (req, res) => {
     const { startDate, endDate } = req.query;

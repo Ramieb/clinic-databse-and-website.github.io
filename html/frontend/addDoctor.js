@@ -50,7 +50,7 @@ async function handleFormSubmit(event) {
         submitButton.disabled = true;
         submitButton.textContent = 'Submitting...';
 
-        const response = await fetch('/doctorActions/add', {
+        const response = await fetch('/admin/addDoctor', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
