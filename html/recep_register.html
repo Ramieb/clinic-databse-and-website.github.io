@@ -17,32 +17,53 @@
         <a href="/">My Account</a>
         <a href="/html/receptionist.html">Dashboard</a>
     </div>
-    <main class="main-content"></main>
+    <main class="main-content" id="register_style">
         <header class="header"> 
             <h1>Register at Our Clinic</h1>
             <p>Create an account to access our clinic services.</p>
         </header>
 
     
-        <section class="register-container">
-            <h2>Register</h2>
+        <div class="register-container">
+            <h2>Register a new patient</h2>
             <form id="registerForm">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+                <div class="form_line">
+                    <label for="first_name">First Name:</label>
+                    <input type="text" id="first_name" name="first_name" required>
 
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-
-                <label for="role">Role:</label>
-                <select id="role" name="role" required>
-                    <option value="patient">Patient</option>
-                </select>
-
-                <button type="submit">Register</button>
-            </form>
-        </section>
+                    <label for="last_name">Last Name:</label>
+                    <input type="text" id="last_name" name="last_name" required>
+                    <label for="dob">Date of Birth:</label>
+                    <input type="date" id="dob" name="dob" required>
+                </div>
+                    <div class="form_line">
+                        <label for="street_address">Street Address:</label>
+                        <input id="street_address" name="street_address" type="text" placeholder="Enter Street Address" required><br>
+            
+                        <label for="city">City:</label>
+                        <input id="city" name="city" type="text" placeholder="Enter City" required><br>
+            
+                        <label for="state">State:</label>
+                        <input id="state" name="state" type="text" placeholder="Enter State" required><br>
+            
+                        <label for="zip_code">Zip Code:</label>
+                        <input id="zip_code" name="zip_code" type="text" placeholder="Enter Zip Code" required><br>
+            
+                        <label for="country">Country:</label>
+                        <input id="country" name="country" type="text" placeholder="Enter Country" required><br>
+                    </div>
+                <div class="form_line">
+                    <label for="phone number">Phone number:</label>
+                    <input type="text" id="phone number" name="phone number" required>
+                
+                    <label for="role">Role:</label>
+                    <select id="role" name="role" required>
+                        <option value="patient">Patient</option>
+                    </select>
+                </div>
+                <button id="submit_register" type="submit">Register</button>
+         </form>
+        </div>
     </main>
-
-    <script src="../frontend/register.js"></script> <!-- Updated path to register.js -->
 </body>
 </html>

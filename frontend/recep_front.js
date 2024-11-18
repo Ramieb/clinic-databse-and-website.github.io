@@ -24,8 +24,8 @@ function submitForm() {
     };
 
     // Use Fetch API to send data to the backend
-    fetch('../backend/routerFiles/receptionistRoute.js', {
-        method: 'GET',  // Or 'POST' if your backend uses POST
+    fetch('/api/appointments', {  // Updated to a more conventional API endpoint
+        method: 'POST',  // Use POST since we're sending data
         headers: {
             'Content-Type': 'application/json',  // Send data as JSON
         },
@@ -35,7 +35,7 @@ function submitForm() {
     .then(data => {
         // Handle the response data (e.g., show available appointments)
         if (data.status === 'success') {
-            document.getElementById('appointment_results').innerHTML = `
+            document.getElementById('appointment_results').innerHTML = ` 
                 <h2>Available Appointments</h2>
                 <ul>
                     ${data.appointments.map(appt => `<li>${appt.time}</li>`).join('')}
@@ -54,3 +54,29 @@ function submitForm() {
         `;
     });
 }
+
+// populate appt drop box with locations
+async function populateOfficeLocations() {
+    try {
+        const response = await fetch('/api/offices');
+        const offices = await response.json();
+
+        const select = document.getElementById('office_loc');
+
+        // Clear existing options (if any)
+        select.innerHTML = '<option value="" disabled selected>Select office</option>';
+
+        // Add new options dynamically
+        offices.forEach(office => {
+            const option = document.createElement('option');
+            option.value = office.id; // ID or whatever unique value you want to send
+            option.textContent = office.location_name; // The name to display
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error fetching office locations:', error);
+    }
+}
+
+// Call the function when the page loads
+window.onload = populateOfficeLocations;

@@ -18,13 +18,29 @@
         <a href="/html/receptionist.html">Dashboard</a>
     </div>
     <main class="main-content">
-        <div class="patient_search_bar"></div>
-            <form id="find_patient" action="../frontend/recep_front.js" method="GET">
-                <input id="lookup_info" type="text" placeholder="Enter Patient ID:">
-                <button id="submitPatientID"onclick="lookForPatient()">Search</button>
-            </form>
+        <div class="lookup_container">
+            <h2>Patient ID Lookup:</h2>
+            <div class="patient_lookup">
+                <form id="find_patient_id">
+                    <label for="lookup_id">Patient ID:</label>
+                    <input id="lookup_id" type="text" name="lookup_id"placeholder="Enter Patient ID:">
+                    <button id="submitPatientID">Search</button>
+                </form>
+            </div>
+            <h2>Alternate Lookup:</h2>
+            <div class="patient_lookup">
+                <form id ="find_patient_alt">
+                    <label for="last_name">Last name:</label>
+                    <input id="last_name" type="text" name="last_name"placeholder="Last name">
+                    <label for="dob">Date of Birth:</label>
+                    <input type="date" id="dob" name="dob">
+                    <button id="submitPatientAlt">Search</button>
+                </form>
+            </div>
+        </div>
+        <div class="output_area">
+            <h2>Please enter patient lookup</h2>
         </div>
     </main>
-    <script src="../frontend/recep_front.js"></script>
 </body>
 </html>
