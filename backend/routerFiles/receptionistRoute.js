@@ -12,7 +12,7 @@ router.get('/offices', async (req, res) => {
         res.json(result.rows);  // Return office locations as JSON
     } catch (err) {
         console.error("Error retrieving office locations:", err);
-        res.status(500).send("Error retrieving office locations");
+        res.status(500).json({ message: 'Error retrieving office locations' });
     }
 });
 
@@ -175,7 +175,7 @@ router.post('/billing_id_lookup', async (req, res) => {
         res.json(result.rows);  // Return office locations as JSON
     } catch (err) {
         console.error("Error retrieving outstanding bills:", err);
-        res.status(500).send("Error retrieving outstanding bills");
+        res.status(500).json({ message: 'Error retrieving outstanding bills' });;
     }
 });
 
@@ -194,7 +194,7 @@ router.post('/billing_alt_lookup', async (req, res) => {
         res.json(result.rows);  // Return office locations as JSON
     } catch (err) {
         console.error("Error retrieving outstanding bills:", err);
-        res.status(500).send("Error retrieving outstanding bills");
+        res.status(500).json({ message: 'Error retrieving outstanding bills' });;
     }
 });
 
