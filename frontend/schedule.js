@@ -68,3 +68,4 @@ function populateAppointmentsTable(appointments, doctorName) {
 
 // Call the function to populate the doctor dropdown when the page loads
 document.addEventListener('DOMContentLoaded', fetchDoctors);
+document.getElementById('viewScheduleBtn').addEventListener('click', fetchAppointments);
