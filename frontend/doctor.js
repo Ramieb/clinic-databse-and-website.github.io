@@ -12,11 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 data.data.forEach((record) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${record.doctor_id}</td>
-                        <td>${record.patient_id}</td>
-                        <td>${record.visit_date}</td>
-                        <td>${record.diagnosis}</td>
-                        <td>${record.treatment}</td>
+                         <td>${record.patient_id}</td>
+                        <td>${record.patient_first_name} ${record.patient_last_name}</td>
+                        <td>${record.app_date}</td>
+                        <td>${record.reason_for_visit}</td>
                     `;
                     historyTableBody.appendChild(row);
                 });
@@ -92,7 +91,9 @@ const referralForm = document.getElementById('referralForm');
     fetchDoctorPatientHistory();
     async function fetchReferrals() {
         try {
-            const response = await fetch('/api/doctor/getReferrals?specialist=<doctor_id>');
+            const doctorId = '<doctor_id>'; // Replace with dynamic doctor ID
+const response = await fetch(`/api/doctor/doctor_patient_history?employee_ssn=${doctorId}`);
+<doctor_id>');
             const referrals = await response.json();
     
             const referralsTableBody = document.getElementById('referralsTableBody');
