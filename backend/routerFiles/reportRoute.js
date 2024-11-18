@@ -32,7 +32,7 @@ router.get('/referral-report-by-doctor', async (req, res) => {
 });
 
 // Endpoint to fetch salary vs billing for doctors within a time range
-router.get('/salary-vs-billing-report', async (req, res) => {
+router.get('/api/salary-vs-billing-report', async (req, res) => {
     const { startDate, endDate } = req.query;
 
     if (!startDate || !endDate || isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
