@@ -1,4 +1,8 @@
 // Endpoint to fetch referral count by doctor for a given time range
+const express = require('express');
+const db = require('../db'); // Import your database connection
+const router = express.Router();
+
 router.get('/referral-report-by-doctor', async (req, res) => {
     const { startDate, endDate } = req.query;
 
