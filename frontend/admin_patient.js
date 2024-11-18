@@ -7,24 +7,29 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch("/api/getPatients");
             if (!response.ok) throw new Error("Failed to fetch patients.");
             const patients = await response.json();
-
-            // Populate table
+    
             patientsTable.innerHTML = ""; // Clear table before populating
             patients.forEach((patient) => {
                 const row = document.createElement("tr");
-                row.setAttribute("data-patient-id", patient.patient_id);
+                row.dataset.patientId = patient.patient_id; // Store patient ID
+    
                 row.innerHTML = `
                     <td>${patient.first_name}</td>
                     <td>${patient.last_name}</td>
                     <td>${patient.date_of_birth}</td>
                     <td>${patient.phone_number}</td>
-                    <td><button onclick="showMedicine(${patient.patient_id})" class="medicine-btn">Medicine</button></td>
-                    <td><button onclick="showAppointments(${patient.patient_id})" class="appointments-btn">Appointments</button></td>
                     <td>
-                        <button onclick="editPatient(${patient.patient_id})" class="edit-btn">Edit</button>
-                        <button onclick="deletePatient(${patient.patient_id})" class="delete-btn">Delete</button>
+                        <button class="medicine-btn" onclick="showMedicine(${patient.patient_id})">Medicine</button>
+                    </td>
+                    <td>
+                        <button class="appointments-btn" onclick="showAppointments(${patient.patient_id})">Appointments</button>
+                    </td>
+                    <td>
+                        <button class="edit-btn" onclick="editPatient(${patient.patient_id})">Edit</button>
+                        <button class="delete-btn" onclick="deletePatient(${patient.patient_id})">Delete</button>
                     </td>
                 `;
+    
                 patientsTable.appendChild(row);
             });
         } catch (error) {
