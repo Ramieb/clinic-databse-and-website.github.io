@@ -92,4 +92,25 @@ router.get('/getAppointments', (req, res) => {
         });
     });
 
+    // Soft delete an appointment by updating its status to 'deleted'
+router.post('/softDelete', (req, res) => {
+    const { patient_id, app_date, app_start_time } = req.body;
+
+    // Query to update the appointment's 'deleted' status or use another method (timestamp, etc.)
+    const query = `
+        UPDATE Appointment
+        SET deleted = TRUE  -- Assuming a 'deleted' column is being used
+        WHERE P_ID = ? AND app_date = ? AND app_start_time = ?
+    `;
+    
+    db.query(query, [patient_id, app_date, app_start_time], (err, result) => {
+        if (err) {
+            console.error('Error performing soft delete:', err);
+            return res.status(500).json({ success: false, message: 'Failed to delete appointment' });
+        }
+
+        res.status(200).json({ success: true, message: 'Appointment marked as deleted' });
+    });
+});
+
 module.exports = router;

@@ -32,7 +32,25 @@ function fetchAppointments() {
         });
 }
 
-// Function to edit the row
+// Function to edit the row (turn table cells into input fields)
+function editRow(button) {
+    const row = button.closest('tr');
+    const cells = row.querySelectorAll('td');
+
+    // Convert cells into editable inputs
+    cells[0].innerHTML = `<input type="text" value="${cells[0].textContent.trim()}">`;  // Date
+    cells[1].innerHTML = `<input type="text" value="${cells[1].textContent.trim()}">`;  // Time
+    cells[2].innerHTML = `<input type="text" value="${cells[2].textContent.trim()}">`;  // Patient First Name
+    cells[3].innerHTML = `<input type="text" value="${cells[3].textContent.trim()}">`;  // Patient Last Name
+    cells[4].innerHTML = `<input type="text" value="${cells[4].textContent.trim()}">`;  // Doctor's Full Name
+    cells[5].innerHTML = `<input type="text" value="${cells[5].textContent.trim()}">`;  // Reason for Visit
+
+    // Change the edit button to a save button
+    button.textContent = 'Save';
+    button.setAttribute('onclick', 'saveRow(this, ' + row.getAttribute('data-id') + ')');
+}
+
+// Function to save the row (send updated data to the server)
 function saveRow(button, patientId) {
     const row = button.closest('tr');
     const cells = row.querySelectorAll('td');
@@ -46,7 +64,7 @@ function saveRow(button, patientId) {
     const doctor_name = cells[4].querySelector('input').value;
     const reason_for_visit = cells[5].querySelector('input').value;
 
-    // Send updated data to the backend
+    // Send updated data to the backend (as you already have)
     fetch(`/api/appointments/updateAppointment`, {
         method: 'POST',
         headers: {
@@ -77,26 +95,40 @@ function saveRow(button, patientId) {
     });
 }
 
-// POST route to soft delete an appointment
-app.post('/api/appointments/softDelete', (req, res) => {
-    const { patient_id, app_date, app_start_time } = req.body;
 
-    const query = `
-        UPDATE Appointment
-        SET deleted = TRUE  -- Assuming you have a 'deleted' column
-        WHERE P_ID = ? AND app_date = ? AND app_start_time = ?
-    `;
-    
-    db.query(query, [patient_id, app_date, app_start_time], (err, result) => {
-        if (err) {
-            console.error('Error performing soft delete:', err);
-            return res.status(500).json({ success: false, message: 'Failed to delete appointment' });
+
+// Function to soft delete an appointment (hide row)
+function softDeleteRow(button) {
+    const row = button.closest('tr');
+    const patientId = row.getAttribute('data-id');
+    const appDate = row.cells[0].textContent.trim();
+    const appStartTime = row.cells[1].textContent.trim().split(' - ')[0]; // Assuming format "start - end"
+
+    // Send request to backend to mark the appointment as deleted (via /admin route)
+    fetch('/admin/softDelete', {  // Changed to /admin/softDelete
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            patient_id: patientId,
+            app_date: appDate,
+            app_start_time: appStartTime
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Appointment deleted successfully!');
+            row.style.display = 'none';  // Hide the row visually
+        } else {
+            alert('Failed to delete appointment');
         }
-
-        res.status(200).json({ success: true, message: 'Appointment marked as deleted' });
+    })
+    .catch(err => {
+        console.error('Error deleting appointment:', err);
     });
-});
-
+}
 
 // Call fetchAppointments on page load to populate the table
 document.addEventListener('DOMContentLoaded', fetchAppointments);
