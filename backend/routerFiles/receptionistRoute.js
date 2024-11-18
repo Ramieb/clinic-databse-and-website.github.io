@@ -109,7 +109,7 @@ router.post('/register', async (req, res) => {
         });
     }
 
-    // Generate the username (phone_number) and password (last_name + zip_code)
+    // Generate the username (phone_number) and password (last_name + phone number)
     const username = phone_number; // Using phone number as the username
     const password = last_name + phone_number; // Password = last name + phone number
     
