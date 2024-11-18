@@ -2,7 +2,18 @@
 // populate appt drop box with locations
 async function populateOfficeLocations() {
     try {
-        const response = await fetch('/api/receptionist/offices');
+        const response = await fetch('/api/receptionist/offices', {
+            method: 'GET',  // Specify GET method
+            headers: {
+                'Content-Type': 'application/json',  // Expecting a JSON response
+            },
+        });
+
+        // Check if the response was successful
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const offices = await response.json();
 
         const select = document.getElementById('office_loc');
@@ -22,17 +33,18 @@ async function populateOfficeLocations() {
     }
 }
 
+
 // Call the function when the page loads
 window.onload = populateOfficeLocations;
 
-async function populateDoctors() {
+/*async function populateDoctors() {
     try {
         
         
     } catch (error) {
         console.error('Error fetching office locations:', error);
     }
-}
+}*/
 
 function editAppointment(patient_id, app_date, app_start_time) {
     // You can add functionality to edit an appointment here
