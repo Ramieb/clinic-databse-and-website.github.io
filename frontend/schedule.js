@@ -1,7 +1,7 @@
 // Function to fetch the list of doctors from the backend and populate the dropdown
 async function fetchDoctors() {
     try {
-        const response = await fetch('/api/doctor/getDoctors');
+        const response = await fetch('doctor/getDoctors');
         const doctors = await response.json();
 
         const dropdown = document.getElementById('doctorDropdown');
