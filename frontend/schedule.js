@@ -18,6 +18,7 @@ async function fetchDoctors() {
 
 // Function to fetch appointments for the selected doctor on the selected date
 async function fetchAppointments() {
+    console.log('Button clicked');
     const doctorSelect = document.getElementById('doctorDropdown');
     const doctorId = doctorSelect.value;
     const appointmentDate = document.getElementById('appointment-date').value;
