@@ -12,11 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 data.data.forEach((record) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                         <td>${record.patient_id}</td>
-                        <td>${record.patient_first_name} ${record.patient_last_name}</td>
-                        <td>${record.app_date}</td>
-                        <td>${record.reason_for_visit}</td>
-                    `;
+                        <td>${record.patient_id}</td>
+                    <td>${record.patient_first_name} ${record.patient_last_name}</td>
+                    <td>${record.visit_date}</td>
+                    <td>${record.diagnosis || 'N/A'}</td>
+                    <td>${record.treatment || 'N/A'}</td>
+                `;
                     historyTableBody.appendChild(row);
                 });
             } else {
