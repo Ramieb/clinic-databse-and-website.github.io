@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Dashboard - Manage Patients</title>
     <link rel="stylesheet" href="../styles.css">
-    <script src="../html/frontend/addPatient.js" defer></script> <!-- Separate JavaScript file for actions -->
+    <script src="../html/frontend/managePatients.js" defer></script> <!-- Updated JS -->
 </head>
 <body>
     <!-- Navbar -->
@@ -18,45 +18,45 @@
         <a href="employees.html">Employees</a>
         <a href="../index.html">Logout</a>
     </div>
-    <!-- Main Content for Patients Management -->
+    <!-- Main Content -->
     <div class="main-content">
-        <!-- Title -->
         <h2>Manage Patients</h2>
-        <!-- Patients Table -->
-
-        
-<div class="add-doctor-btn">
-            <button onclick="window.location.href = 'addPatient.html';">Add Patient</button>
+        <div class="add-patient-btn">
+            <a href="addPatient.html">
+                <button>Add Patient</button>
+            </a>
         </div>
         <table id="doctors-table">
             <thead>
                 <tr>
                     <th>First Name</th>
                     <th>Last Name</th>
-                    <th>Account Creation Date</th>
-                    <th>Medicine</th> <!-- Changed from Medical History to Medicine -->
+                    <th>Date of Birth</th>
+                    <th>Phone Number</th>
+                    <th>Medicine</th>
                     <th>Appointments</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Example row - dynamic population will replace these hardcoded rows -->
+                <!-- Example dynamic row -->
                 <tr data-patient-id="1">
-                    <td>John</td>
+                    <td>Jane</td>
                     <td>Doe</td>
-                    <td>2023-01-15</td>
+                    <td>1990-05-15</td>
+                    <td>1234567890</td>
                     <td>
-                        <button onclick="showMedicine(1)" class="medicine-btn">Medicine</button> <!-- Medicine button -->
+                        <button onclick="showMedicine(1)" class="medicine-btn">Medicine</button>
                     </td>
                     <td>
-                        <button onclick="showAppointments(1)" class="appointments-btn">Past Appointments</button>
+                        <button onclick="showAppointments(1)" class="appointments-btn">Appointments</button>
                     </td>
                     <td>
                         <button onclick="editPatient(1)" class="edit-btn">Edit</button>
                         <button onclick="deletePatient(1)" class="delete-btn">Delete</button>
                     </td>
                 </tr>
-                <!-- Additional rows will be added dynamically -->
+                <!-- Additional rows to be populated dynamically -->
             </tbody>
         </table>
     </div>

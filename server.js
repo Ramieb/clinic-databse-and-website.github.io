@@ -49,19 +49,37 @@ const registerRoute = require('./backend/routerFiles/registerRoute');
 app.use('/register', registerRoute);
 
 const patientRoute = require('./backend/routerFiles/patientRoute');
-app.use('/api', patientRoute);
+app.use('/api/patient', patientRoute);
 
 const doctorRoute = require('./backend/routerFiles/doctorRoute');
 app.use('/api/doctor', doctorRoute);
 
-const receptionistRoute = require('./backend/routerFiles/receptionistRoute');
-app.use('/api/receptionist', receptionistRoute);
+const reportRoute = require('./backend/routerFiles/reportRoute');  // Import your reportRoute file
+app.use('/api/report', reportRoute); 
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
     console.error('Unexpected Error:', err.stack);
     res.status(500).json({ error: 'Internal Server Error' });
 });
+
+// POST route to add doctor
+app.post('/api/doctor/add', (req, res) => {
+    const { first_name, last_name, employee_ssn, specialty, salary, office_id } = req.body;
+  
+    const query = `
+      INSERT INTO doctors (first_name, last_name, employee_ssn, specialty, salary, office_id)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+  
+    db.query(query, [first_name, last_name, employee_ssn, specialty, salary, office_id], (err, result) => {
+      if (err) {
+        console.error('Error adding doctor:', err);
+        return res.status(500).json({ message: 'Failed to add doctor' });
+      }
+      res.status(200).json({ message: 'Doctor added successfully', doctorId: result.insertId });
+    });
+  });
 
 // Set the port for Azure or default to 8080
 const port = process.env.PORT || 8080;
