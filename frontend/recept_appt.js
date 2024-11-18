@@ -141,7 +141,7 @@ async function submitApptFilters() {
     }
 }
 
-/*document.getElementById('appointmentForm').addEventListener('submit', async (event) => {
+document.getElementById('appointmentForm').addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const formData = new FormData(appointmentForm);
@@ -168,7 +168,7 @@ async function submitApptFilters() {
         feedbackDiv.textContent = error.message || 'Error scheduling appointment.';
         feedbackDiv.style.color = 'red';
     }
-});*/
+});
 
 async function createNewAppt(){
     const resultsContainer = document.getElementById('appointment_results');
