@@ -185,5 +185,27 @@ router.get('/salary-vs-billing-report', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+// Route to create a referral
+router.post('/referrals', async (req, res) => {
+    const { specialist, patientId, referralReason } = req.body;
+
+    if (!specialist || !patientId || !referralReason) {
+        return res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    try {
+        const query = `
+            INSERT INTO Referral (specialist, P_ID, reason_for_referral, ref_date)
+            VALUES (?, ?, ?, NOW());
+        `;
+        await db.query(query, [specialist, patientId, referralReason]);
+
+        res.status(201).json({ message: 'Referral created successfully!' });
+    } catch (error) {
+        console.error('Error creating referral:', error.stack);
+        res.status(500).json({ message: 'Server error. Unable to create referral.' });
+    }
+});
+
 
 module.exports = router;
