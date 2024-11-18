@@ -1,3 +1,4 @@
+
 //////////////THIS IS FOR REGISTER PAGE////////////////////
 // Add event listener to the register form
 document.getElementById('registerForm').addEventListener('submit', async function (event) {
@@ -35,7 +36,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
 
     try {
         // Send the form data to the backend
-        const response = await fetch('/api/register', {
+        const response = await fetch('/api/receiptionist/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

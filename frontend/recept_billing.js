@@ -21,7 +21,7 @@ async function submitPatientID(){
 
     try {
         // Send the data to the backend to get available appointments
-        const response = await fetch('/api/billing_id_lookup', {
+        const response = await fetch('/api/receiptionist/billing_id_lookup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ async function submitPatientAlt(){
 
     try {
         // Send the data to the backend to get available appointments
-        const response = await fetch('/api/billing_alt_lookup', {
+        const response = await fetch('/api/receiptionist/billing_alt_lookup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

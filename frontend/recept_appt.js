@@ -48,7 +48,7 @@ async function deleteAppointment(patient_id, app_date, app_start_time) {
     if (confirmDelete) {
         try {
             // Send a DELETE request to the backend to delete the appointment
-            const response = await fetch('/api/appointments', {
+            const response = await fetch('/api/receiptionist/appointments', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -96,7 +96,7 @@ async function submitApptFilters() {
 
     try {
         // Send the data to the backend to get available appointments
-        const response = await fetch('/api/appointments', {
+        const response = await fetch('/api/receiptionist/appointments', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
