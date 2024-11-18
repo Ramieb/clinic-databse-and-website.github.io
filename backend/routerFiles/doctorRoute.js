@@ -59,7 +59,7 @@ router.get('/getAppointments', async (req, res) => {
 
 // Route to get detailed information for a specific doctor
 router.get('/:id', async (req, res) => {
-    const doctorId = req.params.employee_ssn;
+    const doctorId = req.params.id;
 
     if (!doctorId) {
         return res.status(400).json({ error: 'Doctor ID is required.' });
