@@ -2,10 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch doctor data and populate the table
     fetchDoctorData();
 
-    function navigateToAddDoctor() {
-        window.location.href = "addDoctor.html";
-    }
-    
     // Function to fetch doctor data
     async function fetchDoctorData() {
         try {
