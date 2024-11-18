@@ -106,13 +106,12 @@ router.get('/doctor_patient_history', async (req, res) => {
     try {
         const query = `
             SELECT 
-                P.patient_id, 
+                 P.patient_id, 
                 P.first_name AS patient_first_name, 
                 P.last_name AS patient_last_name,
-                A.app_date, 
-                A.reason_for_visit,
-                D.first_name AS doctor_first_name,
-                D.last_name AS doctor_last_name
+                A.app_date AS visit_date, 
+                A.reason_for_visit AS diagnosis,
+                'Placeholder Treatment' AS treatment -- Replace with actual field if available
             FROM Appointment A
             JOIN Patient P ON A.P_ID = P.patient_id
             JOIN Doctor D ON A.D_ID = D.employee_ssn
