@@ -7,7 +7,7 @@ function paybill(patient_id, charge_date) {
 }
 
 async function submitPatientID(){
-    const patient_id = parseInt(document.getElementById("patient_id").value);
+    const patient_id = parseInt(document.getElementById("lookup_id").value);
 
     if (!patientID) {
         alert('Please enter patient ID before entering');
