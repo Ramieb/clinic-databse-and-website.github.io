@@ -8,27 +8,42 @@
 </head>
 <body>
     <!-- Navbar with links for sections and logout -->
-        <nav class="navbar">
-            <a href="medical_history.html" class="nav-link">Medical History</a>
-            <a href="prescriptions.html" class="nav-link">Prescriptions</a>
-            <a href="billing.html" class="nav-link">Billing Information</a>
-            <a href="payment.html" class="nav-link">Payment</a>
-            <a href="referrals.html" class="nav-link">Referrals</a>
-            <a href="/index.html" class="nav-link" id="logoutLink">Logout</a>
-        </nav>
+    <nav class="navbar">
+        <a href="medical_history.html" class="nav-link">Medical History</a>
+        <a href="prescriptions.html" class="nav-link">Prescriptions</a>
+        <a href="billing.html" class="nav-link">Billing Information</a>
+        <a href="payment.html" class="nav-link">Payment</a>
+        <a href="referrals.html" class="nav-link">Referrals</a>
+        <a href="/index.html" class="nav-link" id="logoutLink">Logout</a>
+    </nav>
 
     <div class="dashboard">
         <h1>Patient Profile</h1>
+
+        <!-- Upcoming Appointments Section -->
         <section id="upcoming-appointments" class="section active">
             <h2>Upcoming Appointments</h2>
-            <div id="appointmentContent">Loading upcoming appointments...</div>
+            <div id="appointmentContent">
+                <form id="appointmentForm">
+                    <!-- Placeholder for dynamically loaded appointments -->
+                    <div>Loading upcoming appointments...</div>
+                </form>
+            </div>
+            <div id="appointmentFeedback"></div>
         </section>
-        
+
+        <!-- Schedule Appointment Section -->
         <section id="schedule-appointment" class="section">
             <h2>Schedule an Appointment</h2>
             <form id="appointmentForm">
-                <label for="doctor">Choose a Doctor:</label>
-                <select name="doctor" id="doctor" required>
+                <label for="app_date">Appointment Date:</label>
+                <input name="app_date" type="date" required />
+            
+                <label for="app_start_time">Start Time:</label>
+                <input name="app_start_time" type="time" required />
+            
+                <label for="D_ID">Doctor ID:</label>
+                <select name="D_ID" required>
                     <option value="123456789">John Doe (Cardiology)</option>
                     <option value="234567890">Alice Smith (Pediatrics)</option>
                     <option value="345678901">Bob Johnson (Family Medicine)</option>
@@ -36,19 +51,12 @@
                     <option value="567890123">Diana Lee (Neurology)</option>
                 </select>
             
-                <label for="appointmentDate">Choose a Date:</label>
-                <input type="date" name="appointmentDate" id="appointmentDate" required>
-            
-                <label for="appointmentTime">Choose a Time:</label>
-                <input type="time" name="appointmentTime" id="appointmentTime" required>
-            
-                <label for="reason">Reason for Visit:</label>
-                <textarea name="reason" id="reason" placeholder="Brief reason for visit..." required></textarea>
+                <label for="reason_for_visit">Reason for Visit:</label>
+                <input name="reason_for_visit" type="text" required />
             
                 <button type="submit">Submit</button>
-            </form>           
-            <div id="appointmentFeedback"></div>
-        </section>        
+            </form>            
+        </section>
     </div>
 
     <script src="../frontend/patient.js"></script>
