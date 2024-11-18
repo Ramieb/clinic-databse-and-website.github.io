@@ -63,6 +63,24 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal Server Error' });
 });
 
+// POST route to add doctor
+app.post('/api/doctor/add', (req, res) => {
+    const { first_name, last_name, employee_ssn, specialty, salary, office_id } = req.body;
+  
+    const query = `
+      INSERT INTO doctors (first_name, last_name, employee_ssn, specialty, salary, office_id)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+  
+    db.query(query, [first_name, last_name, employee_ssn, specialty, salary, office_id], (err, result) => {
+      if (err) {
+        console.error('Error adding doctor:', err);
+        return res.status(500).json({ message: 'Failed to add doctor' });
+      }
+      res.status(200).json({ message: 'Doctor added successfully', doctorId: result.insertId });
+    });
+  });
+
 // Set the port for Azure or default to 8080
 const port = process.env.PORT || 8080;
 app.listen(port, () => {

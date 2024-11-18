@@ -37,16 +37,10 @@
                 <input type="text" id="last-name" name="last_name" required>
             </div>
 
-            <!-- Phone Number -->
-            <div class="form">
-                <label for="phone-number">Phone Number:</label>
-                <input type="tel" id="phone-number" name="phone_number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
-            </div>
-
             <!-- SSN -->
             <div class="form">
-                <label for="ssn">SSN:</label>
-                <input type="text" id="ssn" name="ssn" pattern="[0-9]{3}-[0-9]{2}-[0-9]{4}" required>
+                <label for="employee-ssn">SSN:</label>
+                <input type="text" id="employee-ssn" name="employee_ssn" pattern="[0-9]{3}-[0-9]{2}-[0-9]{4}" required>
             </div>
 
             <!-- Specialty -->
@@ -54,12 +48,18 @@
                 <label for="specialty">Specialty:</label>
                 <select id="specialty" name="specialty" required>
                     <option value="">Please Select</option>
-                    <option value="Cardiologist">Cardiologist</option>
-                    <option value="Dermatologist">Dermatologist</option>
-                    <option value="Pediatrician">Pediatrician</option>
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Pediatrics">Pediatrics</option>
+                    <option value="Family Medicine">Family Medicine</option>
+                    <option value="Neurology">Neurology</option>
                 </select>
             </div>
 
+            <div class="form">
+                <label for="Salary">Salary:</label>
+                <input type="text" id="Salary" name="salary" required>
+            </div>
+            
             <!-- Office ID -->
             <div class="form">
                 <label for="office-id">Office ID:</label>

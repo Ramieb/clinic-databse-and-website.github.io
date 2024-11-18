@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const addDoctorButton = document.getElementById('add-doctor-btn');
+    
+    addDoctorButton.addEventListener('click', () => {
+        window.location.href = 'addDoctor.html'; // Navigate to the addDoctor.html page
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
     const doctorId = sessionStorage.getItem('doctorId') || '1';
 
     // Load initial doctor data
@@ -15,7 +23,7 @@ async function fetchDoctorData(doctorId) {
         doctors.forEach(doctor => {
             // Log the doctor object to inspect the data
             console.log(doctor);
-            
+
             const row = document.createElement('tr');
             row.dataset.doctorId = doctor.id; // Store doctor ID for front-end-only deletion
             
