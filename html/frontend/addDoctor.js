@@ -50,7 +50,11 @@ async function handleFormSubmit(event) {
         submitButton.disabled = true;
         submitButton.textContent = 'Submitting...';
 
+<<<<<<< Updated upstream
         const response = await fetch('/admin/addDoctor', {
+=======
+        const response = await fetch('/api/admin/addDoctor', {
+>>>>>>> Stashed changes
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
