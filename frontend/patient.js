@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackDiv = document.getElementById('appointmentFeedback');
     const referralFeedbackDiv = document.getElementById('referralFeedback');
     const scheduleAppointmentSection = document.getElementById('schedule-appointment');
+    const referralContainer = document.getElementById('referrals');
 
     // Extract username from the URL or session storage
     let username = new URLSearchParams(window.location.search).get('username');
@@ -20,6 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Fetch upcoming appointments
         fetchAppointments(username);
+
+        // Fetch patient referrals
+        fetchPatientReferrals();
     } else {
         // Redirect to login page if username is missing
         alert('Username is missing. Redirecting to login page.');
@@ -222,36 +226,59 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    window.fetchPatientReferrals = function fetchPatientReferrals() {
+
+    // Function to fetch patient referrals
+    function fetchPatientReferrals() {
         const username = sessionStorage.getItem('username');
         if (!username) {
             console.error('Username not found. Redirecting to login page.');
             window.location.href = '/login.html';
             return;
         }
-    
-        fetch(`/api/referrals/${username}`)
-            .then(response => {
+
+        const fetchUrl = `/api/referrals/${username}`;
+        referralContainer.textContent = 'Loading referrals...';
+
+        fetch(fetchUrl)
+            .then((response) => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch patient referrals');
                 }
                 return response.json();
             })
-            .then(data => {
-                console.log('Patient referrals:', data);
-                const referralContainer = document.getElementById('referrals');
-                referralContainer.innerHTML = ''; // Clear existing content
-    
-                data.forEach(referral => {
-                    const div = document.createElement('div');
-                    div.textContent = `
-                        Doctor: ${referral.doctor_first_name} ${referral.doctor_last_name}
-                        Reason: ${referral.reason_for_referral}
-                        Status: ${referral.doc_appr ? 'Approved' : referral.doc_appr === false ? 'Rejected' : 'Pending'}
-                    `;
-                    referralContainer.appendChild(div);
-                });
+            .then((data) => {
+                displayReferrals(data);
             })
-            .catch(error => console.error('Error fetching referrals:', error));
-    };        
+            .catch((error) => {
+                console.error('Error fetching referrals:', error);
+                referralContainer.textContent = 'Failed to load referrals. Please try again.';
+            });
+    }
+
+    // Function to display referrals
+    function displayReferrals(referrals) {
+        referralContainer.innerHTML = ''; // Clear existing content
+
+        if (referrals.length === 0) {
+            referralContainer.textContent = 'No referrals found.';
+            return;
+        }
+
+        referrals.forEach((referral) => {
+            const div = document.createElement('div');
+            div.className = 'referral-card';
+            div.innerHTML = `
+                <p>Doctor: ${referral.doctor_first_name} ${referral.doctor_last_name}</p>
+                <p>Reason: ${referral.reason_for_referral}</p>
+                <p>Status: ${
+                    referral.doc_appr === true
+                        ? 'Approved'
+                        : referral.doc_appr === false
+                        ? 'Rejected'
+                        : 'Pending'
+                }</p>
+            `;
+            referralContainer.appendChild(div);
+        });
+    }
 });
