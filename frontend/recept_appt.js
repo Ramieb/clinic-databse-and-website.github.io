@@ -96,7 +96,7 @@ async function submitApptFilters() {
 
     try {
         // Send the data to the backend to get available appointments
-        const response = await fetch('/api/receiptionist/appointments', {
+        const response = await fetch('/api/receptionist/appointments', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

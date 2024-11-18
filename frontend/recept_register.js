@@ -36,7 +36,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
 
     try {
         // Send the form data to the backend
-        const response = await fetch('/api/receiptionist/register', {
+        const response = await fetch('/api/receptionist/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
