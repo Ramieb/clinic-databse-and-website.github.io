@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch upcoming appointments
     function fetchAppointments(username) {
-        const fetchUrl = `https://clinic-website.azurewebsites.net/api/appointments/${username}`;
+        const fetchUrl = `https://clinic-website.azurewebsites.net/api/appointments/${username}`; // Updated to full URL
         upcomingAppointmentsDiv.textContent = 'Loading upcoming appointments...';
 
         fetchWithTimeout(fetchUrl, { timeout: 7000 })
@@ -67,14 +67,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then((data) => {
+                console.log('Fetched appointments:', data);
                 displayAppointments(data);
             })
             .catch((error) => {
-                console.error('Error fetching appointments:', error);
-                if (error.message.includes('No valid referral')) {
-                    upcomingAppointmentsDiv.textContent = 'You need an approved referral to schedule an appointment.';
+                if (error.name === 'AbortError') {
+                    console.error('Request was aborted: Timeout reached');
+                    upcomingAppointmentsDiv.textContent = 'Request timed out. Please try again later.';
                 } else {
-                    upcomingAppointmentsDiv.textContent = 'Failed to load upcoming appointments. Please try again.';
+                    console.error('Error fetching appointments:', error);
+                    upcomingAppointmentsDiv.textContent = 'Failed to load upcoming appointments.';
                 }
             });
     }
@@ -103,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add new appointment using the async function
     async function addAppointment(appointmentData) {
-        const postUrl = `https://clinic-website.azurewebsites.net/api/appointments`;
+        const postUrl = `https://clinic-website.azurewebsites.net/api/appointments`; // Updated to full URL
 
         try {
             const response = await fetchWithTimeout(postUrl, {
