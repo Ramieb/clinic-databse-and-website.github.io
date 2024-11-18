@@ -14,7 +14,7 @@ body {
 
 /* Navbar styling */
 .navbar {
-    background: rgba(255, 257, 255, 0.8);
+    background: rgba(33, 150, 243, 0.3);
     backdrop-filter: blur(10px);
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -55,7 +55,7 @@ body {
     top: 0;
     left: 0;
     width: 240px;
-    height: 50%;
+    height: 100%;
     background: rgba(33, 150, 243, 0.3);
     color: white;
     display: flex;
@@ -173,7 +173,7 @@ button:hover {
     transform: translateY(-2px);
 }
 .referral-section {
-    margin-left: 80px;
+    margin-left: 70%;
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 8px;
