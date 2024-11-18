@@ -4,7 +4,7 @@ const db = require('../db'); // Assuming db is a module that exports the query f
 
 //////////////////APPOINTMENT BACKEND//////////////////////
 // Define the route to get office locations
-router.get('/offices', async (req, res) => {
+router.get('/offices', async (_, res) => {
     try {
         const [result] = await db.query(
             `SELECT location, office_id FROM Office`
@@ -75,7 +75,7 @@ router.post('/appointments', async (req, res) => {
         });
     }
 });
-
+/*
 // Delete appointments
 router.delete('/appointments', async (req, res) => {
     const { patientId, appDate, appStartTime } = req.body;
@@ -96,9 +96,9 @@ router.delete('/appointments', async (req, res) => {
         console.error('Error deleting appointment:', error);
         res.status(500).json({ message: 'An error occurred. Please try again later.' });
     }
-});
+});*/
 /////////////////////////////////////////////
-
+/*
 ///////////////REGISTER BACKEND/////////////////////////
 // POST route to handle patient registration
 router.post('/register', async (req, res) => {
@@ -201,5 +201,5 @@ router.post('/billing_alt_lookup', async (req, res) => {
     }
 });
 /////////////////////////////////////////////
-
+*/
 module.exports = router;
