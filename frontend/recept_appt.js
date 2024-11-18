@@ -79,7 +79,7 @@ async function deleteAppointment(patient_id, app_date, app_start_time) {
 // Handle form submission to check available appointments
 async function submitApptFilters() {
     // Get form values
-    const officeLoc = document.getElementById('office_loc').value;
+    const officeLoc = parseInt(document.getElementById('office_loc').value);
     const apptDate = document.getElementById('appt_date').value;
     
     // Validate the form
