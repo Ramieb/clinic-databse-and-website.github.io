@@ -30,7 +30,7 @@ router.get('/getDoctors', async (_, res) => {
 
 // Route to get appointments for a specific doctor
 router.get('/getAppointments', async (req, res) => {
-    const doctorId = req.query.doctorId;
+    const doctorId = req.query.employee_ssn;
 
     if (!doctorId) {
         return res.status(400).json({ error: 'Doctor ID is required.' });
@@ -59,7 +59,7 @@ router.get('/getAppointments', async (req, res) => {
 
 // Route to get detailed information for a specific doctor
 router.get('/:id', async (req, res) => {
-    const doctorId = req.params.id;
+    const doctorId = req.params.employee_ssn;
 
     if (!doctorId) {
         return res.status(400).json({ error: 'Doctor ID is required.' });
@@ -97,7 +97,7 @@ router.get('/:id', async (req, res) => {
 
 // Route to get doctor-patient history
 router.get('/doctor_patient_history', async (req, res) => {
-    const doctorId = req.query.doctorId;
+    const doctorId = req.query.employee_ssn;
 
     if (!doctorId) {
         return res.status(400).json({ error: 'Doctor ID is required.' });
