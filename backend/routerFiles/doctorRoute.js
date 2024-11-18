@@ -2,32 +2,39 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db'); // Database connection file
 
-// Route to get all doctors for dropdowns or general listing
+// Route to get all doctors
 router.get('/getDoctors', async (req, res) => {
     try {
         const query = `
             SELECT 
                 D.employee_ssn, 
+                D.username,
+                D.Admin_ssn,
                 D.first_name, 
                 D.last_name, 
+                D.hire_date, 
+                D.salary, 
+                D.office_id, 
                 D.specialty, 
                 D.specialist, 
-                D.cost, 
-                O.location
-            FROM Doctor D
-            LEFT JOIN Office O ON D.office_id = O.office_id;
+                D.cost
+            FROM Doctor D;
         `;
         const [doctors] = await db.query(query);
         res.json(doctors);
     } catch (error) {
-        console.error("Error fetching doctors:", error.message);
+        console.error("Error fetching doctors:", error.stack);
         res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Route to get appointments for a specific patient
+// Route to get appointments for a specific doctor
 router.get('/getAppointments', async (req, res) => {
-    const patientId = req.query.patientId;
+    const doctorId = req.query.doctorId;
+
+    if (!doctorId) {
+        return res.status(400).json({ error: 'Doctor ID is required.' });
+    }
 
     try {
         const query = `
@@ -35,92 +42,89 @@ router.get('/getAppointments', async (req, res) => {
                 A.app_date, 
                 A.app_start_time, 
                 A.app_end_time, 
-                D.first_name AS doctor_first, 
-                D.last_name AS doctor_last, 
-                A.reason_for_visit
+                A.reason_for_visit,
+                P.first_name AS patient_first_name,
+                P.last_name AS patient_last_name
             FROM Appointment A
-            JOIN Doctor D ON A.D_ID = D.employee_ssn
-            WHERE A.P_ID = ?;
-        `;
-        const [appointments] = await db.query(query, [patientId]);
-        res.json(appointments);
-    } catch (error) {
-        console.error("Error fetching appointments:", error.message);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-// Route to get doctor information based on user ID
-router.get('/:id', async (req, res) => {
-    const doctorId = req.params.id;
-
-    try {
-        const query = `
-            SELECT * 
-            FROM Doctor 
-            WHERE employee_ssn = ?;
-        `;
-        const [doctorRows] = await db.query(query, [doctorId]);
-
-        if (doctorRows.length > 0) {
-            res.json(doctorRows[0]);
-        } else {
-            res.status(404).json({ message: 'Doctor not found' });
-        }
-    } catch (error) {
-        console.error("Error fetching doctor data:", error.message);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-// Route to get doctor’s appointments
-router.get('/appointmentsbydoctor/:doctorId', async (req, res) => {
-    const doctorId = req.params.doctorId;
-
-    try {
-        const query = `
-            SELECT * 
-            FROM Appointment 
-            WHERE D_ID = ?;
+            JOIN Patient P ON A.P_ID = P.patient_id
+            WHERE A.D_ID = ?;
         `;
         const [appointments] = await db.query(query, [doctorId]);
         res.json(appointments);
     } catch (error) {
-        console.error("Error fetching appointments:", error.message);
+        console.error("Error fetching appointments:", error.stack);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Route to get detailed information for a specific doctor
+router.get('/:id', async (req, res) => {
+    const doctorId = req.params.id;
+
+    if (!doctorId) {
+        return res.status(400).json({ error: 'Doctor ID is required.' });
+    }
+
+    try {
+        const query = `
+            SELECT 
+                D.employee_ssn, 
+                D.username,
+                D.Admin_ssn,
+                D.first_name, 
+                D.last_name, 
+                D.hire_date, 
+                D.salary, 
+                D.office_id, 
+                D.specialty, 
+                D.specialist, 
+                D.cost
+            FROM Doctor D
+            WHERE D.employee_ssn = ?;
+        `;
+        const [doctor] = await db.query(query, [doctorId]);
+
+        if (doctor.length > 0) {
+            res.json(doctor[0]);
+        } else {
+            res.status(404).json({ message: 'Doctor not found' });
+        }
+    } catch (error) {
+        console.error("Error fetching doctor details:", error.stack);
         res.status(500).json({ message: 'Server error' });
     }
 });
 
 // Route to get doctor-patient history
 router.get('/doctor_patient_history', async (req, res) => {
+    const doctorId = req.query.doctorId;
+
+    if (!doctorId) {
+        return res.status(400).json({ error: 'Doctor ID is required.' });
+    }
+
     try {
         const query = `
             SELECT 
-                P.patient_id, P.first_name, P.last_name,
-                H.height, H.weight, H.blood_pressure,
-                MED.medicine, MED.start_date, MED.end_date, MED.dosage,
-                A.allergy, A.start_date, A.end_date, A.seasonal,
-                S.procedure_done, S.body_part, S.surgery_date,
-                IMM.vaccine, IMM.vax_date,
-                ILL.ailment, ILL.start_date, ILL.end_date
-            FROM Patient AS P
-            LEFT JOIN Med_history AS H ON P.patient_id = H.P_ID
-            LEFT JOIN Medication AS MED ON P.patient_id = MED.P_ID
-            LEFT JOIN Allergies AS A ON P.patient_id = A.P_ID
-            LEFT JOIN Surgery AS S ON P.patient_id = S.P_ID
-            LEFT JOIN Immunization AS IMM ON P.patient_id = IMM.P_ID
-            LEFT JOIN Illness AS ILL ON P.patient_id = ILL.P_ID;
+                P.patient_id, 
+                P.first_name AS patient_first_name, 
+                P.last_name AS patient_last_name,
+                A.app_date, 
+                A.reason_for_visit,
+                D.first_name AS doctor_first_name,
+                D.last_name AS doctor_last_name
+            FROM Appointment A
+            JOIN Patient P ON A.P_ID = P.patient_id
+            JOIN Doctor D ON A.D_ID = D.employee_ssn
+            WHERE D.employee_ssn = ?;
         `;
-        const [rows] = await db.query(query);
-        res.json({
-            success: true,
-            data: rows,
-        });
+        const [history] = await db.query(query, [doctorId]);
+        res.json({ success: true, data: history });
     } catch (error) {
-        console.error("Error fetching doctor-patient history:", error.message);
+        console.error("Error fetching doctor-patient history:", error.stack);
         res.status(500).json({
             success: false,
-            message: "Error fetching doctor-patient history",
+            message: 'Error fetching doctor-patient history',
         });
     }
 });
@@ -128,25 +132,27 @@ router.get('/doctor_patient_history', async (req, res) => {
 // Endpoint to fetch referral count by doctor for a given time range
 router.get('/referral-report-by-doctor', async (req, res) => {
     const { startDate, endDate } = req.query;
-    if (!startDate || !endDate) {
-        return res.status(400).json({ error: 'Start and end date are required.' });
+
+    if (!startDate || !endDate || isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
+        return res.status(400).json({ error: 'Valid start and end dates are required.' });
     }
 
     try {
         const query = `
             SELECT 
-                D.first_name AS doctorName, 
-                COUNT(R.referral_id) AS referralCount
+                D.first_name AS doctor_name, 
+                D.last_name AS doctor_last_name,
+                COUNT(R.referral_id) AS referral_count
             FROM Referral R
             JOIN Doctor D ON R.specialist = D.employee_ssn
             WHERE R.ref_date BETWEEN ? AND ?
             GROUP BY D.employee_ssn
-            ORDER BY referralCount DESC;
+            ORDER BY referral_count DESC;
         `;
-        const [results] = await db.query(query, [startDate, endDate]);
-        res.json(results);
+        const [referralReport] = await db.query(query, [startDate, endDate]);
+        res.json(referralReport);
     } catch (error) {
-        console.error("Error fetching referral report:", error.message);
+        console.error("Error fetching referral report:", error.stack);
         res.status(500).json({ error: 'Server error' });
     }
 });
@@ -154,26 +160,28 @@ router.get('/referral-report-by-doctor', async (req, res) => {
 // Endpoint to fetch salary vs billing for doctors within a time range
 router.get('/salary-vs-billing-report', async (req, res) => {
     const { startDate, endDate } = req.query;
-    if (!startDate || !endDate) {
-        return res.status(400).json({ error: 'Start and end date are required.' });
+
+    if (!startDate || !endDate || isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
+        return res.status(400).json({ error: 'Valid start and end dates are required.' });
     }
 
     try {
         const query = `
             SELECT 
-                D.first_name AS doctorName, 
-                D.salary AS salary,
-                SUM(B.total_charge) AS billingAmount
+                D.first_name AS doctor_name, 
+                D.last_name AS doctor_last_name, 
+                D.salary,
+                COALESCE(SUM(B.total_charge), 0) AS billing_amount
             FROM Doctor D
-            JOIN Billing B ON D.employee_ssn = B.D_ID
+            LEFT JOIN Billing B ON D.employee_ssn = B.D_ID
             WHERE B.charge_date BETWEEN ? AND ?
             GROUP BY D.employee_ssn
-            ORDER BY billingAmount DESC;
+            ORDER BY billing_amount DESC;
         `;
-        const [results] = await db.query(query, [startDate, endDate]);
-        res.json(results);
+        const [salaryBillingReport] = await db.query(query, [startDate, endDate]);
+        res.json(salaryBillingReport);
     } catch (error) {
-        console.error("Error fetching salary vs billing report:", error.message);
+        console.error("Error fetching salary vs billing report:", error.stack);
         res.status(500).json({ error: 'Server error' });
     }
 });
