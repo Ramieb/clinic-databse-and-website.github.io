@@ -54,6 +54,9 @@ app.use('/api', patientRoute);
 const doctorRoute = require('./backend/routerFiles/doctorRoute');
 app.use('/api/doctor', doctorRoute);
 
+const reportRoute = require('./backend/rputerFiles/reportRoute');  // Import your reportRoute file
+app.use(reportRoute); 
+
 // Global error handling middleware
 app.use((err, req, res, next) => {
     console.error('Unexpected Error:', err.stack);
