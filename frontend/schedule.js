@@ -1,4 +1,9 @@
 // Function to fetch the list of doctors from the backend and populate the dropdown
+// Function to fetch the list of doctors from the backend and populate the dropdown
+document.addEventListener('DOMContentLoaded', function() {
+    fetchDoctors();
+});
+
 document.getElementById('viewScheduleBtn').addEventListener('click', function() {
     const doctorDropdown = document.getElementById('doctorDropdown');
     const appointmentDate = document.getElementById('appointment-date').value;
