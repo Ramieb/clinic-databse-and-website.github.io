@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../db'); // Database connection file
 
 // Route to get all doctors
-router.get('/getDoctors', async (req, res) => {
+router.get('/getDoctors', async (_, res) => {
     try {
         const query = `
             SELECT 
