@@ -64,28 +64,7 @@ router.post('/appointments', (req, res) => {
         VALUES (?, ?, ?, ADDTIME(?, '01:00:00'), ?, ?, NULL, FALSE);
     `;
 
-    db.query(resolvePatientIdQuery, [username], (error, results) => {
-        if (error || results.length === 0) {
-            console.error('Error resolving patient ID:', error);
-            return res.status(500).json({ error: 'Could not resolve patient ID' });
-        }
 
-        const patientId = results[0].patient_id;
-
-        db.query(
-            insertAppointmentQuery,
-            [appointmentDate, patientId, appointmentTime, appointmentTime, doctor, reason],
-            (insertError) => {
-                if (insertError) {
-                    console.error('Error creating appointment:', insertError);
-                    res.status(500).json({ error: 'Error creating appointment' });
-                } else {
-                    res.status(201).json({ success: true, message: 'Appointment created successfully' });
-                }
-            }
-        );
-    });
-});
 db.query(resolvePatientIdQuery, [username], (error, results) => {
     if (error || results.length === 0) {
         console.error('Error resolving patient ID:', error);
