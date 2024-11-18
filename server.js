@@ -49,13 +49,13 @@ const registerRoute = require('./backend/routerFiles/registerRoute');
 app.use('/register', registerRoute);
 
 const patientRoute = require('./backend/routerFiles/patientRoute');
-app.use('/api', patientRoute);
+app.use('/api/patient', patientRoute);
 
 const doctorRoute = require('./backend/routerFiles/doctorRoute');
 app.use('/api/doctor', doctorRoute);
 
-const reportRoute = require('./backend/rputerFiles/reportRoute');  // Import your reportRoute file
-app.use(reportRoute); 
+const reportRoute = require('./backend/routerFiles/reportRoute');  // Import your reportRoute file
+app.use('/api/report', reportRoute); 
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
