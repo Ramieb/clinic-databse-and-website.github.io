@@ -24,12 +24,6 @@ async function populateOfficeLocations() {
 // Call the function when the page loads
 window.onload = populateOfficeLocations;
 
-// Attach the event listener to the image element
-document.getElementById('submit_filters').addEventListener('click', function(event) {
-    event.preventDefault();  // Prevent the default action (form submission)
-    
-    submitApptFilters();  // Call the submitForm function
-});
 
 // Handle form submission to check available appointments
 async function submitApptFilters() {
@@ -86,5 +80,12 @@ async function submitApptFilters() {
         document.getElementById('appointment_results').innerHTML = `<h2>Error checking appointments. Please try again later.</h2>`;
     }
 }
+
+// Attach the event listener to the image element
+document.getElementById('submit_filters').addEventListener('click', function(event) {
+    event.preventDefault();  // Prevent the default action (form submission)
+    
+    submitApptFilters();  // Call the submitForm function
+});
 
 
