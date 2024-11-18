@@ -30,7 +30,7 @@ async function fetchAppointments() {
     }
 
     try {
-        const response = await fetch(`/api/admin/getAppointments?employee_ssn=${doctorId}&appointmentDate=${appointmentDate}`);
+        const response = await fetch(`/api/admin/getAppointments?employee_ssn=${doctorId}&app_Date=${appointmentDate}`);
         const appointments = await response.json();
         const doctorName = doctorSelect.options[doctorSelect.selectedIndex].text;
         populateAppointmentsTable(appointments, doctorName);
