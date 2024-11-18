@@ -15,21 +15,27 @@ app.use(helmet());
 app.use(bodyParser.json());
 
 // Define CORS options
-const corsOptions = {
-    origin: [
-        'http://127.0.0.1:5501', // Local testing
-        'https://clinic-website.azurewebsites.net' // Azure frontend
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+const allowedOrigins = [
+    'http://127.0.0.1:5501', // Local testing
+    'https://clinic-website.azurewebsites.net' // Azure frontend
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
-};
+}));
 
-// Apply CORS options to all requests
-app.use(cors(corsOptions));
-
-// Handle preflight requests for all routes with OPTIONS method
-app.options('*', cors(corsOptions));
+// Handle preflight requests globally
+app.options('*', cors());
 
 // Serve the main index.html file from the root directory
 app.get('/', (req, res) => {
