@@ -43,8 +43,8 @@ router.post('/appointments', async (req, res) => {
 
             FROM Appointment, Patient, Doctor, Office
 
-            WHERE Appointment.app_date = $1
-                AND Office.office_id = $2 AND Appointment.P_ID = Patient.patient_id 
+            WHERE Appointment.app_date = ?
+                AND Office.office_id = ? AND Appointment.P_ID = Patient.patient_id 
                 AND Doctor.employee_ssn = Appointment.D_ID
                 AND Appointment.office_location = Office.location`, 
             [date, office_id]
@@ -77,7 +77,7 @@ router.delete('/appointments', async (req, res) => {
     try {
         // Perform the deletion logic using patientId, appDate, and appStartTime
         const result = await db.query(
-            'DELETE FROM Appointment WHERE P_ID = $1 AND app_date = $2 AND app_start_time = $3',
+            'DELETE FROM Appointment WHERE P_ID = ? AND app_date = ? AND app_start_time = ?',
             [patientId, appDate, appStartTime]
         );
 
@@ -123,7 +123,7 @@ router.post('/register', async (req, res) => {
 
         // Insert the new user into the Users table
         const userResult = await db.query(
-            'INSERT INTO Users (username, password, role) VALUES ($1, $2, $3) RETURNING username',
+            'INSERT INTO Users (username, password, role) VALUES (?, ?, ?) RETURNING username',
             [username, password, role]
         );
 
@@ -134,7 +134,7 @@ router.post('/register', async (req, res) => {
             `INSERT INTO Patient (
                 patient_id, username, first_name, last_name, date_of_birth, address, 
                 phone_number, primary_id
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING patient_id`,
+            ) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING patient_id`,
             [patient_id, userUsername, first_name, last_name, dob, address, phone_number, null]
         );
 
@@ -169,7 +169,7 @@ router.post('/billing_id_lookup', async (req, res) => {
 			        B.charge_for, B.total_charged, B.total_paid, B.charge_date
             FROM Patient AS P
             JOIN Billing AS B ON P.patient_id = B.P_ID
-            WHERE B.paid_off = FALSE AND B.P_ID = $1`,
+            WHERE B.paid_off = FALSE AND B.P_ID = ?`,
             [patient_id]
         );
         res.json(result.rows);  // Return office locations as JSON
@@ -187,7 +187,7 @@ router.post('/billing_alt_lookup', async (req, res) => {
             `SELECT	P.patient_id, P.first_name, P.last_name,
 			        B.charge_for, B.total_charged, B.total_paid, B.charge_date
             FROM Patient AS P, Billing AS B
-            WHERE B.paid_off = FALSE AND P.last_name = $1 AND P.date_of_birth = $2
+            WHERE B.paid_off = FALSE AND P.last_name = ? AND P.date_of_birth = ?
                     AND P.patient_id = B.P_ID`,
             [patient_last_name, patientDOB]
         );
