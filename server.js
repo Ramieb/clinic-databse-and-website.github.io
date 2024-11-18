@@ -32,7 +32,7 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
 // Serve the main index.html file from the root directory
-app.get('/', (_, res) => {
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html')); // Ensure index.html is in the root directory
 });
 

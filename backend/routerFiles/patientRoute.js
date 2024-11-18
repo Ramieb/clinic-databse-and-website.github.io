@@ -19,8 +19,7 @@ router.get('/appointments/:username', (req, res) => {
         JOIN Doctor ON Appointment.D_ID = Doctor.employee_ssn
         JOIN Patient ON Appointment.P_ID = Patient.patient_id
         WHERE Patient.username = ?
-          AND Appointment.app_date >= CURDATE()
-          AND Appointment.deleted = FALSE
+        AND Appointment.app_date >= CURDATE()
         ORDER BY Appointment.app_date, Appointment.app_start_time;
     `;
 
@@ -46,10 +45,7 @@ router.post('/appointments', (req, res) => {
     }
 
     const resolvePatientIdQuery = `SELECT patient_id FROM Patient WHERE username = ?`;
-    const validateReferralQuery = `
-        SELECT * FROM Referral 
-        WHERE P_ID = ? AND specialist = ? AND doc_appr = TRUE AND expiriation >= CURDATE();
-    `;
+
     const insertAppointmentQuery = `
         INSERT INTO Appointment (
             app_date, 
@@ -72,27 +68,18 @@ router.post('/appointments', (req, res) => {
 
         const patientId = results[0].patient_id;
 
-        // Validate referral
-        db.query(validateReferralQuery, [patientId, doctor], (referralError, referralResults) => {
-            if (referralError || referralResults.length === 0) {
-                console.error('No valid referral found for this specialist:', referralError);
-                return res.status(400).json({ error: 'No valid referral found for this specialist.' });
-            }
-
-            // Insert appointment
-            db.query(
-                insertAppointmentQuery,
-                [appointmentDate, patientId, appointmentTime, appointmentTime, doctor, reason],
-                (insertError) => {
-                    if (insertError) {
-                        console.error('Error creating appointment:', insertError);
-                        res.status(500).json({ error: 'Error creating appointment' });
-                    } else {
-                        res.status(201).json({ success: true, message: 'Appointment created successfully' });
-                    }
+        db.query(
+            insertAppointmentQuery,
+            [appointmentDate, patientId, appointmentTime, appointmentTime, doctor, reason],
+            (insertError) => {
+                if (insertError) {
+                    console.error('Error creating appointment:', insertError);
+                    res.status(500).json({ error: 'Error creating appointment' });
+                } else {
+                    res.status(201).json({ success: true, message: 'Appointment created successfully' });
                 }
-            );
-        });
+            }
+        );
     });
 });
 
