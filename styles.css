@@ -417,6 +417,40 @@ h2 {
 .editing {
     background-color: #f0f0f0;
 }
-.referralSection {
-    margin: 0 auto; /* Centers the section horizontally */
+
+.referral-section {
+    width: 60%; /* Adjust width as needed */
+    margin: 0 auto; /* Centers the div horizontally */
+    padding: 20px;
+    border: 1px solid #ccc; /* Optional: Adds a border for better visualization */
+    border-radius: 10px; /* Optional: Rounds the corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
+    background-color: #f9f9f9; /* Optional: Background color for better readability */
+}
+
+.referral-section h3, 
+.referral-section h2 {
+    text-align: center; /* Centers the headings */
+}
+
+.referral-section table {
+    width: 100%; /* Ensures the table takes full width of the div */
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.referral-section table th, 
+.referral-section table td {
+    border: 1px solid #ddd; /* Adds a border to table cells */
+    padding: 8px;
+    text-align: left; /* Align text to the left */
+}
+
+.referral-section table th {
+    background-color: #f2f2f2; /* Adds a light background for table headers */
+}
+
+#referralMessage {
+    text-align: center; /* Centers the message text */
+    margin-top: 10px;
 }
