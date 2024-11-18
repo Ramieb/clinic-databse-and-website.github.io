@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchDoctorPatientHistory() {
         try {
-            const response = await fetch('http://localhost:8080/api/doctor/doctor_patient_history');
+            const response = await fetch('api/doctor/doctor_patient_history');
             const data = await response.json();
 
             if (data.success) {
@@ -60,7 +60,7 @@ const referralForm = document.getElementById('referralForm');
         const referralReason = document.getElementById('referralReason').value;
 
         try {
-            const response = await fetch('/api/referrals', {
+            const response = await fetch('/api/doctor/referrals', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

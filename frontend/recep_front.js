@@ -27,21 +27,8 @@ window.onload = populateOfficeLocations;
 
 async function populateDoctors() {
     try {
-        const response = await fetch('/api/offices');
-        const offices = await response.json();
-
-        const select = document.getElementById('office_loc');
-
-        // Clear existing options (if any)
-        select.innerHTML = '<option value="" disabled selected>Select office</option>';
-
-        // Add new options dynamically
-        offices.forEach(office => {
-            const option = document.createElement('option');
-            option.value = office.office_id; // ID or whatever unique value you want to send
-            option.textContent = office.location; // The name to display
-            select.appendChild(option);
-        });
+        
+        
     } catch (error) {
         console.error('Error fetching office locations:', error);
     }
