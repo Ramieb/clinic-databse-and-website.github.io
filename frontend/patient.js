@@ -67,14 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then((data) => {
-                console.log('Fetched appointments:', data);
                 displayAppointments(data);
             })
             .catch((error) => {
-                if (error.name === 'AbortError') {
-                    console.error('Request was aborted: Timeout reached');
-                    upcomingAppointmentsDiv.textContent = 'Request timed out. Please try again later.';
-                } else {
                     console.error('Error fetching appointments:', error);
                     upcomingAppointmentsDiv.textContent = 'Failed to load upcoming appointments.';
                 }
