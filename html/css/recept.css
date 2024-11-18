@@ -254,7 +254,27 @@ button:hover {
     margin-bottom: 10px;
 }
 
-
+/* new appt styling */
+#appointmentForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+#appointmentForm label {
+    min-width: 60px; /* Adjust as needed */
+    font-weight: bold;
+    margin-right: 5px;
+}
+#appointmentForm input, 
+#appointmentForm select{
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-right: 20px;
+    min-width: 60px; /* Ensures a reasonable width for inputs */
+}
 
 
 

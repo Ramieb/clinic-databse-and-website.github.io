@@ -27,9 +27,20 @@
                         <option value="1">1010 Main St, Houston, TX</option>
                     </select>
                 </div>
-                <div class="">
+                <div class="filter_pair">
                     <label for="appt_date">Appointment Date:</label>
                     <input type="date" id="appt_date" name="appt_date" required>
+                </div>
+                <div class="">
+                    <label for="doctors">Doctor:</label>
+                    <select id="doctors" name="doctors">
+                        <!--fill select with options from office table-->
+                        <option value="">Select Doctor</option>
+                        <option value="123456789">Dr. John Doe</option>
+                        <option value="234567890">Dr. Alice Smith</option>
+                        <option value="345678901">Dr. Bob Johnson</option>
+                        <option value="456789012">Dr. Charlie White</option>
+                        <option value="567890123">Dr. Diana Lee</option>
                 </div>
                 <div class="">
                     <img src="/html/pictures/reload_pic.png" alt="Submit filters" id="submit_filters">

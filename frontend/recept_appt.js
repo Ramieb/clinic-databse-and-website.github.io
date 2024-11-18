@@ -81,17 +81,19 @@ async function submitApptFilters() {
     // Get form values
     const officeLoc = parseInt(document.getElementById('office_loc').value);
     const apptDate = document.getElementById('appt_date').value;
+    const doc = document.getElementById('doctors').value;
     
     // Validate the form
     if (!officeLoc || !apptDate) {
-        alert('Please select both office location and appointment date.');
+        alert('Please select at least office location and appointment date.');
         return;
     }
 
     // Prepare data to send to the backend
     const formData = {
         office_id: officeLoc,
-        date: apptDate
+        date: apptDate,
+        doctor: doc || null
     };
 
     try {
@@ -139,10 +141,69 @@ async function submitApptFilters() {
     }
 }
 
+/*document.getElementById('appointmentForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(appointmentForm);
+    const appointmentData = Object.fromEntries(formData);
+
+    // Add username to the appointment data
+    appointmentData.username = username;
+
+    console.log('Submitting appointment data:', appointmentData); // Debug log
+
+    try {
+        const result = await addAppointment(appointmentData);
+
+        if (result.success) {
+            feedbackDiv.textContent = 'Appointment scheduled successfully!';
+            feedbackDiv.style.color = 'green';
+            appointmentForm.reset();
+            fetchAppointments(username); // Refresh the list
+        } else {
+            feedbackDiv.textContent = `Error: ${result.error || 'Unknown error'}`;
+            feedbackDiv.style.color = 'red';
+        }
+    } catch (error) {
+        feedbackDiv.textContent = error.message || 'Error scheduling appointment.';
+        feedbackDiv.style.color = 'red';
+    }
+});*/
+
+async function createNewAppt(){
+    const resultsContainer = document.getElementById('appointment_results');
+    resultsContainer.innerHTML = ''; // Clear the previous content
+
+    resultsContainer.innerHTML = `
+            <form id="appointmentForm">
+                <label for="app_date">Appointment Date:</label>
+                <input name="app_date" type="date" required />
+            
+                <label for="app_start_time">Start Time:</label>
+                <input name="app_start_time" type="time" required />
+            
+                <label for="D_ID">Doctor ID:</label>
+                <select name="D_ID" required>
+                    <option value="123456789">John Doe (Cardiology)</option>
+                    <option value="234567890">Alice Smith (Pediatrics)</option>
+                    <option value="345678901">Bob Johnson (Family Medicine)</option>
+                    <option value="456789012">Charlie White (Internal Medicine)</option>
+                    <option value="567890123">Diana Lee (Neurology)</option>
+                </select>
+            
+                <label for="reason_for_visit">Reason for Visit:</label>
+                <input name="reason_for_visit" type="text" required />
+            
+                <button type="submit">Submit</button>
+            </form>`
+}
+
 // Attach the event listener to the image element
 document.getElementById('submit_filters').addEventListener('click', function(event) {
     event.preventDefault();  // Prevent the default action (form submission)
     
     submitApptFilters();  // Call the submitForm function
 });
+
+document.getElementById('new_appt').addEventListener('click', createNewAppt);
 ///////////////////////////////////////////////////////////
