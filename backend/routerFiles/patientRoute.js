@@ -111,11 +111,12 @@ router.get('/getReferrals', async (req, res) => {
                 P.first_name AS patient_first_name,
                 P.last_name AS patient_last_name,
                 R.reason_for_referral,
-                R.status,
+                R.doc_appr AS status,
                 R.ref_date
             FROM Referral R
             JOIN Patient P ON R.P_ID = P.patient_id
-            WHERE R.specialist = ?;
+            WHERE R.specialist = ?
+            ORDER BY R.ref_date DESC;
         `;
         const [referrals] = await db.query(query, [doctorId]);
         res.status(200).json(referrals);
@@ -123,6 +124,33 @@ router.get('/getReferrals', async (req, res) => {
         console.error('Error fetching referrals:', error.stack);
         res.status(500).json({ message: 'Server error.' });
     }
+});
+
+router.get('/referrals/:username', (req, res) => {
+    const username = req.params.username;
+    const query = `
+        SELECT 
+            R.referral_id,
+            D.first_name AS doctor_first_name,
+            D.last_name AS doctor_last_name,
+            R.reason_for_referral,
+            R.doc_appr,
+            R.ref_date
+        FROM Referral R
+        JOIN Doctor D ON R.specialist = D.employee_ssn
+        JOIN Patient P ON R.P_ID = P.patient_id
+        WHERE P.username = ?
+        ORDER BY R.ref_date DESC;
+    `;
+
+    db.query(query, [username], (error, results) => {
+        if (error) {
+            console.error('Error fetching referrals:', error);
+            res.status(500).json({ error: 'Error fetching referrals' });
+        } else {
+            res.status(200).json(results);
+        }
+    });
 });
 
 module.exports = router;

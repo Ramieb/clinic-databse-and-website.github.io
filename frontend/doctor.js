@@ -1,14 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Element references
     const historyTableBody = document.getElementById('historyTableBody');
+    const referralForm = document.getElementById('referralForm');
+    const referralMessage = document.getElementById('referralMessage');
+    const specialistDropdown = document.getElementById('specialist');
+    const referralsTableBody = document.getElementById('referralsTableBody');
+    const doctorId = localStorage.getItem('doctorId'); // Assuming doctorId is stored in localStorage
 
+    /**
+     * Fetch and display doctor-patient history
+     */
     async function fetchDoctorPatientHistory() {
         try {
-            const response = await fetch('api/doctor/doctor_patient_history');
+            const response = await fetch('/api/doctor/doctor_patient_history');
             const data = await response.json();
 
             if (data.success) {
                 historyTableBody.innerHTML = ''; // Clear the table before adding rows
-
                 data.data.forEach((record) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -28,19 +36,18 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('An error occurred while fetching data.');
         }
     }
-const referralForm = document.getElementById('referralForm');
-    const referralMessage = document.getElementById('referralMessage');
-    const specialistDropdown = document.getElementById('specialist');
 
-    // Fetch available specialists and populate the dropdown
+    /**
+     * Fetch and populate the specialist dropdown
+     */
     async function fetchSpecialists() {
         try {
-            const response = await fetch('/api/doctor/getDoctors'); // Assuming this endpoint lists doctors
+            const response = await fetch('/api/doctor/getDoctors');
             const specialists = await response.json();
 
             specialists.forEach((specialist) => {
                 const option = document.createElement('option');
-                option.value = specialist.employee_ssn; // or relevant ID
+                option.value = specialist.employee_ssn; // Use relevant ID
                 option.textContent = `${specialist.first_name} ${specialist.last_name} - ${specialist.specialty}`;
                 specialistDropdown.appendChild(option);
             });
@@ -49,11 +56,11 @@ const referralForm = document.getElementById('referralForm');
         }
     }
 
-    fetchSpecialists();
-
-    // Handle referral creation
-    referralForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    /**
+     * Handle referral creation
+     */
+    async function createReferral(event) {
+        event.preventDefault();
 
         const specialist = specialistDropdown.value;
         const patientId = document.getElementById('patientId').value;
@@ -62,14 +69,8 @@ const referralForm = document.getElementById('referralForm');
         try {
             const response = await fetch('/api/doctor/referrals', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    specialist,
-                    patientId,
-                    referralReason,
-                }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ specialist, patientId, referralReason }),
             });
 
             const result = await response.json();
@@ -87,27 +88,29 @@ const referralForm = document.getElementById('referralForm');
             referralMessage.textContent = 'An unexpected error occurred.';
             referralMessage.style.color = 'red';
         }
-    });
-    // Fetch data on page load
-    fetchDoctorPatientHistory();
+    }
+
+    /**
+     * Fetch and display referrals for the logged-in doctor
+     */
     async function fetchReferrals() {
         try {
-            const response = await fetch('/api/doctor/getReferrals?specialist=<doctor_id>');
+            const response = await fetch(`/api/doctor/getReferrals?specialist=${doctorId}`);
             const referrals = await response.json();
-    
-            const referralsTableBody = document.getElementById('referralsTableBody');
+
             referralsTableBody.innerHTML = ''; // Clear previous data
-    
             referrals.forEach((referral) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${referral.patient_first_name} ${referral.patient_last_name}</td>
                     <td>${referral.reason_for_referral}</td>
                     <td>${referral.ref_date}</td>
-                    <td>${referral.status}</td>
+                    <td>${referral.status === null ? 'Pending' : referral.status ? 'Approved' : 'Rejected'}</td>
                     <td>
-                        <button onclick="updateReferralStatus(${referral.referral_id}, 'Approved')">Approve</button>
-                        <button onclick="updateReferralStatus(${referral.referral_id}, 'Denied')">Deny</button>
+                        ${referral.status === null
+                            ? `<button onclick="updateReferralStatus(${referral.referral_id}, 'Approved')">Approve</button>
+                               <button onclick="updateReferralStatus(${referral.referral_id}, 'Denied')">Deny</button>`
+                            : ''}
                     </td>
                 `;
                 referralsTableBody.appendChild(row);
@@ -116,14 +119,15 @@ const referralForm = document.getElementById('referralForm');
             console.error('Error fetching referrals:', error);
         }
     }
-    
-    async function updateReferralStatus(referralId, status) {
+
+    /**
+     * Update the status of a referral
+     */
+    window.updateReferralStatus = async function (referralId, status) {
         try {
             const response = await fetch('/api/doctor/updateReferralStatus', {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ referralId, status }),
             });
     
@@ -137,8 +141,37 @@ const referralForm = document.getElementById('referralForm');
         } catch (error) {
             console.error('Error updating referral status:', error);
         }
+    };    
+
+    /**
+     * Fetch and display upcoming appointments for the logged-in doctor
+     */
+    async function fetchUpcomingAppointments() {
+        try {
+            const response = await fetch(`/api/doctor/getAppointments?doctorId=${doctorId}`);
+            const data = await response.json();
+            const appointmentSection = document.getElementById('upcomingAppointments');
+
+            appointmentSection.innerHTML = ''; // Clear previous data
+            data.forEach((appointment) => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <p><strong>Date:</strong> ${appointment.app_date}</p>
+                    <p><strong>Time:</strong> ${appointment.app_start_time}</p>
+                    <p><strong>Patient:</strong> ${appointment.patient_name}</p>
+                    <hr>
+                `;
+                appointmentSection.appendChild(div);
+            });
+        } catch (error) {
+            console.error('Error fetching appointments:', error);
+        }
     }
-    
-    // Fetch referrals on page load
-    fetchReferrals();    
+
+    // Event listeners and initial function calls
+    referralForm.addEventListener('submit', createReferral);
+    fetchSpecialists();
+    fetchDoctorPatientHistory();
+    fetchReferrals();
+    fetchUpcomingAppointments();
 });
