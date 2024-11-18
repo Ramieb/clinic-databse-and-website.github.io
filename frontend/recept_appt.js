@@ -2,7 +2,7 @@
 // populate appt drop box with locations
 async function populateOfficeLocations() {
     try {
-        const response = await fetch('/api/offices');
+        const response = await fetch('/api/receptionist/offices');
         const offices = await response.json();
 
         const select = document.getElementById('office_loc');
