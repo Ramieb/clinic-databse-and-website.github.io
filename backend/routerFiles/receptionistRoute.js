@@ -18,7 +18,7 @@ router.get('/offices', async (req, res) => {
 
 // Find the appointments for location and date
 router.post('/appointments', async (req, res) => {
-    const { office_id, date } = req.body;  // Received date and office (doctor)
+    const { office_id, date, doctor } = req.body;  // Received date and office (doctor)
 
     // Validate inputs
     if (!date || !office_id) {
@@ -28,27 +28,34 @@ router.post('/appointments', async (req, res) => {
         });
     }
 
+    // Base query
+    let query = `
+        SELECT 
+            Patient.patient_id,
+            Patient.first_name AS patient_first_name,
+            Patient.last_name AS patient_last_name,
+            Doctor.employee_ssn,
+            Doctor.first_name AS doctor_first_name,
+            Doctor.last_name AS doctor_last_name, 
+            app_date, app_start_time, reason_for_visit, 
+            Office.location AS app_location
+        FROM Appointment
+        JOIN Patient ON Appointment.P_ID = Patient.patient_id
+        JOIN Doctor ON Doctor.employee_ssn = Appointment.D_ID
+        JOIN Office ON Office.office_id = Appointment.office_location
+        WHERE Appointment.app_date = ?
+        AND Office.office_id = ?
+    `;
+
+    // Add doctor filter if doctor_id is provided
+    if (doctor) {
+        query += ` AND Appointment.D_ID = ?`;
+    }
+
     try {
-        // Query to find available appointment slots for the given office_id and date
-        const result = await db.query(`
-            SELECT 
-                Patient.patient_id,
-                Patient.first_name AS patient_first_name,
-                Patient.last_name AS patient_last_name,
-                Doctor.employee_ssn,
-                Doctor.first_name AS doctor_first_name,
-                Doctor.last_name AS doctor_last_name, 
-                app_date,app_start_time, reason_for_visit, 
-                Office.location AS app_location
-
-            FROM Appointment, Patient, Doctor, Office
-
-            WHERE Appointment.app_date = ?
-                AND Office.office_id = ? AND Appointment.P_ID = Patient.patient_id 
-                AND Doctor.employee_ssn = Appointment.D_ID
-                AND Appointment.office_location = Office.location`, 
-            [date, office_id]
-        );
+        // Query to find available appointment slots for the given office_id, date, and optional doctor_id
+        const params = doctor ? [date, office_id, doctor] : [date, office_id];  // Build params based on doctor_id presence
+        const result = await db.query(query, params);
 
         if (result.rows.length > 0) {
             res.json({

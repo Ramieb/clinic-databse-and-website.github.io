@@ -81,17 +81,19 @@ async function submitApptFilters() {
     // Get form values
     const officeLoc = parseInt(document.getElementById('office_loc').value);
     const apptDate = document.getElementById('appt_date').value;
+    const doc = document.getElementById('doctors').value;
     
     // Validate the form
     if (!officeLoc || !apptDate) {
-        alert('Please select both office location and appointment date.');
+        alert('Please select at least office location and appointment date.');
         return;
     }
 
     // Prepare data to send to the backend
     const formData = {
         office_id: officeLoc,
-        date: apptDate
+        date: apptDate,
+        doctor: doc || null
     };
 
     try {
@@ -139,10 +141,17 @@ async function submitApptFilters() {
     }
 }
 
+async function createNewAppt(){
+    const resultsContainer = document.getElementById('appointment_results');
+    resultsContainer.innerHTML = ''; // Clear the previous content
+}
+
 // Attach the event listener to the image element
 document.getElementById('submit_filters').addEventListener('click', function(event) {
     event.preventDefault();  // Prevent the default action (form submission)
     
     submitApptFilters();  // Call the submitForm function
 });
+
+document.getElementById('new_appt').addEventListener('click', createNewAppt);
 ///////////////////////////////////////////////////////////
