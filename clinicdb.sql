@@ -557,5 +557,19 @@ VALUES
     (1, '2023-05-01', 170, 70, '120/80'),
     (2, '2023-05-10', 165, 75, '130/85'),
     (3, '2023-04-20', 160, 68, '125/82');
+--Appointment dummy info
+INSERT INTO Appointment (app_date, P_ID, app_start_time, app_end_time, D_ID, reason_for_visit)
+SELECT CURDATE(), patient_id, '10:00:00', '11:00:00', '123456789', 'General Checkup'
+FROM Patient
+WHERE patient_id NOT IN (SELECT DISTINCT P_ID FROM Appointment);
+
+-- Add admin id
+UPDATE Office
+SET admin_id = '111111111'
+WHERE admin_id IS NULL;
+--Add doctor ID for corresponding patient
+UPDATE Patient
+SET primary_id = '123456789' -- Replace with an actual doctor ID
+WHERE primary_id IS NULL;
 
 COMMIT;
