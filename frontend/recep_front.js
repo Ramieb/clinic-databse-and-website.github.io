@@ -2,58 +2,60 @@
 document.getElementById('submit_filters').addEventListener('click', function(event) {
     event.preventDefault();  // Prevent the default action (form submission)
     
-    submitForm();  // Call the submitForm function
+    submitApptFilters();  // Call the submitForm function
 });
 
-// Function to handle the form submission
-function submitForm() {
-    // Get the form data
+// Handle form submission to check available appointments
+document.getElementById('submit_filters').addEventListener('click', async (e) => {
+    e.preventDefault();  // Prevent form from submitting normally
+    
+    // Get form values
     const officeLoc = document.getElementById('office_loc').value;
     const apptDate = document.getElementById('appt_date').value;
-
-    // Basic validation: Ensure both fields are filled in
+    
+    // Validate the form
     if (!officeLoc || !apptDate) {
-        alert("Please select both office location and appointment date.");
+        alert('Please select both office location and appointment date.');
         return;
     }
 
-    // Prepare the data to send to the backend
+    // Prepare data to send to the backend
     const formData = {
-        office_loc: officeLoc,
-        appt_date: apptDate
+        office_id: officeLoc,
+        date: apptDate
     };
 
-    // Use Fetch API to send data to the backend
-    fetch('/api/appointments', {  // Updated to a more conventional API endpoint
-        method: 'POST',  // Use POST since we're sending data
-        headers: {
-            'Content-Type': 'application/json',  // Send data as JSON
-        },
-        body: JSON.stringify(formData)  // Send form data as JSON
-    })
-    .then(response => response.json())  // Parse the JSON response
-    .then(data => {
-        // Handle the response data (e.g., show available appointments)
+    // Send the data to the backend to get available appointments
+    try {
+        const response = await fetch('/api/appointments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+
+        // Handle the response
         if (data.status === 'success') {
-            document.getElementById('appointment_results').innerHTML = ` 
+            // Display available appointments (you can customize this part)
+            const resultsContainer = document.getElementById('appointment_results');
+            resultsContainer.innerHTML = `
                 <h2>Available Appointments</h2>
                 <ul>
-                    ${data.appointments.map(appt => `<li>${appt.time}</li>`).join('')}
+                    ${data.appointments.map(appt => `<li>${appt.app_start_time} - ${appt.app_end_time}</li>`).join('')}
                 </ul>
             `;
         } else {
-            document.getElementById('appointment_results').innerHTML = `
-                <h2>No appointments found for this date and location.</h2>
-            `;
+            document.getElementById('appointment_results').innerHTML = `<h2>No appointments found.</h2>`;
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error:', error);
-        document.getElementById('appointment_results').innerHTML = `
-            <h2>Error checking appointments. Please try again later.</h2>
-        `;
-    });
-}
+        document.getElementById('appointment_results').innerHTML = `<h2>Error checking appointments. Please try again later.</h2>`;
+    }
+});
+
 
 // populate appt drop box with locations
 async function populateOfficeLocations() {
@@ -69,7 +71,7 @@ async function populateOfficeLocations() {
         // Add new options dynamically
         offices.forEach(office => {
             const option = document.createElement('option');
-            option.value = office.id; // ID or whatever unique value you want to send
+            option.value = office.office_id; // ID or whatever unique value you want to send
             option.textContent = office.location; // The name to display
             select.appendChild(option);
         });
