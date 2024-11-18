@@ -18,7 +18,7 @@ router.get('/offices', async (req, res) => {
 
 // Find the appointments for location and date
 router.post('/appointments', async (req, res) => {
-    const { date, office_id } = req.body;  // Received date and office (doctor)
+    const { office_id, date } = req.body;  // Received date and office (doctor)
 
     // Validate inputs
     if (!date || !office_id) {
