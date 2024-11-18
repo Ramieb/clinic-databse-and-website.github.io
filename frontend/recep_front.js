@@ -36,7 +36,7 @@ async function populateDoctors() {
 
 function editAppointment(patient_id, app_date, app_start_time) {
     // You can add functionality to edit an appointment here
-    alert('Editing appointment for Patient ID: ' + patientId);
+    alert('Editing appointment for Patient ID: ' + patient_id);
     // For example, you might redirect to an edit page or open a modal to edit the details
     // window.location.href = `/edit-appointment/${patientId}`;
 }
@@ -245,6 +245,7 @@ async function submitPatientID(){
         });
 
         const data = await response.json();
+        console.log(data);
 
         const resultsContainer = document.getElementById('billing_output');
         resultsContainer.innerHTML = ''; // Clear the previous content
@@ -303,6 +304,7 @@ async function submitPatientAlt(){
         });
 
         const data = await response.json();
+        console.log(data);
 
         const resultsContainer = document.getElementById('billing_output');
         resultsContainer.innerHTML = ''; // Clear the previous content
@@ -335,12 +337,12 @@ async function submitPatientAlt(){
     }
 
 }
-document.getElementById('submitPatientID').addEventListener('click', function(event) {
+document.getElementById('find_patient_id').addEventListener('submit', function(event) {
     event.preventDefault();  // Prevent the default action (form submission)
     
     submitPatientID();  // Call the submitForm function
 });
-document.getElementById('submitPatientAlt').addEventListener('click', function(event) {
+document.getElementById('find_patient_alt').addEventListener('submit', function(event) {
     event.preventDefault();  // Prevent the default action (form submission)
     
     submitPatientAlt();  // Call the submitForm function
