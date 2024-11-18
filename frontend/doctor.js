@@ -117,27 +117,24 @@ const referralForm = document.getElementById('referralForm');
         }
     }
     
-    async function updateReferralStatus(referralId, status) {
-        try {
-            const response = await fetch('/api/doctor/updateReferralStatus', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ referralId, status }),
-            });
-    
-            if (response.ok) {
-                alert(`Referral ${status} successfully!`);
-                fetchReferrals(); // Refresh the table
-            } else {
-                const result = await response.json();
-                alert(`Error: ${result.message}`);
+    window.updateReferralStatus = function updateReferralStatus(referralId, newStatus) {
+        fetch(`/api/referrals/update/${referralId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to update referral status: ${response.statusText}`);
             }
-        } catch (error) {
-            console.error('Error updating referral status:', error);
-        }
-    }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Referral status updated:', data);
+            // Optionally update the UI here
+        })
+        .catch(error => console.error('Error updating referral status:', error));
+    };    
     
     // Fetch referrals on page load
     fetchReferrals();    
