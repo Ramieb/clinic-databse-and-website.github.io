@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Dashboard - Manage Doctors</title>
+    <title>Doctor Dashboard</title>
     <link rel="stylesheet" href="../html/css/doctor.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="js/doctor.js" defer></script> <!-- Separate JavaScript file for actions -->
+    <script src="doctor.js" defer></script>
 </head>
 <body>
     <!-- Navbar -->
@@ -19,76 +18,32 @@
             <span class="user-id">Admin123</span>
         </div>
     </div>
-    
-    <!-- Container -->
-    <div class="container">
-        <div class="sidebar">
-            <ul class="sidebar-menu">
-                
-                 <!--   <a href="admin.html">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
-                    </a>
-                -->
-                
-                    <a href="doctors.html">
-                        <i class="fas fa-user-md"></i> Doctors
-                    </a>
-                
-                
-                    <a href="doctorSchedule.html">
-                        <i class="fas fa-calendar"></i> Doctor Schedule
-                    </a>
-                
-                
-                    <a href="admin_patients.html">
-                        <i class="fas fa-user"></i> Patients
-                    </a>
-                
-                
-                    <a href="admin_appointments.html">
-                        <i class="fas fa-calendar-check"></i> Appointments
-                    </a>
-                
-                
-                    <a href="employees.html">
-                        <i class="fas fa-users"></i> Employees
-                    </a>    
-                
-            </ul>
-        </div>
 
-        <!-- Main Content for Doctors Management -->
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="doctor.html"><i class="fas fa-user-md"></i> Doctors</a></li>
+            <li><a href="schedule.html"><i class="fas fa-calendar"></i> Schedule</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
         <div class="main-content">
-            <h2>Manage Doctors</h2>
-            <div class="table-actions">
-                <button onclick="window.location.href='addDoctor.html'" class="add-doctor-btn">Add Doctor</button>
-            </div>
-            
-            <!-- Doctors Table -->
-            <table id="doctors-table">
+            <h2>Doctor-Patient History</h2>
+            <table>
                 <thead>
                     <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Specialty</th>
-                        
-                        <th>Office Id</th>
+                        <th>Doctor ID</th>
+                        <th>Patient ID</th>
+                        <th>Visit Date</th>
+                        <th>Diagnosis</th>
+                        <th>Treatment</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- Rows will be dynamically populated with JavaScript -->
-                    <tr>
-                        <td>John</td>
-                        <td>Doe</td>
-                        <td>Cardiology</td>
-                        
-                        <td>1</td>
-                        <td>
-                            <button class="edit-btn">Edit</button>
-                            <button class="delete-btn">Delete</button>
-                        </td>
-                    </tr>
-                    <!-- Additional rows can be populated here -->
+                <tbody id="historyTableBody">
+                    <!-- Data will be dynamically inserted here -->
                 </tbody>
             </table>
         </div>
