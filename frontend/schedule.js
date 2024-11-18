@@ -1,23 +1,4 @@
 // Function to fetch the list of doctors from the backend and populate the dropdown
-// Function to fetch the list of doctors from the backend and populate the dropdown
-document.addEventListener('DOMContentLoaded', function() {
-    fetchDoctors();
-});
-
-document.getElementById('viewScheduleBtn').addEventListener('click', function() {
-    const doctorDropdown = document.getElementById('doctorDropdown');
-    const appointmentDate = document.getElementById('appointment-date').value;
-    const doctorId = doctorDropdown.value;
-
-    if (!doctorId || !appointmentDate) {
-        alert("Please select a doctor and a date.");
-        return;
-    }
-
-    // Call the function to fetch the appointments here
-    fetchAppointments(doctorId, appointmentDate);
-});
-
 async function fetchDoctors() {
     try {
         const response = await fetch('/api/doctor/getDoctors');
@@ -85,3 +66,5 @@ function populateAppointmentsTable(appointments, doctorName) {
     scheduleTitle.textContent = `Schedule for Doctor: ${doctorName}`;
 }
 
+// Call the function to populate the doctor dropdown when the page loads
+document.addEventListener('DOMContentLoaded', fetchDoctors);
