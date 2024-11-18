@@ -29,11 +29,10 @@ router.post('/appointments', async (req, res) => {
     try {
         // Query to find available appointment slots for the given office_id and date
         const result = await db.query(`
-            SELECT app_start_time, app_end_time
-            FROM Appointment
+            SELECT P_ID, D_ID, app_start_time, reason_for_visit
+            FROM Appointment, Patient
             WHERE app_date = $1
-              AND D_ID = $2
-              AND available = true`, 
+              AND D_ID = $2 AND Appointment.P_ID = Patient.patient_id`, 
             [date, office_id]
         );
 
