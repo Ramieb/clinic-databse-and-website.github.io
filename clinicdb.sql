@@ -242,15 +242,6 @@ CREATE TABLE Med_History (
         ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE ReferralLogs (
-    log_id INT AUTO_INCREMENT PRIMARY KEY,
-    referral_id INT NOT NULL,
-    doctor_id VARCHAR(10) NOT NULL,
-    patient_id INT NOT NULL,
-    status ENUM('Pending', 'Approved', 'Rejected'),
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (referral_id) REFERENCES Referrals(referral_id)
-);
 
 /* CREATE VIEW Doctor_Patient_History_View
 AS SELECT	P.patient_id, P.first_name, P.last_name,
@@ -306,63 +297,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- Trigger to handle referral request before insertion
-DELIMITER //
-
-CREATE TRIGGER before_insert_referral
-BEFORE INSERT ON Referral
-FOR EACH ROW
-BEGIN
-    -- Ensure the primary doctor exists
-    IF NOT EXISTS (SELECT 1 FROM Doctor WHERE employee_ssn = NEW.primary_doc) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Invalid Primary Doctor ID. Referral cannot be created.';
-    END IF;
-
-    -- Ensure the specialist exists
-    IF NOT EXISTS (SELECT 1 FROM Doctor WHERE employee_ssn = NEW.specialist) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Invalid Specialist Doctor ID. Referral cannot be created.';
-    END IF;
-
-    -- Ensure the patient exists
-    IF NOT EXISTS (SELECT 1 FROM Patient WHERE patient_id = NEW.P_ID) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Invalid Patient ID. Referral cannot be created.';
-    END IF;
-
-    -- Default values for doc_appr and used
-    IF NEW.doc_appr IS NULL THEN
-        SET NEW.doc_appr = FALSE;
-    END IF;
-
-    IF NEW.used IS NULL THEN
-        SET NEW.used = FALSE;
-    END IF;
-END;
-//
-
-DELIMITER ;
-
--- Trigger to handle referral approval by the doctor
-DELIMITER //
-
-CREATE TRIGGER after_update_referral
-AFTER UPDATE ON Referral
-FOR EACH ROW
-BEGIN
-    -- Check if the status is updated to 'Approved'
-    IF NEW.doc_appr = TRUE THEN
-        -- Log that the referral has been approved (or take necessary actions)
-        INSERT INTO ReferralLogs (referral_id, doctor_id, patient_id, status, timestamp)
-        VALUES (NEW.ref_date, NEW.specialist, NEW.P_ID, 'Approved', NOW());
-    END IF;
-END;
-//
-
-DELIMITER ;
-
-DELIMITER //
 CREATE TRIGGER No_Referral
 BEFORE INSERT ON Appointment
 FOR EACH ROW
@@ -460,31 +394,6 @@ BEGIN
 END; //
 DELIMITER ;
 
--- Ensure that no two appointments overlap for the same doctor
-/* DELIMITER //
-CREATE TRIGGER Prevent_Double_Booking
-BEFORE INSERT ON Appointment
-FOR EACH ROW
-BEGIN
-    DECLARE overlap_count INT;
-
-    SELECT COUNT(*)
-    INTO overlap_count
-    FROM Appointment
-    WHERE D_ID = NEW.D_ID
-      AND app_date = NEW.app_date
-      AND (
-        (NEW.app_start_time BETWEEN app_start_time AND app_end_time)
-        OR (NEW.app_end_time BETWEEN app_start_time AND app_end_time)
-        OR (app_start_time BETWEEN NEW.app_start_time AND NEW.app_end_time)
-      );
-
-    IF overlap_count > 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Double-booking is not allowed for this doctor.';
-    END IF;
-END; //
-DELIMITER ; */
 
 DELIMITER //
 CREATE TRIGGER Populate_Default_Data
