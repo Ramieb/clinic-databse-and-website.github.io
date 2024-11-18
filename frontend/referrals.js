@@ -1,13 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const username = localStorage.getItem('username');
+    const username = sessionStorage.getItem('username');
+
+    if (!username) {
+        console.error('Username not found in sessionStorage. Redirecting to login page.');
+        window.location.href = '/login.html'; // Redirect to login page if username is missing
+        return;
+    }
+
+    console.log("Username retrieved from sessionStorage:", username);
 
     // Fetch referrals for the patient
     fetch(`/api/referrals/${username}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to fetch referrals: ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
             const pendingContainer = document.getElementById('pendingReferrals');
             const processedContainer = document.getElementById('processedReferrals');
 
+            // Clear existing content
+            pendingContainer.innerHTML = '';
+            processedContainer.innerHTML = '';
+
+            // Populate referral data
             data.forEach(referral => {
                 const div = document.createElement('div');
                 div.textContent = `
