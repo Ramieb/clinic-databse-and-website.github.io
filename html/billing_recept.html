@@ -13,8 +13,7 @@
         <a href="billing_recept.html">Billing</a>
     </div>
     <div class="sidebar">
-        <img src="/html/pictures/receptionist2_clear.png" alt="Profile picture">
-        <a href="/">My Account</a>
+        <img src="/html/pictures/guy1.png" alt="Profile picture">
         <a href="/html/receptionist.html">Dashboard</a>
     </div>
     <main class="main-content">
@@ -24,24 +23,26 @@
                 <form id="find_patient_id">
                     <label for="lookup_id">Patient ID:</label>
                     <input id="lookup_id" type="text" name="lookup_id"placeholder="Enter Patient ID:">
-                    <button id="submitPatientID">Search</button>
+                    <button id="submitPatientID" type="submit" >Search</button>
                 </form>
             </div>
             <h2>Alternate Lookup:</h2>
             <div class="patient_lookup">
                 <form id ="find_patient_alt">
-                    <label for="last_name">Last name:</label>
-                    <input id="last_name" type="text" name="last_name"placeholder="Last name">
-                    <label for="dob">Date of Birth:</label>
-                    <input type="date" id="dob" name="dob">
-                    <button id="submitPatientAlt">Search</button>
+                    <label for="last_name_bill">Last name:</label>
+                    <input id="last_name_bill" type="text" name="last_name_bill"placeholder="Last name">
+                    <label for="dob_bill">Date of Birth:</label>
+                    <input type="date" id="dob_bill" name="dob_bill">
+                    <button id="submitPatientAlt" type="submit" >Search</button>
                 </form>
             </div>
         </div>
         <div class="output_area">
-            <h2>Please enter patient lookup</h2>
+            <div id="billing_output">
+                <h2>Please enter patient lookup</h2>
+            </div>
         </div>
     </main>
-    <script src="../frontend/recep_front.js"></script>
+    <script src="../frontend/recept_billing.js"></script>
 </body>
 </html>

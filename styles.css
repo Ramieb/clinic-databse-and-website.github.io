@@ -417,3 +417,6 @@ h2 {
 .editing {
     background-color: #f0f0f0;
 }
+.referralSection {
+    margin: 0 auto; /* Centers the section horizontally */
+}

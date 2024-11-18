@@ -19,7 +19,8 @@ router.get('/appointments/:username', (req, res) => {
         JOIN Doctor ON Appointment.D_ID = Doctor.employee_ssn
         JOIN Patient ON Appointment.P_ID = Patient.patient_id
         WHERE Patient.username = ?
-        AND Appointment.app_date >= CURDATE()
+          AND Appointment.app_date >= CURDATE()
+          AND Appointment.deleted = FALSE
         ORDER BY Appointment.app_date, Appointment.app_start_time;
     `;
 
@@ -45,7 +46,10 @@ router.post('/appointments', (req, res) => {
     }
 
     const resolvePatientIdQuery = `SELECT patient_id FROM Patient WHERE username = ?`;
-
+    const validateReferralQuery = `
+        SELECT * FROM Referral 
+        WHERE P_ID = ? AND specialist = ? AND doc_appr = TRUE AND expiriation >= CURDATE();
+    `;
     const insertAppointmentQuery = `
         INSERT INTO Appointment (
             app_date, 
@@ -68,18 +72,84 @@ router.post('/appointments', (req, res) => {
 
         const patientId = results[0].patient_id;
 
-        db.query(
-            insertAppointmentQuery,
-            [appointmentDate, patientId, appointmentTime, appointmentTime, doctor, reason],
-            (insertError) => {
-                if (insertError) {
-                    console.error('Error creating appointment:', insertError);
-                    res.status(500).json({ error: 'Error creating appointment' });
-                } else {
-                    res.status(201).json({ success: true, message: 'Appointment created successfully' });
-                }
+        // Validate referral
+        db.query(validateReferralQuery, [patientId, doctor], (referralError, referralResults) => {
+            if (referralError || referralResults.length === 0) {
+                console.error('No valid referral found for this specialist:', referralError);
+                return res.status(400).json({ error: 'No valid referral found for this specialist.' });
             }
-        );
+
+            // Insert appointment
+            db.query(
+                insertAppointmentQuery,
+                [appointmentDate, patientId, appointmentTime, appointmentTime, doctor, reason],
+                (insertError) => {
+                    if (insertError) {
+                        console.error('Error creating appointment:', insertError);
+                        res.status(500).json({ error: 'Error creating appointment' });
+                    } else {
+                        res.status(201).json({ success: true, message: 'Appointment created successfully' });
+                    }
+                }
+            );
+        });
+    });
+});
+
+// Route to get referrals for a specific doctor
+router.get('/getReferrals', async (req, res) => {
+    const doctorId = req.query.specialist;
+
+    if (!doctorId) {
+        return res.status(400).json({ message: 'Doctor ID is required.' });
+    }
+
+    try {
+        const query = `
+            SELECT 
+                R.referral_id,
+                P.first_name AS patient_first_name,
+                P.last_name AS patient_last_name,
+                R.reason_for_referral,
+                R.doc_appr AS status,
+                R.ref_date
+            FROM Referral R
+            JOIN Patient P ON R.P_ID = P.patient_id
+            WHERE R.specialist = ?
+            ORDER BY R.ref_date DESC;
+        `;
+        const [referrals] = await db.query(query, [doctorId]);
+        res.status(200).json(referrals);
+    } catch (error) {
+        console.error('Error fetching referrals:', error.stack);
+        res.status(500).json({ message: 'Server error.' });
+    }
+});
+
+router.get('/referrals/:username', (req, res) => {
+    const username = req.params.username;
+    const query = `
+        SELECT 
+            R.referral_id,
+            D.first_name AS doctor_first_name,
+            D.last_name AS doctor_last_name,
+            R.reason_for_referral,
+            R.doc_appr,
+            R.ref_date
+        FROM Referral R
+        JOIN Doctor D ON R.specialist = D.employee_ssn
+        JOIN Patient P ON R.P_ID = P.patient_id
+        WHERE P.username = ?
+        ORDER BY R.ref_date DESC;
+    `;
+
+    db.query(query, [username], (error, results) => {
+        if (error) {
+            console.error('Error fetching referrals:', error);
+            res.status(500).json({ error: 'Error fetching referrals' });
+        } else {
+            res.status(200).json(results);
+        }
     });
 });
 

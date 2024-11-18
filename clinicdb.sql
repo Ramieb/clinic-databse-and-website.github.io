@@ -103,6 +103,22 @@ CREATE TABLE Patient (
     FOREIGN KEY (primary_id) REFERENCES Doctor(employee_ssn)
         ON DELETE SET NULL ON UPDATE CASCADE
 );
+CREATE TABLE Referral (
+    primary_doc VARCHAR(9) NOT NULL,
+    P_ID INT NOT NULL,
+    ref_date DATETIME NOT NULL,
+    expiration DATE NOT NULL,
+    specialist VARCHAR(9) NOT NULL,
+    doc_appr BOOL,
+    used BOOL,
+    PRIMARY KEY (P_ID, ref_date),
+    FOREIGN KEY (primary_doc) REFERENCES Doctor(employee_ssn)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (specialist) REFERENCES Doctor(employee_ssn)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (P_ID) REFERENCES Patient(patient_id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
 
 CREATE TABLE Appointment (
     app_date DATE NOT NULL,
@@ -113,8 +129,11 @@ CREATE TABLE Appointment (
     reason_for_visit VARCHAR(50),
     referral VARCHAR(9),
     need_referral BOOL,
+    office_location INT NOT NULL,
     PRIMARY KEY (P_ID, app_date, app_start_time),
     FOREIGN KEY (D_ID) REFERENCES Doctor(employee_ssn)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (office_location) REFERENCES Office(office_id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
     FOREIGN KEY (referral) REFERENCES Doctor(employee_ssn)
         ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -124,6 +143,10 @@ CREATE TABLE Appointment (
 
 ALTER TABLE Appointment
 ADD COLUMN deleted BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE Referral
+ADD COLUMN status ENUM('Pending', 'Approved', 'Denied') DEFAULT 'Pending',
+ADD COLUMN response_date DATE NULL;
 
 CREATE TABLE Billing (
     P_ID INT NOT NULL,
@@ -153,22 +176,6 @@ CREATE TABLE Payment (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-CREATE TABLE Referral (
-    primary_doc VARCHAR(9) NOT NULL,
-    P_ID INT NOT NULL,
-    ref_date DATETIME NOT NULL,
-    expiriation DATE NOT NULL,
-    specialist VARCHAR(9) NOT NULL,
-    doc_appr BOOL,
-    used BOOL,
-    PRIMARY KEY (P_ID, ref_date),
-    FOREIGN KEY (primary_doc) REFERENCES Doctor(employee_ssn)
-        ON DELETE RESTRICT ON UPDATE CASCADE,
-    FOREIGN KEY (specialist) REFERENCES Doctor(employee_ssn)
-        ON DELETE RESTRICT ON UPDATE CASCADE,
-    FOREIGN KEY (P_ID) REFERENCES Patient(patient_id)
-        ON DELETE CASCADE ON UPDATE CASCADE
-);
 
 CREATE TABLE Medication (
     medicine VARCHAR(50) NOT NULL,
@@ -239,15 +246,6 @@ CREATE TABLE Med_History (
         ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE ReferralLogs (
-    log_id INT AUTO_INCREMENT PRIMARY KEY,
-    referral_id INT NOT NULL,
-    doctor_id VARCHAR(10) NOT NULL,
-    patient_id INT NOT NULL,
-    status ENUM('Pending', 'Approved', 'Rejected'),
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (referral_id) REFERENCES Referrals(referral_id)
-);
 
 /* CREATE VIEW Doctor_Patient_History_View
 AS SELECT	P.patient_id, P.first_name, P.last_name,
@@ -303,63 +301,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- Trigger to handle referral request before insertion
-DELIMITER //
-
-CREATE TRIGGER before_insert_referral
-BEFORE INSERT ON Referral
-FOR EACH ROW
-BEGIN
-    -- Ensure the primary doctor exists
-    IF NOT EXISTS (SELECT 1 FROM Doctor WHERE employee_ssn = NEW.primary_doc) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Invalid Primary Doctor ID. Referral cannot be created.';
-    END IF;
-
-    -- Ensure the specialist exists
-    IF NOT EXISTS (SELECT 1 FROM Doctor WHERE employee_ssn = NEW.specialist) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Invalid Specialist Doctor ID. Referral cannot be created.';
-    END IF;
-
-    -- Ensure the patient exists
-    IF NOT EXISTS (SELECT 1 FROM Patient WHERE patient_id = NEW.P_ID) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Invalid Patient ID. Referral cannot be created.';
-    END IF;
-
-    -- Default values for doc_appr and used
-    IF NEW.doc_appr IS NULL THEN
-        SET NEW.doc_appr = FALSE;
-    END IF;
-
-    IF NEW.used IS NULL THEN
-        SET NEW.used = FALSE;
-    END IF;
-END;
-//
-
-DELIMITER ;
-
--- Trigger to handle referral approval by the doctor
-DELIMITER //
-
-CREATE TRIGGER after_update_referral
-AFTER UPDATE ON Referral
-FOR EACH ROW
-BEGIN
-    -- Check if the status is updated to 'Approved'
-    IF NEW.doc_appr = TRUE THEN
-        -- Log that the referral has been approved (or take necessary actions)
-        INSERT INTO ReferralLogs (referral_id, doctor_id, patient_id, status, timestamp)
-        VALUES (NEW.ref_date, NEW.specialist, NEW.P_ID, 'Approved', NOW());
-    END IF;
-END;
-//
-
-DELIMITER ;
-
-DELIMITER //
 CREATE TRIGGER No_Referral
 BEFORE INSERT ON Appointment
 FOR EACH ROW
@@ -369,22 +310,46 @@ BEGIN
     SELECT COUNT(*)
     INTO referral_exists
 	FROM Referral AS R
-    WHERE R.P_ID = NEW.P_ID AND R.specialist = NEW.D_ID AND R.doc_appr = TRUE; -- new refers to the new row trying to be inserted and specialist is the doctor id of the specialist that is being referred to
+    WHERE R.P_ID = NEW.P_ID AND R.specialist = NEW.D_ID AND R.doc_appr = TRUE AND R.used = FALSE AND R.expiration > CURDATE(); -- new refers to the new row trying to be inserted and specialist is the doctor id of the specialist that is being referred to
     
-    IF referral_exists = 0 THEN
+    -- If such a referral exists, fetch the primary_doc
+    IF referral_exists > 0 THEN
+        SELECT R.primary_doc
+        INTO referral_primary_doc
+        FROM Referral AS R
+        WHERE R.P_ID = NEW.P_ID 
+          AND R.specialist = NEW.D_ID 
+          AND R.doc_appr = TRUE 
+          AND R.used = FALSE 
+          AND R.expiration > CURDATE()
+        LIMIT 1;  -- In case there are multiple, fetch only one
+
+        -- Set the referral column in the new appointment
+        SET NEW.referral = referral_primary_doc;
+
+        -- Mark the referral as used
+        UPDATE Referral AS R
+        SET R.used = TRUE
+        WHERE R.P_ID = NEW.P_ID 
+          AND R.specialist = NEW.D_ID 
+          AND R.doc_appr = TRUE 
+          AND R.used = FALSE 
+          AND R.expiration > CURDATE()
+        LIMIT 1;  -- Ensure only one referral is marked as used
+    ELSE
+        -- If no referral exists and the doctor is a specialist, raise an error
         IF EXISTS (
             SELECT 1 
             FROM Doctor 
             WHERE employee_ssn = NEW.D_ID 
               AND specialist = TRUE
         ) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Cannot create appointment: No approved referral to specialist.';
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Cannot create appointment: No approved referral to specialist.';
         END IF;
     END IF;
-END; //
+END //
 
--- THIS MIGHT NOT WORK SAYS ERRORS ON MY WORKBENCH
 DELIMITER //
 CREATE TRIGGER Appointment_Reminders
 -- The trigger will begin when an appointment is added
@@ -457,31 +422,6 @@ BEGIN
 END; //
 DELIMITER ;
 
--- Ensure that no two appointments overlap for the same doctor
-/* DELIMITER //
-CREATE TRIGGER Prevent_Double_Booking
-BEFORE INSERT ON Appointment
-FOR EACH ROW
-BEGIN
-    DECLARE overlap_count INT;
-
-    SELECT COUNT(*)
-    INTO overlap_count
-    FROM Appointment
-    WHERE D_ID = NEW.D_ID
-      AND app_date = NEW.app_date
-      AND (
-        (NEW.app_start_time BETWEEN app_start_time AND app_end_time)
-        OR (NEW.app_end_time BETWEEN app_start_time AND app_end_time)
-        OR (app_start_time BETWEEN NEW.app_start_time AND NEW.app_end_time)
-      );
-
-    IF overlap_count > 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Double-booking is not allowed for this doctor.';
-    END IF;
-END; //
-DELIMITER ; */
 
 DELIMITER //
 CREATE TRIGGER Populate_Default_Data
@@ -550,12 +490,19 @@ VALUES (1, 'kthompson_patient', 'Kyle', 'Thompson', '1995-04-12', '321 Maple St,
 (2, 'nlee_patient', 'Nancy', 'Lee', '1988-07-22', '654 Cedar St, Houston, TX', '8321114321', '345678901'),
 (3, 'rmartinez_patient', 'Ricardo', 'Martinez', '1993-09-30', '987 Birch St, Houston, TX', '7134551234', '567890123');
 
+-- REFERRALS DUMMY INFO
+INSERT INTO Referral (primary_doc, P_ID, ref_date, expiriation, specialist, doc_appr, used)
+VALUES 
+    ('234567890', 1, '2023-04-01', '2025-06-01', '123456789', TRUE, FALSE),
+    ('234567890', 2, '2023-05-01', '2025-07-01', '123456789', TRUE, TRUE),
+    ('456789012', 3, '2023-06-01', '2025-08-01', '567890123', TRUE, FALSE);
+
 -- APPOINTMENTS DUMMY INFO
 INSERT INTO Appointment (app_date, P_ID, app_start_time, app_end_time, D_ID, reason_for_visit, referral, need_referral)
 VALUES 
-    ('2023-05-15', 1, '10:00:00', '10:30:00', '123456789', 'Follow-up', NULL, FALSE),
-    ('2023-06-10', 2, '14:00:00', '14:30:00', '234567890', 'Check-up', NULL, TRUE),
-    ('2023-07-20', 3, '09:00:00', '09:45:00', '345678901', 'Routine Consultation', NULL, FALSE);
+    ('2023-05-15', 1, '10:00:00', '10:30:00', '123456789', 'Follow-up', NULL, TRUE,'1010 Main St, Houston, TX'),
+    ('2023-06-10', 2, '14:00:00', '14:30:00', '234567890', 'Check-up', NULL, FALSE,'1010 Main St, Houston, TX'),
+    ('2023-07-20', 3, '09:00:00', '09:45:00', '345678901', 'Routine Consultation', NULL, FALSE,'1010 Main St, Houston, TX');
 
 -- BILLING DUMMY INFO
 INSERT INTO Billing (P_ID, D_ID, charge_for, total_charge, charge_date, paid_off, paid_total)
@@ -573,13 +520,6 @@ VALUES
     (2, 200, '2023-05-18 14:30:00', '2023-05-15 00:00:00', 'Debit'),
     (3, 50, '2023-06-25 09:00:00', '2023-06-20 00:00:00', 'Cash');  
 
-
--- REFERRALS DUMMY INFO
-INSERT INTO Referral (primary_doc, P_ID, ref_date, expiriation, specialist, doc_appr, used)
-VALUES 
-    ('123456789', 1, '2023-04-01', '2023-06-01', '345678901', TRUE, FALSE),
-    ('234567890', 2, '2023-05-01', '2023-07-01', '456789012', FALSE, TRUE),
-    ('345678901', 3, '2023-06-01', '2023-08-01', '567890123', TRUE, TRUE);
 
 -- MEDICATIONS DUMMY INFO
 INSERT INTO Medication (medicine, start_date, end_date, dosage, time_of_day, D_ID, P_ID, cost)
