@@ -239,6 +239,16 @@ CREATE TABLE Med_History (
         ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE ReferralLogs (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    referral_id INT NOT NULL,
+    doctor_id VARCHAR(10) NOT NULL,
+    patient_id INT NOT NULL,
+    status ENUM('Pending', 'Approved', 'Rejected'),
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (referral_id) REFERENCES Referrals(referral_id)
+);
+
 /* CREATE VIEW Doctor_Patient_History_View
 AS SELECT	P.patient_id, P.first_name, P.last_name,
 			H.height, HIST.weight, H.blood_pressure,
@@ -293,18 +303,76 @@ BEGIN
 END //
 DELIMITER ;
 
+-- Trigger to handle referral request before insertion
 DELIMITER //
+
+CREATE TRIGGER before_insert_referral
+BEFORE INSERT ON Referral
+FOR EACH ROW
+BEGIN
+    -- Ensure the primary doctor exists
+    IF NOT EXISTS (SELECT 1 FROM Doctor WHERE employee_ssn = NEW.primary_doc) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid Primary Doctor ID. Referral cannot be created.';
+    END IF;
+
+    -- Ensure the specialist exists
+    IF NOT EXISTS (SELECT 1 FROM Doctor WHERE employee_ssn = NEW.specialist) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid Specialist Doctor ID. Referral cannot be created.';
+    END IF;
+
+    -- Ensure the patient exists
+    IF NOT EXISTS (SELECT 1 FROM Patient WHERE patient_id = NEW.P_ID) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid Patient ID. Referral cannot be created.';
+    END IF;
+
+    -- Default values for doc_appr and used
+    IF NEW.doc_appr IS NULL THEN
+        SET NEW.doc_appr = FALSE;
+    END IF;
+
+    IF NEW.used IS NULL THEN
+        SET NEW.used = FALSE;
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+-- Trigger to handle referral approval by the doctor
+DELIMITER //
+
+CREATE TRIGGER after_update_referral
+AFTER UPDATE ON Referral
+FOR EACH ROW
+BEGIN
+    IF NEW.doc_appr = TRUE THEN
+        INSERT INTO ReferralLogs (referral_id, doctor_id, patient_id, status, timestamp)
+        VALUES (NEW.referral_id, NEW.specialist, NEW.P_ID, 'Approved', NOW()); -- Ensure referral_id exists
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+DELIMITER //
+
 CREATE TRIGGER No_Referral
 BEFORE INSERT ON Appointment
 FOR EACH ROW
 BEGIN
-	DECLARE referral_exists INT;
-    
+    DECLARE referral_exists INT;
+
     SELECT COUNT(*)
     INTO referral_exists
-	FROM Referral AS R
-    WHERE R.P_ID = NEW.P_ID AND R.specialist = NEW.D_ID AND R.doc_appr = TRUE; -- new refers to the new row trying to be inserted and specialist is the doctor id of the specialist that is being referred to
-    
+    FROM Referral AS R
+    WHERE R.P_ID = NEW.P_ID 
+      AND R.specialist = NEW.D_ID 
+      AND R.doc_appr = TRUE
+      AND R.expiriation >= CURDATE(); -- Ensure referral is not expired
+
     IF referral_exists = 0 THEN
         IF EXISTS (
             SELECT 1 
@@ -312,11 +380,12 @@ BEGIN
             WHERE employee_ssn = NEW.D_ID 
               AND specialist = TRUE
         ) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Cannot create appointment: No approved referral to specialist.';
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Cannot create appointment: No approved referral to specialist.';
         END IF;
     END IF;
-END; //
+END;
+//
 
 -- THIS MIGHT NOT WORK SAYS ERRORS ON MY WORKBENCH
 DELIMITER //
