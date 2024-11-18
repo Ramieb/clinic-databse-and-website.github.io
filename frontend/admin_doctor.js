@@ -17,8 +17,8 @@ async function fetchDoctorData(doctorId) {
             row.dataset.doctorId = doctor.id; // Store doctor ID for front-end-only deletion
             
             row.innerHTML = `
-                <td>${doctor.first_Name}</td>
-                <td>${doctor.last_Name}</td>
+                <td>${doctor.first_name}</td>
+                <td>${doctor.last_name}</td>
                 <td>${doctor.specialty}</td>
                 <td>${doctor.office_Id}</td>
                 <td>
