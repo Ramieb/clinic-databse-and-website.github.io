@@ -4,6 +4,35 @@ const db = require('../db');
 
 router.use(bodyParser.json());
 
+// Route to get appointments for a specific doctor and date
+router.get('/getAppointments', async (req, res) => {
+    const { employee_ssn, appointmentDate } = req.query;
+
+    if (!employee_ssn || !appointmentDate) {
+        return res.status(400).json({ error: 'Doctor ID and appointment date are required' });
+    }
+
+    try {
+        const query = `
+            SELECT app_start_time, app_end_time, P_ID, reason_for_visit, 
+                (SELECT first_name FROM Patient WHERE patient_id = P_ID) AS patient_first_name, 
+                (SELECT last_name FROM Patient WHERE patient_id = P_ID) AS patient_last_name
+            FROM Appointment
+            WHERE D_ID = ? AND app_date = ?
+        `;
+        const appointments = await db.query(query, [employee_ssn, appointmentDate]);
+
+        if (appointments.length === 0) {
+            return res.status(404).json({ message: 'No appointments found for the selected doctor and date.' });
+        }
+
+        res.json(appointments);
+    } catch (error) {
+        console.error('Error fetching appointments:', error);
+        res.status(500).json({ error: 'An error occurred while fetching appointments.' });
+    }
+});
+
 // Route to handle adding a doctor
 router.post('/addDoctor', async (req, res) => {
     const { first_name, last_name, phone_number, ssn, specialty, salary, office_id } = req.body;
