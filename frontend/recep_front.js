@@ -70,7 +70,7 @@ async function populateOfficeLocations() {
         offices.forEach(office => {
             const option = document.createElement('option');
             option.value = office.id; // ID or whatever unique value you want to send
-            option.textContent = office.location_name; // The name to display
+            option.textContent = office.location; // The name to display
             select.appendChild(option);
         });
     } catch (error) {
