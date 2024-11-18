@@ -148,8 +148,6 @@ ALTER TABLE Referral
 ADD COLUMN status ENUM('Pending', 'Approved', 'Denied') DEFAULT 'Pending',
 ADD COLUMN response_date DATE NULL;
 
-ALTER TABLE Referral ADD COLUMN username VARCHAR(255);
-
 CREATE TABLE Billing (
     P_ID INT NOT NULL,
     D_ID VARCHAR(9),
