@@ -27,13 +27,14 @@
                     <!-- Doctors will be populated here -->
                 </select>
                 <input type="date" id="appointment-date">
-                <button onclick="fetchAppointments()">View Schedule</button>
+                <button id="viewScheduleBtn">View Schedule</button>
             </div>
         </div>
+    </div>
 
         <!-- Appointment Table -->
         <div class="doctors-table">
-            <h3 id="schedule-title">Schedule for Doctor: [Selected Doctor]</h3>
+            <h2>Schedule for Doctor: [Selected Doctor]</h2>
             <table id="doctors-table">
                 <thead>
                     <tr>
