@@ -29,18 +29,64 @@ router.get('/getAppointments', async (req, res) => {
         res.status(500).send('Internal server error');
     }
 });
+
+// Route to get appointments for a specific doctor and date
+router.post('/getAppointments', async (req, res) => {
+    const { employee_ssn, appointmentDate } = req.query;
+    
+    // Join appointments with patient details using P_ID
+    const query = `
+        SELECT 
+            a.app_start_time, 
+            p.patient_id, 
+            p.first_name AS patient_first_name, 
+            p.last_name AS patient_last_name, 
+            a.reason_for_visit
+        FROM Appointment a
+        JOIN Patient p ON a.P_ID = p.patient_id
+        WHERE a.D_ID = ? AND a.app_date = ?
+    `;
+
+    try {
+        const appointments = await db.query(query, [employee_ssn, appointmentDate]);
+        res.json(appointments);
+    } catch (error) {
+        console.error('Error fetching appointments:', error);
+        res.status(500).send('Internal server error');
+    }
+});
+
+router.get('/getPatients', async (req, res) => {
+    try {
+        // Query the database to get patients data
+        const result = await db.query('SELECT * FROM patients');
+        
+        // Check if any patients are found
+        if (result.rows.length > 0) {
+            // Return the patients data as JSON
+            res.json(result.rows);
+        } else {
+            res.status(404).json({ message: 'No patients found' });
+        }
+    } catch (error) {
+        console.error('Error fetching patients:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Route to handle adding a doctor
 router.post('/addDoctor', async (req, res) => {
     const { first_name, last_name, phone_number, ssn, specialty, salary, office_id } = req.body;
-
+    const ssn_int = parseInt(ssn, 9);
+    const salart_int = parseInt(salary);
     if (!first_name || !last_name || !phone_number || !ssn || !specialty || !salary || !office_id) {
         return res.status(400).json({ message: 'Please provide all required fields.' });
     }
 
     try {
         // Logic to add the doctor to the database
-        const query = 'INSERT INTO doctors (first_name, last_name, phone_number, ssn, specialty, salary, office_id) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        const values = [first_name, last_name, phone_number, ssn, specialty, salary, office_id];
+        const query = 'INSERT INTO doctor (first_name, last_name, ssn, specialty, salary, office_id) VALUES (?, ?, ?, ?, ?, ?)';
+        const values = [first_name, last_name, ssn_int, specialty, salary_int, office_id];
 
         // Assuming you have a database connection (e.g., MySQL)
         await db.query(query, values);
