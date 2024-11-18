@@ -23,11 +23,6 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
         if (response.ok) {
             const data = await response.json();
             console.log("Received response:", data); // Log the received response
-
-            // Store the username in sessionStorage
-            sessionStorage.setItem('username', username);
-            console.log("Username saved in sessionStorage:", username);
-
             if (data.redirect) {
                 window.location.href = data.redirect; // Redirect if 'redirect' property exists
             } else {

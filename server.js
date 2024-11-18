@@ -54,9 +54,6 @@ app.use('/api', patientRoute);
 const doctorRoute = require('./backend/routerFiles/doctorRoute');
 app.use('/api/doctor', doctorRoute);
 
-const referralRoute = require('./routerFiles/referralRoute');
-app.use(referralRoute);
-
 // Global error handling middleware
 app.use((err, req, res, next) => {
     console.error('Unexpected Error:', err.stack);
