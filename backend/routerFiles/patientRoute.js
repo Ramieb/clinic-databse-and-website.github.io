@@ -83,4 +83,54 @@ router.post('/appointments', (req, res) => {
     });
 });
 
+
+// Fetch all patients (renamed to match '/api/getPatients')
+router.get("/getPatients", async (req, res) => {
+    try {
+        const [patients] = await db.query("SELECT * FROM Patient");
+        res.json(patients);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error fetching patients.");
+    }
+});
+
+// Fetch medications for a patient
+router.get("/medications/:id", async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [medications] = await db.query("SELECT * FROM Medication WHERE P_ID = ?", [id]);
+        res.json(medications);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error fetching medications.");
+    }
+});
+
+// Fetch appointments for a patient
+router.get("/appointments/:id", async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [appointments] = await db.query("SELECT * FROM Appointment WHERE P_ID = ?", [id]);
+        res.json(appointments);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error fetching appointments.");
+    }
+});
+
+// Delete a patient
+router.delete("/:id", async (req, res) => {
+    const { id } = req.params;
+    try {
+        await db.query("DELETE FROM Patient WHERE patient_id = ?", [id]);
+        res.sendStatus(204); // No Content
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error deleting patient.");
+    }
+});
+
+module.exports = router;
+
 module.exports = router;
