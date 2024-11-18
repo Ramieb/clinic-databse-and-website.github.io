@@ -13,6 +13,9 @@ async function fetchDoctorData(doctorId) {
         tableBody.innerHTML = ''; // Clear existing rows
         
         doctors.forEach(doctor => {
+            // Log the doctor object to inspect the data
+            console.log(doctor);
+            
             const row = document.createElement('tr');
             row.dataset.doctorId = doctor.id; // Store doctor ID for front-end-only deletion
             
