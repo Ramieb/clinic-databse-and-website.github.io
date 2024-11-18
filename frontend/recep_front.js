@@ -127,10 +127,6 @@ async function submitApptFilters() {
             // Display available appointments (adjust based on the new response structure)
             resultsContainer.innerHTML = `
                 <h2>All Appointments</h2>
-                <label for="choose_doc">Filter by Doctor:</label>
-                <select id="choose_doc" name="choose_doc">
-                    <option value="" disabled selected>Select Doctor</option>
-                <button id="search_doc" onclick="populateDoctors(${appt.employee_ssn})">Search</button>
                 <ul>
                     ${data.appointments.map(appt => `
                         <li>
@@ -236,3 +232,10 @@ document.getElementById('registerForm').addEventListener('submit', async functio
 
 ///////////////////////
 
+
+
+///possible update to appointment filtering
+/* <label for="choose_doc">Filter by Doctor:</label>
+                <select id="choose_doc" name="choose_doc">
+                    <option value="" disabled selected>Select Doctor</option>
+                <button id="search_doc" onclick="populateDoctors(${appt.employee_ssn})">Search</button> */
