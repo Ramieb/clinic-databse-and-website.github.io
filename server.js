@@ -15,10 +15,10 @@ app.use(helmet());
 app.use(bodyParser.json());
 
 // Define CORS options
-const allowedOrigins = [
-    'http://127.0.0.1:5501', // Local testing
-    'https://clinic-website.azurewebsites.net' // Azure frontend
-];
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',')
+    : ['http://127.0.0.1:5501', 'https://clinic-website.azurewebsites.net'];
+
 
 app.use(cors({
     origin: (origin, callback) => {
