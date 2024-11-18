@@ -16,6 +16,7 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ username, password }),
+            mode: 'cors',
         });
 
         console.log("Response status:", response.status); // Log the response status
