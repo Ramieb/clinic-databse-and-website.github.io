@@ -384,7 +384,6 @@ BEGIN
     END IF;
 END; //
 
--- THIS MIGHT NOT WORK SAYS ERRORS ON MY WORKBENCH
 DELIMITER //
 CREATE TRIGGER Appointment_Reminders
 -- The trigger will begin when an appointment is added
