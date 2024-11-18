@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const appointmentForm = document.getElementById('appointmentForm');
     const referralRequestForm = document.getElementById('referralRequestForm');
     const upcomingAppointmentsDiv = document.getElementById('appointmentContent');
-    const feedbackDiv = document.getElementById('appointmentFeedback');
     const referralFeedbackDiv = document.getElementById('referralFeedback');
     const scheduleAppointmentSection = document.getElementById('schedule-appointment');
+    const referralsTableBody = document.getElementById('patientReferralsTableBody');
 
     // Extract username from the URL or session storage
     let username = new URLSearchParams(window.location.search).get('username');
@@ -20,6 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Fetch upcoming appointments
         fetchAppointments(username);
+
+        // Fetch patient referrals
+        fetchPatientReferrals(username);
     } else {
         // Redirect to login page if username is missing
         alert('Username is missing. Redirecting to login page.');
@@ -101,98 +103,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Add new appointment using the async function
-    async function addAppointment(appointmentData) {
-        const postUrl = `https://clinic-website.azurewebsites.net/api/appointments`;
-
+    // Fetch patient referrals
+    async function fetchPatientReferrals(patientId) {
         try {
-            const response = await fetchWithTimeout(postUrl, {
-                method: 'POST',
-                body: JSON.stringify(appointmentData),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                timeout: 7000, // 7-second timeout
-            });
-
+            const response = await fetch(`/api/patient/getReferrals?patientId=${patientId}`);
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`Failed to fetch referrals: ${response.statusText}`);
             }
 
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            if (error.name === 'AbortError') {
-                console.error('Request was aborted: Timeout reached');
-                throw new Error('Request timed out. Please try again.');
-            } else {
-                console.error('Error adding appointment:', error);
-                throw error;
-            }
-        }
-    }
+            const referrals = await response.json();
+            referralsTableBody.innerHTML = ''; // Clear the table before adding new rows
 
-    // Add referral request using the async function
-    async function requestReferral(referralData) {
-        const postUrl = `https://clinic-website.azurewebsites.net/api/referrals`;
-
-        try {
-            const response = await fetchWithTimeout(postUrl, {
-                method: 'POST',
-                body: JSON.stringify(referralData),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                timeout: 7000, // 7-second timeout
+            referrals.forEach((referral) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${referral.reason_for_referral}</td>
+                    <td>${referral.doc_appr === null ? 'Pending' : referral.doc_appr ? 'Approved' : 'Rejected'}</td>
+                    <td>${referral.response_date || 'Pending approval'}</td>
+                `;
+                referralsTableBody.appendChild(row);
             });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data;
         } catch (error) {
-            if (error.name === 'AbortError') {
-                console.error('Request was aborted: Timeout reached');
-                throw new Error('Request timed out. Please try again.');
-            } else {
-                console.error('Error requesting referral:', error);
-                throw error;
-            }
+            console.error('Error fetching patient referrals:', error);
+            referralFeedbackDiv.textContent = 'Failed to load referrals. Please try again.';
+            referralFeedbackDiv.style.color = 'red';
         }
-    }
-
-    // Add new appointment form submission handler
-    if (appointmentForm) {
-        appointmentForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            const formData = new FormData(appointmentForm);
-            const appointmentData = Object.fromEntries(formData);
-
-            // Add username to the appointment data
-            appointmentData.username = username;
-
-            console.log('Submitting appointment data:', appointmentData); // Debug log
-
-            try {
-                const result = await addAppointment(appointmentData);
-
-                if (result.success) {
-                    feedbackDiv.textContent = 'Appointment scheduled successfully!';
-                    feedbackDiv.style.color = 'green';
-                    appointmentForm.reset();
-                    fetchAppointments(username); // Refresh the list
-                } else {
-                    feedbackDiv.textContent = `Error: ${result.error || 'Unknown error'}`;
-                    feedbackDiv.style.color = 'red';
-                }
-            } catch (error) {
-                feedbackDiv.textContent = error.message || 'Error scheduling appointment.';
-                feedbackDiv.style.color = 'red';
-            }
-        });
     }
 
     // Referral request form submission handler
@@ -206,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Submitting referral request data:', referralData); // Debug log
 
             try {
-                const result = await requestReferral(referralData);
+                const result = await addAppointment(referralData);
 
                 if (result.success) {
                     referralFeedbackDiv.textContent = 'Referral request sent successfully!';
@@ -222,25 +157,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    async function fetchPatientReferrals(patientId) {
-        try {
-            const response = await fetch(`/api/patient/getReferrals?patientId=${patientId}`);
-            const referrals = await response.json();
-    
-            const referralsTableBody = document.getElementById('patientReferralsTableBody');
-            referralsTableBody.innerHTML = '';
-    
-            referrals.forEach((referral) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${referral.reason_for_referral}</td>
-                    <td>${referral.status}</td>
-                    <td>${referral.response_date || 'Pending approval'}</td>
-                `;
-                referralsTableBody.appendChild(row);
-            });
-        } catch (error) {
-            console.error('Error fetching patient referrals:', error);
-        }
-    }    
 });
