@@ -94,8 +94,20 @@ router.get('/appointmentsbydoctor/:doctorId', async (req, res) => {
 router.get('/doctor_patient_history', async (req, res) => {
     try {
         // Query the doctor_patient_history view
-        const [rows] = await db.query('SELECT * FROM doctor_patient_history');
-        
+       AS SELECT	P.patient_id, P.first_name, P.last_name,
+			H.height, HIST.weight, H.blood_pressure,
+            MED.medicine, MED.start_date, MED.end_date, MED.dosage,
+            A.allergy, A.start_date, A.end_date, A.seasonal,
+            S.procedure_done, S.body_part, S.surgery_date,
+            IMM.vaccine, IMM.vax_date,
+            ILL.ailment, ILL.start_date, ILL.end_date
+FROM Patient AS P
+LEFT OUTER JOIN Med_history AS H ON P.patient_id = H.P_ID
+LEFT OUTER JOIN Medication AS MED ON P.patient_id = MED.P_ID
+LEFT OUTER JOIN Allergies AS A ON P.patient_id = A.P_ID
+LEFT OUTER JOIN Surgery AS S ON P.patient_id = S.P_ID
+LEFT OUTER JOIN Immunization AS IMM ON P.patient_id = IMM.P_ID
+LEFT OUTER JOIN Illness AS ILL ON P.patient_id = ILL.P_ID;
         res.json({
             success: true,
             data: rows
