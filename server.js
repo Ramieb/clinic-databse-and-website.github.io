@@ -54,6 +54,9 @@ app.use('/api', patientRoute);
 const doctorRoute = require('./backend/routerFiles/doctorRoute');
 app.use('/api/doctor', doctorRoute);
 
+/*const receptioninstRoute = require('./backend/routerFiles/receptioninstRoute');
+app.use('/api', receptioninstRoute);*/
+
 // Global error handling middleware
 app.use((err, req, res, next) => {
     console.error('Unexpected Error:', err.stack);
