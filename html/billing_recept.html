@@ -29,16 +29,18 @@
             <h2>Alternate Lookup:</h2>
             <div class="patient_lookup">
                 <form id ="find_patient_alt">
-                    <label for="last_name">Last name:</label>
-                    <input id="last_name" type="text" name="last_name"placeholder="Last name">
-                    <label for="dob">Date of Birth:</label>
-                    <input type="date" id="dob" name="dob">
+                    <label for="last_name_bill">Last name:</label>
+                    <input id="last_name_bill" type="text" name="last_name_bill"placeholder="Last name">
+                    <label for="dob_bill">Date of Birth:</label>
+                    <input type="date" id="dob_bill" name="dob_bill">
                     <button id="submitPatientAlt">Search</button>
                 </form>
             </div>
         </div>
         <div class="output_area">
-            <h2>Please enter patient lookup</h2>
+            <div id="billing_output">
+                <h2>Please enter patient lookup</h2>
+            </div>
         </div>
     </main>
     <script src="../frontend/recep_front.js"></script>

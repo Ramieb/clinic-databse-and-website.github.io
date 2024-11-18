@@ -160,7 +160,43 @@ router.post('/register', async (req, res) => {
 /////////////////////////////////////////
 
 /////////////////BILLING BACKEND////////////////////
+router.post('/billing_id_lookup', async (req, res) => {
+    const { patient_id } = req.body;
 
+    try {
+        const result = await db.query(
+            `SELECT	P.patient_id, P.first_name, P.last_name,
+			        B.charge_for, B.total_charged, B.total_paid, B.charge_date
+            FROM Patient AS P
+            JOIN Billing AS B ON P.patient_id = B.P_ID
+            WHERE B.paid_off = FALSE AND B.P_ID = $1`,
+            [patient_id]
+        );
+        res.json(result.rows);  // Return office locations as JSON
+    } catch (err) {
+        console.error("Error retrieving outstanding bills:", err);
+        res.status(500).send("Error retrieving outstanding bills");
+    }
+});
+
+router.post('/billing_alt_lookup', async (req, res) => {
+    const { patient_last_name, patientDOB } = req.body;
+
+    try {
+        const result = await db.query(
+            `SELECT	P.patient_id, P.first_name, P.last_name,
+			        B.charge_for, B.total_charged, B.total_paid, B.charge_date
+            FROM Patient AS P, Billing AS B
+            WHERE B.paid_off = FALSE AND P.last_name = $1 AND P.date_of_birth = $2
+                    AND P.patient_id = B.P_ID`,
+            [patient_last_name, patientDOB]
+        );
+        res.json(result.rows);  // Return office locations as JSON
+    } catch (err) {
+        console.error("Error retrieving outstanding bills:", err);
+        res.status(500).send("Error retrieving outstanding bills");
+    }
+});
 
 /////////////////////////////////////////////
 
