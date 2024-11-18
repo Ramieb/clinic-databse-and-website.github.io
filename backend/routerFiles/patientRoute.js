@@ -111,12 +111,11 @@ router.get('/getReferrals', async (req, res) => {
                 P.first_name AS patient_first_name,
                 P.last_name AS patient_last_name,
                 R.reason_for_referral,
-                R.doc_appr AS status,
+                R.status,
                 R.ref_date
             FROM Referral R
             JOIN Patient P ON R.P_ID = P.patient_id
-            WHERE R.specialist = ?
-            ORDER BY R.ref_date DESC;
+            WHERE R.specialist = ?;
         `;
         const [referrals] = await db.query(query, [doctorId]);
         res.status(200).json(referrals);
