@@ -113,8 +113,11 @@ CREATE TABLE Appointment (
     reason_for_visit VARCHAR(50),
     referral VARCHAR(9),
     need_referral BOOL,
+    office_location INT NOT NULL,
     PRIMARY KEY (P_ID, app_date, app_start_time),
     FOREIGN KEY (D_ID) REFERENCES Doctor(employee_ssn)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (office_location) REFERENCES Office(office_id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
     FOREIGN KEY (referral) REFERENCES Doctor(employee_ssn)
         ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -348,11 +351,9 @@ CREATE TRIGGER after_update_referral
 AFTER UPDATE ON Referral
 FOR EACH ROW
 BEGIN
-    -- Check if the status is updated to 'Approved'
     IF NEW.doc_appr = TRUE THEN
-        -- Log that the referral has been approved (or take necessary actions)
         INSERT INTO ReferralLogs (referral_id, doctor_id, patient_id, status, timestamp)
-        VALUES (NEW.ref_date, NEW.specialist, NEW.P_ID, 'Approved', NOW());
+        VALUES (NEW.referral_id, NEW.specialist, NEW.P_ID, 'Approved', NOW()); -- Ensure referral_id exists
     END IF;
 END;
 //
@@ -360,17 +361,21 @@ END;
 DELIMITER ;
 
 DELIMITER //
+
 CREATE TRIGGER No_Referral
 BEFORE INSERT ON Appointment
 FOR EACH ROW
 BEGIN
-	DECLARE referral_exists INT;
-    
+    DECLARE referral_exists INT;
+
     SELECT COUNT(*)
     INTO referral_exists
-	FROM Referral AS R
-    WHERE R.P_ID = NEW.P_ID AND R.specialist = NEW.D_ID AND R.doc_appr = TRUE; -- new refers to the new row trying to be inserted and specialist is the doctor id of the specialist that is being referred to
-    
+    FROM Referral AS R
+    WHERE R.P_ID = NEW.P_ID 
+      AND R.specialist = NEW.D_ID 
+      AND R.doc_appr = TRUE
+      AND R.expiriation >= CURDATE(); -- Ensure referral is not expired
+
     IF referral_exists = 0 THEN
         IF EXISTS (
             SELECT 1 
@@ -378,11 +383,12 @@ BEGIN
             WHERE employee_ssn = NEW.D_ID 
               AND specialist = TRUE
         ) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Cannot create appointment: No approved referral to specialist.';
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Cannot create appointment: No approved referral to specialist.';
         END IF;
     END IF;
-END; //
+END;
+//
 
 -- THIS MIGHT NOT WORK SAYS ERRORS ON MY WORKBENCH
 DELIMITER //
@@ -553,9 +559,9 @@ VALUES (1, 'kthompson_patient', 'Kyle', 'Thompson', '1995-04-12', '321 Maple St,
 -- APPOINTMENTS DUMMY INFO
 INSERT INTO Appointment (app_date, P_ID, app_start_time, app_end_time, D_ID, reason_for_visit, referral, need_referral)
 VALUES 
-    ('2023-05-15', 1, '10:00:00', '10:30:00', '123456789', 'Follow-up', NULL, FALSE),
-    ('2023-06-10', 2, '14:00:00', '14:30:00', '234567890', 'Check-up', NULL, TRUE),
-    ('2023-07-20', 3, '09:00:00', '09:45:00', '345678901', 'Routine Consultation', NULL, FALSE);
+    ('2023-05-15', 1, '10:00:00', '10:30:00', '123456789', 'Follow-up', NULL, FALSE,'1010 Main St, Houston, TX'),
+    ('2023-06-10', 2, '14:00:00', '14:30:00', '234567890', 'Check-up', NULL, TRUE,'1010 Main St, Houston, TX'),
+    ('2023-07-20', 3, '09:00:00', '09:45:00', '345678901', 'Routine Consultation', NULL, FALSE,'1010 Main St, Houston, TX');
 
 -- BILLING DUMMY INFO
 INSERT INTO Billing (P_ID, D_ID, charge_for, total_charge, charge_date, paid_off, paid_total)
@@ -623,5 +629,19 @@ VALUES
     (1, '2023-05-01', 170, 70, '120/80'),
     (2, '2023-05-10', 165, 75, '130/85'),
     (3, '2023-04-20', 160, 68, '125/82');
+--Appointment dummy info
+INSERT INTO Appointment (app_date, P_ID, app_start_time, app_end_time, D_ID, reason_for_visit)
+SELECT CURDATE(), patient_id, '10:00:00', '11:00:00', '123456789', 'General Checkup'
+FROM Patient
+WHERE patient_id NOT IN (SELECT DISTINCT P_ID FROM Appointment);
+
+-- Add admin id
+UPDATE Office
+SET admin_id = '111111111'
+WHERE admin_id IS NULL;
+--Add doctor ID for corresponding patient
+UPDATE Patient
+SET primary_id = '123456789' -- Replace with an actual doctor ID
+WHERE primary_id IS NULL;
 
 COMMIT;
