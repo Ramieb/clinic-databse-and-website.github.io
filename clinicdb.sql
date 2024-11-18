@@ -113,8 +113,11 @@ CREATE TABLE Appointment (
     reason_for_visit VARCHAR(50),
     referral VARCHAR(9),
     need_referral BOOL,
+    office_location INT NOT NULL,
     PRIMARY KEY (P_ID, app_date, app_start_time),
     FOREIGN KEY (D_ID) REFERENCES Doctor(employee_ssn)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (office_location) REFERENCES Office(office_id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
     FOREIGN KEY (referral) REFERENCES Doctor(employee_ssn)
         ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -553,9 +556,9 @@ VALUES (1, 'kthompson_patient', 'Kyle', 'Thompson', '1995-04-12', '321 Maple St,
 -- APPOINTMENTS DUMMY INFO
 INSERT INTO Appointment (app_date, P_ID, app_start_time, app_end_time, D_ID, reason_for_visit, referral, need_referral)
 VALUES 
-    ('2023-05-15', 1, '10:00:00', '10:30:00', '123456789', 'Follow-up', NULL, FALSE),
-    ('2023-06-10', 2, '14:00:00', '14:30:00', '234567890', 'Check-up', NULL, TRUE),
-    ('2023-07-20', 3, '09:00:00', '09:45:00', '345678901', 'Routine Consultation', NULL, FALSE);
+    ('2023-05-15', 1, '10:00:00', '10:30:00', '123456789', 'Follow-up', NULL, FALSE,'1010 Main St, Houston, TX'),
+    ('2023-06-10', 2, '14:00:00', '14:30:00', '234567890', 'Check-up', NULL, TRUE,'1010 Main St, Houston, TX'),
+    ('2023-07-20', 3, '09:00:00', '09:45:00', '345678901', 'Routine Consultation', NULL, FALSE,'1010 Main St, Houston, TX');
 
 -- BILLING DUMMY INFO
 INSERT INTO Billing (P_ID, D_ID, charge_for, total_charge, charge_date, paid_off, paid_total)
