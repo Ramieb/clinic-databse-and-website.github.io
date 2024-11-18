@@ -51,9 +51,6 @@ app.use('/register', registerRoute);
 const patientRoute = require('./backend/routerFiles/patientRoute');
 app.use('/api', patientRoute);
 
-/*const receptioninstRoute = require('./backend/routerFiles/receptioninstRoute');
-app.use('/api', receptioninstRoute);*/
-
 const doctorRoute = require('./backend/routerFiles/doctorRoute');
 app.use('/api/doctor', doctorRoute);
 
