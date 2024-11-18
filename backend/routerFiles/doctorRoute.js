@@ -185,6 +185,7 @@ router.get('/salary-vs-billing-report', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 // Route to create a referral
 router.post('/referrals', async (req, res) => {
     const { specialist, patientId, referralReason } = req.body;
@@ -207,5 +208,27 @@ router.post('/referrals', async (req, res) => {
     }
 });
 
+// Route to update referral status
+router.put('/updateReferralStatus', async (req, res) => {
+    const { referralId, status } = req.body;
+
+    if (!referralId || !status) {
+        return res.status(400).json({ message: 'Referral ID and status are required.' });
+    }
+
+    try {
+        const query = `
+            UPDATE Referral
+            SET status = ?, response_date = NOW()
+            WHERE referral_id = ?;
+        `;
+        await db.query(query, [status, referralId]);
+
+        res.status(200).json({ message: `Referral ${status} successfully!` });
+    } catch (error) {
+        console.error('Error updating referral status:', error.stack);
+        res.status(500).json({ message: 'Server error. Unable to update referral status.' });
+    }
+});
 
 module.exports = router;

@@ -96,4 +96,33 @@ router.post('/appointments', (req, res) => {
     });
 });
 
+// Route to get referrals for a specific doctor
+router.get('/getReferrals', async (req, res) => {
+    const doctorId = req.query.specialist;
+
+    if (!doctorId) {
+        return res.status(400).json({ message: 'Doctor ID is required.' });
+    }
+
+    try {
+        const query = `
+            SELECT 
+                R.referral_id,
+                P.first_name AS patient_first_name,
+                P.last_name AS patient_last_name,
+                R.reason_for_referral,
+                R.status,
+                R.ref_date
+            FROM Referral R
+            JOIN Patient P ON R.P_ID = P.patient_id
+            WHERE R.specialist = ?;
+        `;
+        const [referrals] = await db.query(query, [doctorId]);
+        res.status(200).json(referrals);
+    } catch (error) {
+        console.error('Error fetching referrals:', error.stack);
+        res.status(500).json({ message: 'Server error.' });
+    }
+});
+
 module.exports = router;

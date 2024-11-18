@@ -90,4 +90,55 @@ const referralForm = document.getElementById('referralForm');
     });
     // Fetch data on page load
     fetchDoctorPatientHistory();
+    async function fetchReferrals() {
+        try {
+            const response = await fetch('/api/doctor/getReferrals?specialist=<doctor_id>');
+            const referrals = await response.json();
+    
+            const referralsTableBody = document.getElementById('referralsTableBody');
+            referralsTableBody.innerHTML = ''; // Clear previous data
+    
+            referrals.forEach((referral) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${referral.patient_first_name} ${referral.patient_last_name}</td>
+                    <td>${referral.reason_for_referral}</td>
+                    <td>${referral.ref_date}</td>
+                    <td>${referral.status}</td>
+                    <td>
+                        <button onclick="updateReferralStatus(${referral.referral_id}, 'Approved')">Approve</button>
+                        <button onclick="updateReferralStatus(${referral.referral_id}, 'Denied')">Deny</button>
+                    </td>
+                `;
+                referralsTableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error fetching referrals:', error);
+        }
+    }
+    
+    async function updateReferralStatus(referralId, status) {
+        try {
+            const response = await fetch('/api/doctor/updateReferralStatus', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ referralId, status }),
+            });
+    
+            if (response.ok) {
+                alert(`Referral ${status} successfully!`);
+                fetchReferrals(); // Refresh the table
+            } else {
+                const result = await response.json();
+                alert(`Error: ${result.message}`);
+            }
+        } catch (error) {
+            console.error('Error updating referral status:', error);
+        }
+    }
+    
+    // Fetch referrals on page load
+    fetchReferrals();    
 });

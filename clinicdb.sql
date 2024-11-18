@@ -144,6 +144,10 @@ CREATE TABLE Appointment (
 ALTER TABLE Appointment
 ADD COLUMN deleted BOOLEAN DEFAULT FALSE;
 
+ALTER TABLE Referral
+ADD COLUMN status ENUM('Pending', 'Approved', 'Denied') DEFAULT 'Pending',
+ADD COLUMN response_date DATE NULL;
+
 CREATE TABLE Billing (
     P_ID INT NOT NULL,
     D_ID VARCHAR(9),

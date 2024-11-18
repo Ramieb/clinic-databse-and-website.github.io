@@ -222,4 +222,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    async function fetchPatientReferrals(patientId) {
+        try {
+            const response = await fetch(`/api/patient/getReferrals?patientId=${patientId}`);
+            const referrals = await response.json();
+    
+            const referralsTableBody = document.getElementById('patientReferralsTableBody');
+            referralsTableBody.innerHTML = '';
+    
+            referrals.forEach((referral) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${referral.reason_for_referral}</td>
+                    <td>${referral.status}</td>
+                    <td>${referral.response_date || 'Pending approval'}</td>
+                `;
+                referralsTableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error fetching patient referrals:', error);
+        }
+    }    
 });
