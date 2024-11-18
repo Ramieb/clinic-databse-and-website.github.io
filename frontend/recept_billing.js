@@ -16,7 +16,7 @@ async function submitPatientID(){
 
     // Prepare data to send to the backend
     const formData = {
-        patient_id: lookup_id,
+        patient_id: patient_id,
     };
 
     try {
