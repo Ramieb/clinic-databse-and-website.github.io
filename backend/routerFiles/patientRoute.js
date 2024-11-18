@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../db');
 
 // Fetch upcoming appointments for a user
-router.get('/appointments/:username', (req, res) => {
+router.get('/appointments/:username', async (req, res) => {
     const username = req.params.username;
 
     const query = `
@@ -25,19 +25,17 @@ router.get('/appointments/:username', (req, res) => {
 
     console.log('Fetching appointments for username:', username);
 
-    db.query(query, [username], (error, results) => {
-        if (error) {
-            console.error('Error fetching appointments:', error);
-            res.status(500).json({ error: 'Error fetching appointments' });
-        } else {
-            console.log('Fetched appointments:', results);
-            res.status(200).json(results);
-        }
-    });
+    try {
+        const [results] = await db.query(query, [username]);
+        res.status(200).json(results);
+    } catch (error) {
+        console.error('Error fetching appointments:', error.stack);
+        res.status(500).json({ error: 'Error fetching appointments' });
+    }
 });
 
 // Add a new appointment
-router.post('/appointments', (req, res) => {
+router.post('/appointments', async (req, res) => {
     const { username, doctor, appointmentDate, appointmentTime, reason } = req.body;
 
     if (!username || !doctor || !appointmentDate || !appointmentTime || !reason) {
@@ -46,9 +44,9 @@ router.post('/appointments', (req, res) => {
 
     const resolvePatientIdQuery = `SELECT patient_id FROM Patient WHERE username = ?`;
     const validateReferralQuery = `
-    SELECT * FROM Referral 
-    WHERE P_ID = ? AND specialist = ? AND doc_appr = TRUE AND expiriation >= CURDATE();
-`;
+        SELECT * FROM Referral 
+        WHERE P_ID = ? AND specialist = ? AND doc_appr = TRUE AND expiration >= CURDATE();
+    `;
 
     const insertAppointmentQuery = `
         INSERT INTO Appointment (
@@ -64,36 +62,29 @@ router.post('/appointments', (req, res) => {
         VALUES (?, ?, ?, ADDTIME(?, '01:00:00'), ?, ?, NULL, FALSE);
     `;
 
+    try {
+        // Resolve patient ID from username
+        const [patientResults] = await db.query(resolvePatientIdQuery, [username]);
+        if (patientResults.length === 0) {
+            return res.status(404).json({ error: 'Patient not found' });
+        }
 
-db.query(resolvePatientIdQuery, [username], (error, results) => {
-    if (error || results.length === 0) {
-        console.error('Error resolving patient ID:', error);
-        return res.status(500).json({ error: 'Could not resolve patient ID' });
-    }
+        const patientId = patientResults[0].patient_id;
 
-    const patientId = results[0].patient_id;
-
-    // Validate referral
-    db.query(validateReferralQuery, [patientId, doctor], (referralError, referralResults) => {
-        if (referralError || referralResults.length === 0) {
-            console.error('No valid referral found for this specialist:', referralError);
+        // Validate referral
+        const [referralResults] = await db.query(validateReferralQuery, [patientId, doctor]);
+        if (referralResults.length === 0) {
             return res.status(400).json({ error: 'No valid referral found for this specialist.' });
         }
 
         // Insert appointment
-        db.query(
-            insertAppointmentQuery,
-            [appointmentDate, patientId, appointmentTime, appointmentTime, doctor, reason],
-            (insertError) => {
-                if (insertError) {
-                    console.error('Error creating appointment:', insertError);
-                    res.status(500).json({ error: 'Error creating appointment' });
-                } else {
-                    res.status(201).json({ success: true, message: 'Appointment created successfully' });
-                }
-            }
-        );
-    });
+        await db.query(insertAppointmentQuery, [appointmentDate, patientId, appointmentTime, appointmentTime, doctor, reason]);
+        res.status(201).json({ success: true, message: 'Appointment created successfully' });
+
+    } catch (error) {
+        console.error('Error creating appointment:', error.stack);
+        res.status(500).json({ error: 'Error creating appointment' });
+    }
 });
 
 // Fetch all patients (renamed to match '/api/getPatients')
@@ -102,7 +93,7 @@ router.get("/getPatients", async (req, res) => {
         const [patients] = await db.query("SELECT * FROM Patient");
         res.json(patients);
     } catch (error) {
-        console.error(error);
+        console.error('Error fetching patients:', error.stack);
         res.status(500).send("Error fetching patients.");
     }
 });
@@ -114,7 +105,7 @@ router.get("/medications/:id", async (req, res) => {
         const [medications] = await db.query("SELECT * FROM Medication WHERE P_ID = ?", [id]);
         res.json(medications);
     } catch (error) {
-        console.error(error);
+        console.error('Error fetching medications:', error.stack);
         res.status(500).send("Error fetching medications.");
     }
 });
@@ -126,7 +117,7 @@ router.get("/appointments/:id", async (req, res) => {
         const [appointments] = await db.query("SELECT * FROM Appointment WHERE P_ID = ?", [id]);
         res.json(appointments);
     } catch (error) {
-        console.error(error);
+        console.error('Error fetching appointments:', error.stack);
         res.status(500).send("Error fetching appointments.");
     }
 });
@@ -138,7 +129,7 @@ router.delete("/:id", async (req, res) => {
         await db.query("DELETE FROM Patient WHERE patient_id = ?", [id]);
         res.sendStatus(204); // No Content
     } catch (error) {
-        console.error(error);
+        console.error('Error deleting patient:', error.stack);
         res.status(500).send("Error deleting patient.");
     }
 });
