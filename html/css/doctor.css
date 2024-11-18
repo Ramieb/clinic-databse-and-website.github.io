@@ -70,12 +70,12 @@ body {
     left: 0;
     width: 240px;
     height: 100%;
-    background: rgba(33, 150, 243, 0.3);
+    background: rgba(33, 150, 243, 0.5);
     color: white;
     display: flex;
     flex-direction: column;
     padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
 .sidebar-menu {
