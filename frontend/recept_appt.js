@@ -186,7 +186,7 @@ async function createNewAppt(){
     const resultsContainer = document.getElementById('appointment_results');
     resultsContainer.innerHTML = ''; // Clear the previous content
 
-    resultsContainer.innerHTML = `
+    /*resultsContainer.innerHTML = `
             <form id="appointmentForm">
                 <label for="app_date">Appointment Date:</label>
                 <input name="app_date" type="date" required />
@@ -207,7 +207,7 @@ async function createNewAppt(){
                 <input name="reason_for_visit" type="text" required />
             
                 <button type="submit">Submit</button>
-            </form>`
+            </form>`;*/
 }
 
 // Attach the event listener to the image element
