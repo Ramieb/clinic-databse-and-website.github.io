@@ -52,7 +52,9 @@ const patientRoute = require('./backend/routerFiles/patientRoute');
 app.use('/api', patientRoute);
 
 const doctorRoute = require('./backend/routerFiles/doctorRoute');
-app.use('/api/', doctorRoute);
+app.use('/api', doctorRoute);
+const adminRoute = require('./backend/routerFiles/adminRoute');
+app.use('/api', adminRoute);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
