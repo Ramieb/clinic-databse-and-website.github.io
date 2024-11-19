@@ -3,83 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Dashboard</title>
-    <link rel="stylesheet" href="../html/css/doctor.css">
-    <script src="./doctor.js" defer></script>
+    <title>Doctor Management</title>
+    <script src="doctor-client.js" defer></script>
 </head>
 <body>
-    <!-- Navbar -->
-    <div class="navbar">
-        <img src="./logo.png" alt="Company Logo" class="logo">
-        <div class="navbar-right">
-            <i class="fas fa-bell notification-icon"></i>
-            <i class="fas fa-envelope message-icon"></i>
-            <img src="/html/pictures/guy1.png" alt="Profile Photo" class="profile-photo">
-            <span class="user-id">Doctor</span>
-        </div>
-    </div>
+    <h1>Doctor Management</h1>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <ul class="sidebar-menu">
-            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-            <li><a href="doctor.html"><i class="fas fa-user-md"></i> Doctors</a></li>
-            <li><a href="doctorSchedule.html"><i class="fas fa-calendar"></i> Schedule</a></li>
-        </ul>
-    </div>
+    <!-- Button to fetch doctors -->
+    <button id="fetch-doctors-btn">Fetch All Doctors</button>
 
-    <!-- Main Content -->
-    <div class="container">
-        <div class="main-content">
-            <h2>Doctor-Patient History</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Patient ID</th>
-                        <th>Patient Name</th>
-                        <th>Visit Date</th>
-                        <th>Diagnosis</th>
-                        <th>Treatment</th>
-                    </tr>
-                </thead>
-                <tbody id="historyTableBody">
-                    <!-- Data will be dynamically inserted here -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="referral-section">
-    <h3>Create Referral</h3>
-    <form id="referralForm">
-        <label for="specialist">Select Specialist:</label>
-        <select id="specialist" name="specialist" required>
-            <!-- Options will be dynamically populated -->
-        </select>
+    <!-- Table to display doctors -->
+    <table border="1">
+        <thead>
+            <tr>
+                <th>SSN</th>
+                <th>Name</th>
+                <th>Specialty</th>
+                <th>Salary</th>
+                <th>Office</th>
+            </tr>
+        </thead>
+        <tbody id="doctors-table"></tbody>
+    </table>
 
-        <label for="patientId">Patient ID:</label>
-        <input type="text" id="patientId" name="patientId" placeholder="Enter Patient ID" required>
+    <hr>
 
-        <label for="referralReason">Reason for Referral:</label>
-        <textarea id="referralReason" name="referralReason" placeholder="Enter reason" required></textarea>
+    <!-- Input for fetching appointments -->
+    <h2>Fetch Appointments</h2>
+    <input type="text" id="doctor-ssn-input" placeholder="Enter Doctor SSN">
+    <button id="fetch-appointments-btn">Fetch Appointments</button>
+    <ul id="appointments-list"></ul>
 
-        <button type="submit">Create Referral</button>
-    </form>
-   <!-- <div id="referralMessage"></div>
+    <hr>
 
-    <h2>Referral Requests</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Patient</th>
-            <th>Reason</th>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody id="referralsTableBody"></tbody>
-</table> -->
-</div> 
-
+    <!-- Form to create a referral -->
+    <h2>Create Referral</h2>
+    <input type="text" id="specialist-input" placeholder="Specialist">
+    <input type="text" id="patient-id-input" placeholder="Patient ID">
+    <input type="text" id="referral-reason-input" placeholder="Reason for Referral">
+    <button id="create-referral-btn">Create Referral</button>
 </body>
 </html>
