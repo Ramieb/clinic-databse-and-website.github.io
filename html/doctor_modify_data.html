@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Management</title>
+    <script src="js/fetchData.js" defer></script>
+    <script src="js/addData.js" defer></script>
+    <script src="js/editData.js" defer></script>
+    <script src="js/deleteData.js" defer></script>
+</head>
+<body>
+    <h1>Data Management</h1>
+    <form id="addForm">
+        <input type="text" id="name" placeholder="Name" required>
+        <input type="text" id="description" placeholder="Description" required>
+        <button type="submit">Add</button>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="dataTableBody">
+            <!-- Data will be populated here -->
+        </tbody>
+    </table>
+</body>
+</html>
