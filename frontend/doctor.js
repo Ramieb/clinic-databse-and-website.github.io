@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchDoctorPatientHistory() {
         try {
-            const response = await fetch('api/doctor/doctor_patient_history');
+            const response = await fetch('/api/doctor/doctor_patient_history');
             const data = await response.json();
 
             if (data.success) {
