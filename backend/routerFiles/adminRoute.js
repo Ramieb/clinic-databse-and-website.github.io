@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-router.use(bodyParser.json());
+// router.use(bodyParser.json());
 
 // Route to get appointments for a specific doctor and date
 router.get('/getAppointments', async (req, res) => {
