@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to fetch doctor data
     async function fetchDoctorData() {
         try {
-            const response = await fetch('/api/doctor/getDoctors');
+            const response = await fetch('/api/getDoctors');
             const doctors = await response.json();
             const tableBody = document.getElementById('doctors-table').querySelector('tbody');
             tableBody.innerHTML = ''; // Clear existing rows
