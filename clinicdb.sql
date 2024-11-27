@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS clinicdb;
 -- Create Database
 CREATE DATABASE IF NOT EXISTS clinicdb;
 USE clinicdb;
@@ -5,7 +6,7 @@ USE clinicdb;
 -- Table Creation
 CREATE TABLE Users (
     username VARCHAR(50) PRIMARY KEY NOT NULL,
-    password VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
     role ENUM('patient', 'doctor', 'nurse', 'receptionist', 'admin') NOT NULL
 );
 
@@ -128,7 +129,6 @@ CREATE TABLE Appointment (
     D_ID VARCHAR(9) NOT NULL,
     reason_for_visit VARCHAR(50),
     referral VARCHAR(9),
-    need_referral BOOL,
     office_location INT NOT NULL,
     PRIMARY KEY (P_ID, app_date, app_start_time),
     FOREIGN KEY (D_ID) REFERENCES Doctor(employee_ssn)
@@ -140,13 +140,6 @@ CREATE TABLE Appointment (
     FOREIGN KEY (P_ID) REFERENCES Patient(patient_id)
         ON DELETE CASCADE ON UPDATE CASCADE
 );
-
-ALTER TABLE Appointment
-ADD COLUMN deleted BOOLEAN DEFAULT FALSE;
-
-ALTER TABLE Referral
-ADD COLUMN status ENUM('Pending', 'Approved', 'Denied') DEFAULT 'Pending',
-ADD COLUMN response_date DATE NULL;
 
 CREATE TABLE Billing (
     P_ID INT NOT NULL,
@@ -168,7 +161,7 @@ CREATE TABLE Payment (
     total_paid INT,
     pay_date DATETIME NOT NULL,
     pay_towards DATETIME,
-    payment_type VARCHAR(25);
+    payment_type VARCHAR(25),
     PRIMARY KEY (P_ID, pay_date),
     FOREIGN KEY (P_ID) REFERENCES Patient(patient_id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -176,12 +169,11 @@ CREATE TABLE Payment (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-
 CREATE TABLE Medication (
     medicine VARCHAR(50) NOT NULL,
     start_date DATE,
     end_date DATE,
-    dosage VARCHAR(25),
+    dosage VARCHAR(50),
     time_of_day VARCHAR(20),
     D_ID VARCHAR(9),
     P_ID INT NOT NULL,
@@ -247,11 +239,11 @@ CREATE TABLE Med_History (
 );
 
 
-/* CREATE VIEW Doctor_Patient_History_View
+CREATE VIEW Doctor_Patient_History_View
 AS SELECT	P.patient_id, P.first_name, P.last_name,
-			H.height, HIST.weight, H.blood_pressure,
-            MED.medicine, MED.start_date, MED.end_date, MED.dosage,
-            A.allergy, A.start_date, A.end_date, A.seasonal,
+			H.height, H.weight, H.blood_pressure,
+            MED.medicine, MED.start_date AS medicine_start_date, MED.end_date AS medicine_end_date, MED.dosage,
+            A.allergy, A.start_date AS allergy_start_date, A.end_date AS allergy_end_date, A.seasonal,
             S.procedure_done, S.body_part, S.surgery_date,
             IMM.vaccine, IMM.vax_date,
             ILL.ailment, ILL.start_date, ILL.end_date
@@ -265,14 +257,14 @@ LEFT OUTER JOIN Illness AS ILL ON P.patient_id = ILL.P_ID;
 
 CREATE VIEW Outstanding_Bills
 AS SELECT	P.patient_id, P.first_name, P.last_name,
-			B.charge_for, B.total_charged, B.charge_date, B.paid_off
+			B.charge_for, B.total_charge, B.charge_date, B.paid_off
 FROM Patient AS P
 LEFT OUTER JOIN Billing AS B ON P.patient_id = B.P_ID
 WHERE B.paid_off = FALSE;
 
 CREATE VIEW Paid_Bills
 AS SELECT	P.patient_id, P.first_name, P.last_name,
-			B.charge_for, B.total_charged, B.charge_date, B.paid_off,
+			B.charge_for, B.total_charge, B.charge_date, B.paid_off,
             PAY.total_paid, PAY.pay_date
 FROM Patient AS P
 LEFT OUTER JOIN Payment AS PAY ON P.patient_id = PAY.P_ID
@@ -296,16 +288,18 @@ BEGIN
         SET account_role = found_role;
     ELSE
 		SET login_status = FALSE;
-        SET account_role = found_role;
+        SET account_role = "User not found";
     END IF;
 END //
 DELIMITER ;
 
+DELIMITER //
 CREATE TRIGGER No_Referral
 BEFORE INSERT ON Appointment
 FOR EACH ROW
 BEGIN
 	DECLARE referral_exists INT;
+    DECLARE referral_primary_doc VARCHAR(9);
     
     SELECT COUNT(*)
     INTO referral_exists
@@ -349,62 +343,55 @@ BEGIN
         END IF;
     END IF;
 END //
+DELIMITER ;
 
 DELIMITER //
-CREATE TRIGGER Appointment_Reminders
--- The trigger will begin when an appointment is added
+CREATE PROCEDURE Appt_Reminder (IN patient_id INT, IN appointment_day DATE, IN appointment_time TIME, OUT notification VARCHAR(128), OUT patientID INT)
+BEGIN
+	SET notification = CONCAT(
+    'Appointment Reminder: You have an appointment on ',
+    DATE_FORMAT(appointment_day, '%W, %M %d, %Y'),
+    ' at ',
+    TIME_FORMAT(appointment_time, '%h:%i %p'),
+    '.');
+    SET patientID = patient_id;
+END //
+DELIMITER ;
+/*
+DELIMITER //
+CREATE TRIGGER New_Appointment
 AFTER INSERT ON Appointment
 FOR EACH ROW
 BEGIN
-    -- Calculate the 1-day and 2-hour reminder times
-    DECLARE reminder_date_1day DATETIME;
-    DECLARE reminder_date_2hour DATETIME;
-
-    SET reminder_date_1day = DATE_SUB(NEW.app_date, INTERVAL 1 DAY);
-    SET reminder_date_2hour = TIMESTAMPADD(HOUR, -2, CONCAT(NEW.app_date, ' ', NEW.app_start_time));
-
-    -- Insert logic to notify the patient (or log the reminders if needed)
-    INSERT INTO Logs (log_message, log_time)  -- Example log for debugging
-    VALUES (CONCAT('Reminder set for 1 day before appointment on ', reminder_date_1day), NOW());
-
-    INSERT INTO Logs (log_message, log_time)  -- Log for 2-hour reminder
-    VALUES (CONCAT('Reminder set for 2 hours before appointment on ', reminder_date_2hour), NOW());
-END; //
+    DECLARE reminder_day TEXT;
+    DECLARE reminder_hour TEXT;
+    DECLARE appt_datetime DATETIME;
+    
+    SET appt_datetime = CAST(CONCAT(NEW.app_date, ' ', NEW.app_start_time) AS DATETIME);
+    
+    SET reminder_day = CONCAT(
+							 'CREATE EVENT reminder_day_', NEW.P_ID, '_', NEW.app_date, '_', NEW.app_start_time,
+                            'ON SCHEDULE AT TIMESTAMPADD(DAY, -1,\'', appt_datetime, '\')
+                            DO CALL Appt_Reminder(', NEW.P_ID, ',', NEW.appt_date, ',', NEW.appt_start_time, ');'
+							);
+	select reminder_day;
+	PREPARE stmt_day FROM reminder_day;
+    EXECUTE stmt_day;
+    DEALLOCATE PREPARE stmt_day;
+    
+    SET reminder_hour = CONCAT(
+							 'CREATE EVENT reminder_hour_', NEW.P_ID, '_', NEW.app_date, '_', NEW.app_start_time,
+                            'ON SCHEDULE AT TIMESTAMPADD(HOUR, -1,\'', appt_datetime, '\')
+								DO CALL Appt_Reminder(', NEW.P_ID, ',', NEW.appt_date, ',', NEW.appt_start_time, ');'
+							);
+    
+    PREPARE stmt_hour FROM reminder_hour;
+    EXECUTE stmt_hour;
+    DEALLOCATE PREPARE stmt_hour;
+END //
 DELIMITER ;
+*/
 
-DELIMITER //
-CREATE EVENT Send_Reminders
-ON SCHEDULE EVERY 1 HOUR  -- Adjust based on your needs
-DO
-BEGIN
-    -- Send the 1-day reminders
-    SELECT 
-        P.phone_number, 
-        CONCAT('Reminder: Your appointment is tomorrow at ', A.app_start_time) AS message
-    FROM Appointment A
-    JOIN Patient P ON A.P_ID = P.patient_id
-    WHERE A.app_date = DATE_ADD(CURDATE(), INTERVAL 1 DAY)
-      AND CURTIME() BETWEEN '00:00:00' AND '01:00:00'; -- Run within the first hour
-
-    -- Send the 2-hour reminders
-    SELECT 
-        P.phone_number, 
-        CONCAT('Reminder: Your appointment is in 2 hours at ', A.app_start_time) AS message
-    FROM Appointment A
-    JOIN Patient P ON A.P_ID = P.patient_id
-    WHERE CONCAT(A.app_date, ' ', A.app_start_time) = TIMESTAMPADD(HOUR, 2, NOW());
-
-    -- Optional: Add logic to interface with external services like Twilio for SMS
-END; //
-DELIMITER ;
-
--- Testing the appointment_Reminder by storing the reminders in a log table. This table is not required, only using for debugging.
-CREATE TABLE Logs (
-    log_id INT AUTO_INCREMENT PRIMARY KEY,
-    log_message VARCHAR(255),
-    log_time DATETIME
-);
--- THIS SECTION MIGHT NOT WORK, DELETE/COMMENT OUT IF NECESSARY
 
 -- 2 triggers will be the appointment reminder & referral trigger
 -- create view for the receptionist to see all of patients bills and payments, create view for doctor to see all patients med history combined.
@@ -412,29 +399,6 @@ CREATE TABLE Logs (
 -- need to add login info (username, password, security lvl/role)
 
 -- TRIGGERS
-DELIMITER //
-CREATE TRIGGER Calculate_End_Time
-BEFORE INSERT ON Appointment
-FOR EACH ROW
-BEGIN
-    -- Add 1 hour to the start time for the default appointment duration
-    SET NEW.app_end_time = ADDTIME(NEW.app_start_time, '01:00:00');
-END; //
-DELIMITER ;
-
-
-DELIMITER //
-CREATE TRIGGER Populate_Default_Data
-AFTER INSERT ON Users
-FOR EACH ROW
-BEGIN
-    -- Insert default data for the new user in related tables
-    INSERT INTO Prescriptions (username, prescription_data) VALUES (NEW.username, 'default prescription');
-    INSERT INTO Billing (username, billing_data) VALUES (NEW.username, 'default billing');
-    INSERT INTO Medical_History (username, history_data) VALUES (NEW.username, 'default history');
-    -- Repeat for other tables if needed (e.g., Payment, Referrals)
-END; //
-DELIMITER ;
 
 -- LOGIN DUMMY INFO
 INSERT INTO Users(username, password, role) 
@@ -456,13 +420,17 @@ VALUES ('temp_username', 'temp_pass', 'doctor'),
 
 -- OFFICE DUMMY INFO
 INSERT INTO Office (office_id, location, admin_id, admin_start_date) 
-VALUES (1, '1010 Main St, Houston, TX', '111111111', '2023-01-15'),
-(2, '2020 West Loop N, Houston, TX', '111111111', '2022-05-22'),
-(3, '3030 Fannin St, Houston, TX', '111111111', '2023-03-10');
+VALUES (1, '1010 Main St, Houston, TX', NULL, '2023-01-15'),
+(2, '2020 West Loop N, Houston, TX', NULL, '2022-05-22'),
+(3, '3030 Fannin St, Houston, TX', NULL, '2023-03-10');
 
 -- ADMIN DUMMY INFO 
 INSERT INTO Admin (employee_ssn, username, first_name, last_name, hire_date, salary, office_id) 
 VALUES ('111111111', 'big_boss', 'Mr.', 'Boss', '2021-08-15', 175000, 1);
+
+UPDATE Office
+SET admin_id = '111111111'
+WHERE admin_id = NULL;
 
 -- DOCTOR DUMMY INFO
 INSERT INTO Doctor (employee_ssn, username, Admin_ssn, first_name, last_name, hire_date, salary, office_id, specialty, specialist, cost) 
@@ -491,18 +459,18 @@ VALUES (1, 'kthompson_patient', 'Kyle', 'Thompson', '1995-04-12', '321 Maple St,
 (3, 'rmartinez_patient', 'Ricardo', 'Martinez', '1993-09-30', '987 Birch St, Houston, TX', '7134551234', '567890123');
 
 -- REFERRALS DUMMY INFO
-INSERT INTO Referral (primary_doc, P_ID, ref_date, expiriation, specialist, doc_appr, used)
+INSERT INTO Referral (primary_doc, P_ID, ref_date, expiration, specialist, doc_appr, used)
 VALUES 
     ('234567890', 1, '2023-04-01', '2025-06-01', '123456789', TRUE, FALSE),
     ('234567890', 2, '2023-05-01', '2025-07-01', '123456789', TRUE, TRUE),
     ('456789012', 3, '2023-06-01', '2025-08-01', '567890123', TRUE, FALSE);
 
 -- APPOINTMENTS DUMMY INFO
-INSERT INTO Appointment (app_date, P_ID, app_start_time, app_end_time, D_ID, reason_for_visit, referral, need_referral)
+INSERT INTO Appointment (app_date, P_ID, app_start_time, app_end_time, D_ID, reason_for_visit, referral, office_location)
 VALUES 
-    ('2023-05-15', 1, '10:00:00', '10:30:00', '123456789', 'Follow-up', NULL, TRUE,'1010 Main St, Houston, TX'),
-    ('2023-06-10', 2, '14:00:00', '14:30:00', '234567890', 'Check-up', NULL, FALSE,'1010 Main St, Houston, TX'),
-    ('2023-07-20', 3, '09:00:00', '09:45:00', '345678901', 'Routine Consultation', NULL, FALSE,'1010 Main St, Houston, TX');
+    ('2023-05-15', 1, '10:00:00', '10:30:00', '123456789', 'Follow-up', NULL,1),
+    ('2023-06-10', 2, '14:00:00', '14:30:00', '234567890', 'Check-up', NULL, 2),
+    ('2023-07-20', 3, '09:00:00', '09:45:00', '345678901', 'Routine Consultation', NULL, 3);
 
 -- BILLING DUMMY INFO
 INSERT INTO Billing (P_ID, D_ID, charge_for, total_charge, charge_date, paid_off, paid_total)
